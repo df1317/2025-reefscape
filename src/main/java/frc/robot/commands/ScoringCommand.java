@@ -7,7 +7,7 @@ import frc.robot.subsystems.ScoringSubsystem;
 public class ScoringCommand extends Command {
 
     private ScoringSubsystem m_ScoringSubsystem;
-    private boolean intake;
+    public boolean intake;
     private Timer outtakeTimer;
 
     public ScoringCommand(ScoringSubsystem scoringSub, boolean intake) {
