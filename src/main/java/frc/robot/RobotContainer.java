@@ -18,31 +18,24 @@ import frc.robot.subsystems.ScoringSubsystem;
  */
 public class RobotContainer {
 
-    // The robot's subsystems and commands are defined here...
+  // The robot's subsystems and commands are defined here...
 
-    private final ScoringSubsystem m_ScoringSubsystem = new ScoringSubsystem();
-    private final ControllerActions m_ControllerActions =
-        new ControllerActions();
+  private final ScoringSubsystem m_ScoringSubsystem = new ScoringSubsystem();
+  private final ControllerActions m_ControllerActions = new ControllerActions();
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        // Configure the trigger bindings
-        configureBindings();
-    }
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
+  public RobotContainer() {
+    // Configure the trigger bindings
+    configureBindings();
+  }
 
-    private void configureBindings() {
-        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+  private void configureBindings() {
+    ScoringCommand score = new ScoringCommand(m_ScoringSubsystem, false);
+    m_ControllerActions.scoreButton.onTrue(score);
 
-        // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-        // pressed,
-        // cancelling on release.
-
-        ScoringCommand score = new ScoringCommand(m_ScoringSubsystem, false);
-        m_ControllerActions.scoreButton.onTrue(score);
-
-        ScoringCommand intake = new ScoringCommand(m_ScoringSubsystem, true);
-        m_ControllerActions.intakeButton.onTrue(intake);
-    }
+    ScoringCommand intake = new ScoringCommand(m_ScoringSubsystem, true);
+    m_ControllerActions.intakeButton.onTrue(intake);
+  }
 }
