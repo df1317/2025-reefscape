@@ -4,8 +4,8 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.commands.ScoringCommand;
+import frc.robot.subsystems.ScoringSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -17,31 +17,32 @@ import frc.robot.commands.ScoringCommand;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
 
-  private final ScoringSubsystem m_ScoringSubsystem = new ScoringSubsystem();
-  private final Buttons m_Buttons = new Buttons();
+    // The robot's subsystems and commands are defined here...
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
-  }
+    private final ScoringSubsystem m_ScoringSubsystem = new ScoringSubsystem();
+    private final ControllerActions m_ControllerActions =
+        new ControllerActions();
 
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
+    public RobotContainer() {
+        // Configure the trigger bindings
+        configureBindings();
+    }
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is
-    // pressed,
-    // cancelling on release.
+    private void configureBindings() {
+        // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    ScoringCommand score = new ScoringCommand(m_ScoringSubsystem, false);
-    m_Buttons.scoreButtonL.or(m_Buttons.scoreButtonR).onTrue(score);
+        // Schedule `exampleMethodCommand` when the Xbox controller's B button is
+        // pressed,
+        // cancelling on release.
 
-    ScoringCommand intake = new ScoringCommand(m_ScoringSubsystem, true);
-    m_Buttons.intakeButtonL.or(m_Buttons.intakeButtonR).onTrue(intake);
-  }
+        ScoringCommand score = new ScoringCommand(m_ScoringSubsystem, false);
+        m_ControllerActions.scoreButton.onTrue(score);
 
+        ScoringCommand intake = new ScoringCommand(m_ScoringSubsystem, true);
+        m_ControllerActions.intakeButton.onTrue(intake);
+    }
 }
