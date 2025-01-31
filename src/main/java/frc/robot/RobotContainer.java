@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import frc.robot.commands.ScoringCommand;
 import frc.robot.subsystems.ScoringSubsystem;
 
 /**
@@ -32,10 +31,10 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    ScoringCommand score = new ScoringCommand(m_ScoringSubsystem, false);
-    m_ControllerActions.scoreButton.onTrue(score);
+    // run motors forward for 3 sec
+    m_ControllerActions.scoreButton.onTrue(m_ScoringSubsystem.runIntakeCommand(true).withTimeout(3));
 
-    ScoringCommand intake = new ScoringCommand(m_ScoringSubsystem, true);
-    m_ControllerActions.intakeButton.onTrue(intake);
+    m_ControllerActions.intakeButton
+        .onTrue(m_ScoringSubsystem.runIntakeCommand(false).until(m_ScoringSubsystem.getCoralSensorState));
   }
 }
