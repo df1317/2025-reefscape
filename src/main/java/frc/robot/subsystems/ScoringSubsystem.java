@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Constants.*;
 
 public class ScoringSubsystem extends SubsystemBase {
 
@@ -16,9 +17,9 @@ public class ScoringSubsystem extends SubsystemBase {
     public DigitalInput coralSensor;
 
     public ScoringSubsystem() {
-        motor1 = new SparkMax(24, MotorType.kBrushless);
-        motor2 = new SparkMax(25, MotorType.kBrushless);
-        coralSensor = new DigitalInput(1);
+        motor1 = new SparkMax(scoreMotor1, MotorType.kBrushless);
+        motor2 = new SparkMax(scoreMotor2, MotorType.kBrushless);
+        coralSensor = new DigitalInput(coralSensorPort);
     }
 
     public Command runIntakeCommand(boolean out) {
