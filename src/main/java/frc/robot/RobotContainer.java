@@ -40,6 +40,10 @@ public class RobotContainer {
         .onTrue(m_ScoringSubsystem.runIntakeCommand(false).until(m_ScoringSubsystem.getCoralSensorState));
     m_ControllerActions.manualElevatorButton
         .onTrue(m_ElevatorSubsystem.manualElevatorCommand(m_ControllerActions.manualElevatorInput()));
+    m_ControllerActions.elevator0.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(0));
+    m_ControllerActions.elevator1.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(1));
+    m_ControllerActions.elevator2.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(2));
+    m_ControllerActions.elevator3.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(3));
 
   }
 }
