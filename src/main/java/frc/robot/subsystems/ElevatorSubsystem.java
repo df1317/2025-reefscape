@@ -16,7 +16,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         motor2 = new SparkMax(27, MotorType.kBrushless);
     }
 
-    public Command raiseElevatorCommand(double input) {
+    public Command manualElevatorCommand(double input) {
         return this.startEnd(() -> {
             motor1.set(input);
             motor2.set(input);
