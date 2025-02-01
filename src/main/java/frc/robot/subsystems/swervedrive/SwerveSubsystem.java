@@ -21,7 +21,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -29,7 +28,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -63,11 +61,6 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private final SwerveDrive swerveDrive;
   /**
-   * AprilTag field layout.
-   */
-  private final AprilTagFieldLayout aprilTagFieldLayout =
-    AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-  /**
    * Enable vision odometry updates while driving.
    */
   private final boolean visionDriveTest = false;
@@ -97,6 +90,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+    this.replaceSwerveModuleFeedforward(0.45089, 2.4847, 0.36831);
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(false); //!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true, true, 0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
@@ -393,15 +387,27 @@ public class SwerveSubsystem extends SubsystemBase {
     double distanceInMeters,
     double speedInMetersPerSecond
   ) {
-    return run(() -> drive(new ChassisSpeeds(speedInMetersPerSecond, 0, 0))
-    ).until(
-      () ->
-        swerveDrive
-          .getPose()
-          .getTranslation()
-          .getDistance(new Translation2d(0, 0)) >
-        distanceInMeters
-    );
+    return new Command() {
+      private Translation2d startTranslation;
+
+      @Override
+      public void initialize() {
+        startTranslation = swerveDrive.getPose().getTranslation();
+      }
+
+      @Override
+      public void execute() {
+        driveFieldOriented(new ChassisSpeeds(speedInMetersPerSecond, 0, 0));
+      }
+
+      @Override
+      public boolean isFinished() {
+        return (
+          swerveDrive.getPose().getTranslation().getDistance(startTranslation) >
+          distanceInMeters
+        );
+      }
+    };
   }
 
   /**
