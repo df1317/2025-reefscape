@@ -18,7 +18,14 @@ This is the code for 1317's 2025 Reefscape robot for this years FRC game!
 
 ## Why AGPL 3.0?
 
-This is FIRST; our mission as teams is to learn and the best way to learn is to share info with other teams! <img src="https://cachet.dunkirk.sh/emojis/kitty-gun/r" align="right" /> The AGPL 3.0 license only requires you to make your source code public if you are distributing the software to others (e.g. selling it, or making it available for download as a compiled project). If you are running this code on your robot or forking this repo then you should be completely fine. Just don't ever charge for this software. Ever. (Not sure why you would be charging for frc code though?)
+This is FIRST; our mission as teams is to learn and the best way to learn is to
+share info with other teams!
+<img src="https://cachet.dunkirk.sh/emojis/kitty-gun/r" align="right" /> The
+AGPL 3.0 license only requires you to make your source code public if you are
+distributing the software to others (e.g. selling it, or making it available for
+download as a compiled project). If you are running this code on your robot or
+forking this repo then you should be completely fine. Just don't ever charge for
+this software. Ever. (Not sure why you would be charging for frc code though?)
 
 <p align="center">
 	<img src="https://raw.githubusercontent.com/taciturnaxolotl/carriage/master/.github/images/line-break.svg" />
