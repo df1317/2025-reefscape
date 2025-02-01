@@ -38,7 +38,7 @@ this software. Ever. (Not sure why you would be charging for frc code though?)
 </p>
 
 <p align="center">
-	<i>&copy 2025-present <a href="https://github.com/df1317">Digital Fusion FRC team 1317</a></i>
+	<code>&copy 2025-present <a href="https://github.com/df1317">Digital Fusion FRC team 1317</a></code>
 </p>
 
 <p align="center">
