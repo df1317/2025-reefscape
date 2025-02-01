@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.ScoringSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -21,6 +22,7 @@ public class RobotContainer {
 
   private final ScoringSubsystem m_ScoringSubsystem = new ScoringSubsystem();
   private final ControllerActions m_ControllerActions = new ControllerActions();
+  private final ElevatorSubsystem m_ElevatorSubsystem = new ElevatorSubsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -36,5 +38,8 @@ public class RobotContainer {
 
     m_ControllerActions.intakeButton
         .onTrue(m_ScoringSubsystem.runIntakeCommand(false).until(m_ScoringSubsystem.getCoralSensorState));
+    m_ControllerActions.manualElevatorButton
+        .onTrue(m_ElevatorSubsystem.manualElevatorCommand(m_ControllerActions.manualElevatorInput()));
+
   }
 }

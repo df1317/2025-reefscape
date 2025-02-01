@@ -15,6 +15,7 @@ public class ControllerActions {
             m_JoystickL.button(1).or(m_JoystickR.button(1)));
     public final Trigger intakeButton = new Trigger(
             m_JoystickL.button(3).or(m_JoystickR.button(3)));
+    public final Trigger manualElevatorButton = new Trigger(m_JoystickR.button(2));
 
     public double manualElevatorInput() {
         double pos = m_JoystickR.getRawAxis(0);
