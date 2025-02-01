@@ -22,7 +22,7 @@ public class ControllerActions {
     public final Trigger elevator3 = new Trigger(m_JoystickL.button(6).or(m_JoystickR.button(6)));
 
     public double manualElevatorInput() {
-        double pos = m_JoystickR.getRawAxis(0);
+        double pos = -m_JoystickR.getRawAxis(0);
         if (Math.abs(pos) < elevatorDeadzone) {
             return 0;
         } else {

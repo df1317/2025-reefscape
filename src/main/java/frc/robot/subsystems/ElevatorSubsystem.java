@@ -3,7 +3,10 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,7 +18,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     private DutyCycleEncoder encoderL = new DutyCycleEncoder(2);
     private DutyCycleEncoder encoderR = new DutyCycleEncoder(3);
     private double kp = 0.1, ki = 0, kd = 0;
-    private PIDController elevatorPID = new PIDController(kp, ki, kd);
+    private double maxV = 1, maxA = 1;
+    private ProfiledPIDController elevatorPID = new ProfiledPIDController(kp, ki, kd, new Constraints(maxV, maxA));
+    private final static double upSpeed = 0.5;
+    private final static double downSpeed = 0.1;
+    private double ks = 0, kg = 0, kv = 0, ka = 0;
+    private ElevatorFeedforward elevatorFF = new ElevatorFeedforward(ks, kg, kv);
 
     public ElevatorSubsystem() {
         motorL = new SparkMax(26, MotorType.kBrushless);
@@ -40,8 +48,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command manualElevatorCommand(double input) {
         return this.startEnd(() -> {
-            motorL.set(input);
-            motorR.set(input);
+
+            if (input > 0) {
+                motorL.set(upSpeed * input);
+                motorR.set(upSpeed * input);
+            } else {
+                motorL.set(downSpeed * input);
+                motorR.set(downSpeed * input);
+            }
         }, () -> {
             motorL.set(0);
             motorR.set(0);
@@ -50,13 +64,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command setPointElevatorCommand(int height) {
-        return this.runEnd(() -> {
-            elevatorPID.setSetpoint(getDesiredPosistion(height));
-            motorL.set(elevatorPID.calculate(encoderL.get()));
-            motorR.set(elevatorPID.calculate(encoderR.get()));
-        }, () -> {
-            motorL.set(0);
-            motorR.set(0);
+        return this.runOnce(() -> {
+            elevatorPID.setGoal(getDesiredPosistion(height));
         });
+    }
+
+    public Command runElevator() {
+        return run(
+                () -> {
+                    motorL.set(elevatorFF.calculate(elevatorPID.calculate(encoderL.get())));
+                    motorR.set(elevatorFF.calculate(elevatorPID.calculate(encoderR.get())));
+                });
     }
 }
