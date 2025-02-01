@@ -18,7 +18,7 @@ This is the code for 1317's 2025 robot for this years Reefscape FRC game!
 
 <p align="center">
     <a href="https://www.youtube.com/watch?v=YWbxcjlY9JY">
-        <img src="https://img.youtube.com/vi/YWbxcjlY9JY/0.jpg" alt="reefscape game animation cover image"/>
+        <img src="https://cloud-hvvo27j27-hack-club-bot.vercel.app/0image.png" alt="reefscape game animation cover image"/>
     </a>
 </p>
 
