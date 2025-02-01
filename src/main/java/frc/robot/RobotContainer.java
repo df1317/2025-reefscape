@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -172,12 +172,23 @@ public class RobotContainer {
         .runIntakeCommand(false)
         .until(m_ScoringSubsystem.getCoralSensorState)
     );
-    m_ControllerActions.manualElevatorButton
-        .onTrue(m_ElevatorSubsystem.manualElevatorCommand(m_ControllerActions.manualElevatorInput()));
-    m_ControllerActions.elevator0.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(0));
-    m_ControllerActions.elevator1.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(1));
-    m_ControllerActions.elevator2.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(2));
-    m_ControllerActions.elevator3.onTrue(m_ElevatorSubsystem.setPointElevatorCommand(3));
+    m_ControllerActions.manualElevatorButton.onTrue(
+      m_ElevatorSubsystem.manualElevatorCommand(
+        m_ControllerActions.manualElevatorInput()
+      )
+    );
+    m_ControllerActions.elevator0.onTrue(
+      m_ElevatorSubsystem.setPointElevatorCommand(0)
+    );
+    m_ControllerActions.elevator1.onTrue(
+      m_ElevatorSubsystem.setPointElevatorCommand(1)
+    );
+    m_ControllerActions.elevator2.onTrue(
+      m_ElevatorSubsystem.setPointElevatorCommand(2)
+    );
+    m_ControllerActions.elevator3.onTrue(
+      m_ElevatorSubsystem.setPointElevatorCommand(3)
+    );
   }
 
   /**
