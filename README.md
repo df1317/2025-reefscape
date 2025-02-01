@@ -18,7 +18,7 @@ This is the code for 1317's 2025 robot for this years Reefscape FRC game!
 
 <p align="center">
     <a href="https://www.youtube.com/watch?v=YWbxcjlY9JY">
-        <img src="https://raw.githubusercontent.com/df1317/2025-reefscape/master/.github/images/reefscape.webp" alt="reefscape game animation cover image"/>
+        <img src="https://raw.githubusercontent.com/df1317/2025-reefscape/main/.github/images/reefscape.webp" alt="reefscape game animation cover image"/>
     </a>
 </p>
 
@@ -42,5 +42,5 @@ this software. Ever. (Not sure why you would be charging for frc code though?)
 </p>
 
 <p align="center">
-	<a href="https://github.com/df1317/2025-reefscape/blob/master/LICENSE.md"><img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=AGPL 3.0&logoColor=d9e0ee&colorA=363a4f&colorB=b7bdf8"/></a>
+	<a href="https://github.com/df1317/2025-reefscape/blob/main/LICENSE.md"><img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=AGPL 3.0&logoColor=d9e0ee&colorA=363a4f&colorB=b7bdf8"/></a>
 </p>
