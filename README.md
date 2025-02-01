@@ -5,7 +5,7 @@
 </h3>
 
 <p align="center">
-    <i>It wasn't the water game we hoped for but its the water game we deserved.</i>
+    <i>It wasn't the water game we hoped for but its the water game we got.</i>
 </p>
 
 <p align="center">
