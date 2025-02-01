@@ -14,7 +14,13 @@
 
 ## What's this?
 
-This is the code for 1317's 2025 Reefscape robot for this years FRC game!
+This is the code for 1317's 2025 robot for this years Reefscape FRC game!
+
+<p align="center">
+    <a href="https://www.youtube.com/watch?v=YWbxcjlY9JY">
+        <img src="https://img.youtube.com/vi/YWbxcjlY9JY/0.jpg" alt="reefscape game animation cover image"/>
+    </a>
+</p>
 
 ## Why AGPL 3.0?
 
