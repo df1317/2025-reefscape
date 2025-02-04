@@ -34,7 +34,7 @@ forking this repo then you should be completely fine. Just don't ever charge for
 this software. Ever. (Not sure why you would be charging for frc code though?)
 
 <p align="center">
-	<img src="https://raw.githubusercontent.com/df1317/2025-reefscape/refs/heads/main/.github/images/reefscape.webp" />
+	<img src="https://raw.githubusercontent.com/taciturnaxolotl/carriage/master/.github/images/line-break.svg" />
 </p>
 
 <p align="center">
