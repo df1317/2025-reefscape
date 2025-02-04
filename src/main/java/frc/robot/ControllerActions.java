@@ -6,8 +6,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ControllerActions {
 
-    public final CommandXboxController m_XboxController =
-        new CommandXboxController(0);
+    public CommandXboxController m_XboxController;
     public final CommandJoystick m_JoystickL = new CommandJoystick(1);
     public final CommandJoystick m_JoystickR = new CommandJoystick(2);
 
@@ -17,4 +16,8 @@ public class ControllerActions {
     public final Trigger intakeButton = new Trigger(
         m_JoystickL.button(3).or(m_JoystickR.button(3))
     );
+
+    public ControllerActions(CommandXboxController driverXbox) {
+        this.m_XboxController = driverXbox;
+    }
 }
