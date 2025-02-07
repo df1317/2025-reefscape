@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -8,6 +10,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -15,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -25,6 +29,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final double EncoderL2 = 0.0;
     private final double EncoderL3 = 0.0;
     private final double EncoderL4 = 0.0;
+    private final double maxHeight = 2;
     private long t = System.nanoTime();
     private long pt = System.nanoTime();
 
@@ -53,10 +58,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double ks = 0, kg = 0, kv = 0, ka = 0;
     private ElevatorFeedforward elevatorFF = new ElevatorFeedforward(ks, kg, kv);
 
+    private double currentMaxVel = maxV;
     private TrapezoidProfile.Constraints ffc = new TrapezoidProfile.Constraints(maxV, maxA);
     private TrapezoidProfile.State ffState = new TrapezoidProfile.State();
     private TrapezoidProfile.State preRenfernce = new TrapezoidProfile.State();
-    private TrapezoidProfile profiler = new TrapezoidProfile(ffc);
+    private TrapezoidProfile Profiler = new TrapezoidProfile(ffc);
     private ElevatorFeedforward ff = new ElevatorFeedforward(ks, kg, kv);
 
     public ElevatorSubsystem() {
@@ -94,9 +100,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         double ffValue = 0.0;
         // TODO: change limits
         boolean running = false;
-
-        preRenfernce = profiler.calculate(pt, preRenfernce, ffState);
-        ffValue = ff.calculate(preRenfernce.velocity);
+        preRenfernce.velocity = MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel);
+        preRenfernce = Profiler.calculate(pt, preRenfernce, ffState);
+        ffValue = ff.calculate(MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel));
 
         switch (checkLimtis()) {
             case NONE:
@@ -133,6 +139,33 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
         pt = t;
 
+    }
+
+    public Command setPos(DoubleSupplier height) {
+        return Commands.runOnce(() -> {
+            currentMaxVel = maxV;
+            ffState.position = height.getAsDouble();
+            ffState.velocity = 0.0;
+        });
+
+    }
+
+    public Command setSpeed(DoubleSupplier velo) {
+        return Commands.run(() -> {
+            double tol = 0.1;
+            currentMaxVel = MathUtil.clamp(velo.getAsDouble(), -maxV, maxV);
+            if (velo.getAsDouble() > tol) {
+                ffState.position = maxHeight;
+                ffState.velocity = 0.0;
+            } else if (velo.getAsDouble() < tol) {
+                ffState.position = 0.0;
+                ffState.velocity = 0.0;
+            } else {
+                ffState.position = preRenfernce.position;
+                ffState.velocity = 0.0;
+            }
+
+        });
     }
 
     private double getDesiredPosistion(int height) {
