@@ -1,7 +1,9 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -12,15 +14,25 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -32,6 +44,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final double maxHeight = 2;
     private long t = System.nanoTime();
     private long pt = System.nanoTime();
+    private RelativeEncoder encoder;
 
     private enum LimitSwitchTrigger {
         TOP,
@@ -51,12 +64,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     // private DutyCycleEncoder encoderR = new DutyCycleEncoder(3);
     private double kp = 0.1, ki = 0, kd = 0;
     private double maxV = 1, maxA = 1;
-    private double krot = 0.0;
-    private ProfiledPIDController elevatorPID = new ProfiledPIDController(kp, ki, kd, new Constraints(maxV, maxA));
+    private double krot = 0.0; // rotations/meter
+    // private ProfiledPIDController elevatorPID = new ProfiledPIDController(kp, ki,
+    // kd, new Constraints(maxV, maxA));
     private final static double upSpeed = 0.5;
     private final static double downSpeed = 0.1;
     private double ks = 0, kg = 0, kv = 0, ka = 0;
-    private ElevatorFeedforward elevatorFF = new ElevatorFeedforward(ks, kg, kv);
+    // private ElevatorFeedforward elevatorFF = new ElevatorFeedforward(ks, kg, kv);
 
     private double currentMaxVel = maxV;
     private TrapezoidProfile.Constraints ffc = new TrapezoidProfile.Constraints(maxV, maxA);
@@ -64,6 +78,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     private TrapezoidProfile.State preRenfernce = new TrapezoidProfile.State();
     private TrapezoidProfile Profiler = new TrapezoidProfile(ffc);
     private ElevatorFeedforward ff = new ElevatorFeedforward(ks, kg, kv);
+
+    // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+    private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+    // Mutable holder for unit-safe linear distance values, persisted to avoid
+    // reallocation.
+    private final MutDistance m_distance = Meters.mutable(0);
+    // Mutable holder for unit-safe linear velocity values, persisted to avoid
+    // reallocation.
+    private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
 
     public ElevatorSubsystem() {
         motorL = new SparkMax(26, MotorType.kBrushless);
@@ -79,6 +102,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         controllerL = motorL.getClosedLoopController();
         controllerR = motorR.getClosedLoopController();
+
+        encoder = motorL.getEncoder();
     }
 
     public void setDesiredPosistion(double height, double time) {
@@ -202,8 +227,77 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command setPointElevatorCommand(int height) {
-        return this.runOnce(() -> new PrintCommand("pls put osmtu=hing here later"));
+        return this.runOnce(() -> new PrintCommand("pls put somthing here later"));
     }
+
+    public Command sysIDCommand(double quasiTimeout, double timeout, double dynamicTimeout) {
+        return m_sysIdRoutine.quasistatic(Direction.kForward)
+                .withTimeout(quasiTimeout).onlyWhile(() -> {
+                    return (checkLimtis() != LimitSwitchTrigger.TOP);
+                })
+                .andThen(Commands.waitSeconds(timeout))
+                .andThen(m_sysIdRoutine
+                        .quasistatic(Direction.kReverse).onlyWhile(() -> {
+                            return (checkLimtis() != LimitSwitchTrigger.BOTTOM);
+                        }))
+                .withTimeout(quasiTimeout)
+                .andThen(Commands.waitSeconds(timeout))
+                .andThen(m_sysIdRoutine.dynamic(Direction.kForward)
+                        .withTimeout(dynamicTimeout).onlyWhile(() -> {
+                            return (checkLimtis() != LimitSwitchTrigger.TOP);
+                        }))
+                .andThen(Commands.waitSeconds(timeout))
+                .andThen(m_sysIdRoutine.dynamic(Direction.kReverse)
+                        .withTimeout(dynamicTimeout).onlyWhile(() -> {
+                            return (checkLimtis() != LimitSwitchTrigger.BOTTOM);
+                        }));
+
+    }
+
+    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+
+            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+            new SysIdRoutine.Config(null, null, null, null),
+            new SysIdRoutine.Mechanism(
+                    // Tell SysId how to plumb the driving voltage to the motors.
+                    voltage -> {
+                        // if (checkLimtis() == LimitSwitchTrigger.TOP
+                        // && Voltage.ofBaseUnits(0, Volts).compareTo(voltage) < 0) {
+                        // motorL.setVoltage(voltage);
+                        // motorR.setVoltage(voltage);
+                        // }
+                        // if (checkLimtis() == LimitSwitchTrigger.BOTTOM
+                        // && Voltage.ofBaseUnits(0, Volts).compareTo(voltage) > 0) {
+                        // motorL.setVoltage(voltage);
+                        // motorR.setVoltage(voltage);
+                        // }
+                        // if (checkLimtis() == LimitSwitchTrigger.NONE) {
+                        // motorL.setVoltage(voltage);
+                        // motorR.setVoltage(voltage);
+                        // }
+
+                        motorL.setVoltage(voltage);
+                        motorR.setVoltage(voltage);
+
+                    },
+                    // Tell SysId how to record a frame of data for each motor on the mechanism
+                    // being
+                    // characterized.
+                    log -> {
+                        // Record a frame for the left motors. Since these share an encoder, we consider
+                        // the entire group to be one motor.
+                        log.motor("elevator")
+                                .voltage(
+                                        m_appliedVoltage.mut_replace(
+                                                motorL.get() * motorL.getBusVoltage(), Volts))
+                                .linearPosition(m_distance.mut_replace(encoder.getPosition() / krot, Meters))
+                                .linearVelocity(
+                                        m_velocity.mut_replace(encoder.getVelocity() / 60.0 / krot, MetersPerSecond));
+                    },
+                    // Tell SysId to make generated commands require this subsystem, suffix test
+                    // state in
+                    // WPILog with this subsystem's name ("drive")
+                    this));
 
     // public Command runElevator() {
     // return run(
