@@ -36,12 +36,13 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-    private final double EncoderL0 = 0.0;
-    private final double EncoderL1 = 0.0;
-    private final double EncoderL2 = 0.0;
-    private final double EncoderL3 = 0.0;
-    private final double EncoderL4 = 0.0;
-    private final double maxHeight = 2;
+    private final double EncoderL0 = 1.1;
+    private final double EncoderL1 = 2.2;
+    private final double EncoderL2 = 3.3;
+    private final double EncoderL3 = 4.4;
+    private final double EncoderL4 = 5.5;
+    private final double maxHeight = 2.0;
+    private final double minHeight = -2.0;
     private long t = System.nanoTime();
     private long pt = System.nanoTime();
     private RelativeEncoder encoder;
@@ -179,12 +180,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         return Commands.run(() -> {
             double tol = 0.1;
             currentMaxVel = MathUtil.clamp(velo.getAsDouble(), -maxV, maxV);
-            if (velo.getAsDouble() > tol) {
-                ffState.position = maxHeight;
-                ffState.velocity = 0.0;
-            } else if (velo.getAsDouble() < tol) {
-                ffState.position = 0.0;
-                ffState.velocity = 0.0;
+            if (Math.abs(velo.getAsDouble()) > tol) {
+                if (velo.getAsDouble() > 0) {
+                    ffState.position = maxHeight;
+                    ffState.velocity = 0.0;
+                } else {
+                    ffState.position = minHeight;
+                    ffState.velocity = 0.0;
+                }
             } else {
                 ffState.position = preRenfernce.position;
                 ffState.velocity = 0.0;
