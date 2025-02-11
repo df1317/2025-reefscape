@@ -119,7 +119,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private void motorBreak() {
-        System.out.println("sorry you need to motor break!");
+        ffState.position = preRenfernce.position;
+        ffState.velocity = 0.0;
+
+        motorL.stopMotor();
+        motorR.stopMotor();
     }
 
     public void runControlLoop() {
@@ -145,6 +149,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 this.motorBreak();
                 if (preRenfernce.velocity < 0) {
                     running = true;
+
                 }
                 break;
             case TEST:
