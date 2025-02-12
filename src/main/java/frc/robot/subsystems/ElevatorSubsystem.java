@@ -35,10 +35,9 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final double EncoderL2 = 3.3;
   private final double EncoderL3 = 4.4;
   private final double EncoderL4 = 5.5;
-  private final double maxHeight = 2.0;
-  private final double minHeight = -2.0;
+  private final double maxHeight = 3.0;
+  private final double minHeight = 0;
   private long t = System.nanoTime();
-  private long pt = System.nanoTime();
   private RelativeEncoder encoder;
 
   private enum LimitSwitchTrigger {
@@ -58,12 +57,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   // private DutyCycleEncoder encoderR = new DutyCycleEncoder(3);
   private double kp = 0.1, ki = 0, kd = 0;
   private double maxV = 1, maxA = 1;
-  private double krot = 12.0; // rotations/meter
+  private double krot = 144.0; // rotations/meter
   // private ProfiledPIDController elevatorPID = new ProfiledPIDController(kp, ki,
   // kd, new Constraints(maxV, maxA));
   private static final double upSpeed = 0.5;
   private static final double downSpeed = 0.1;
-  private double ks = 0, kg = 0, kv = 0, ka = 0;
+  private double ks = 0, kg = 0, kv = 0.01, ka = 0;
   // private ElevatorFeedforward elevatorFF = new ElevatorFeedforward(ks, kg, kv);
 
   private double currentMaxVel = maxV;
@@ -140,7 +139,12 @@ public class ElevatorSubsystem extends SubsystemBase {
       -currentMaxVel,
       currentMaxVel
     );
-    preRenfernce = Profiler.calculate(pt, preRenfernce, ffState);
+    preRenfernce = Profiler.calculate(
+      (System.nanoTime() - t) / 1e9,
+      preRenfernce,
+      ffState
+    );
+    t = System.nanoTime();
     ffValue = ff.calculate(
       MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel)
     );
@@ -183,7 +187,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         ffValue
       );
     }
-    pt = t;
 
     SmartDashboard.putNumber(
       "elevator/current-position",
@@ -194,6 +197,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       preRenfernce.velocity
     );
     SmartDashboard.putNumber("elevator/end-position", ffState.position);
+    SmartDashboard.putNumber("elevator/currentMaxVal", currentMaxVel);
   }
 
   public Command setPos(DoubleSupplier height) {
@@ -221,8 +225,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         ffState.position = preRenfernce.position;
         ffState.velocity = 0.0;
       }
-
-      SmartDashboard.putNumber("elevator/velocity-setpoint", currentMaxVel);
     });
   }
 
