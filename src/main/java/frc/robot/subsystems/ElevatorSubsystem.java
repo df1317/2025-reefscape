@@ -7,6 +7,8 @@ import static edu.wpi.first.units.Units.Volts;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -91,9 +93,18 @@ public class ElevatorSubsystem extends SubsystemBase {
       .p(kp, ClosedLoopSlot.kSlot0)
       .i(ki, ClosedLoopSlot.kSlot0)
       .d(kd, ClosedLoopSlot.kSlot0);
+    config.smartCurrentLimit(25);
 
-    motorL.configure(config, null, null);
-    motorR.configure(config.inverted(true), null, null);
+    motorL.configure(
+      config,
+      ResetMode.kResetSafeParameters,
+      PersistMode.kNoPersistParameters
+    );
+    motorR.configure(
+      config.inverted(true),
+      ResetMode.kResetSafeParameters,
+      PersistMode.kNoPersistParameters
+    );
 
     controllerL = motorL.getClosedLoopController();
     controllerR = motorR.getClosedLoopController();
@@ -187,6 +198,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public Command setPos(DoubleSupplier height) {
     return Commands.runOnce(() -> {
+      System.out.println("setPos called");
       currentMaxVel = maxV;
       ffState.position = height.getAsDouble();
       ffState.velocity = 0.0;
