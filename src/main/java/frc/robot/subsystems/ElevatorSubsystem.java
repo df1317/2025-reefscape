@@ -27,6 +27,7 @@ import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -65,7 +66,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     // private DutyCycleEncoder encoderR = new DutyCycleEncoder(3);
     private double kp = 0.1, ki = 0, kd = 0;
     private double maxV = 1, maxA = 1;
-    private double krot = 0.0; // rotations/meter
+    private double krot = 12.0; // rotations/meter
     // private ProfiledPIDController elevatorPID = new ProfiledPIDController(kp, ki,
     // kd, new Constraints(maxV, maxA));
     private final static double upSpeed = 0.5;
@@ -97,9 +98,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .p(kp, ClosedLoopSlot.kSlot0)
                 .i(ki, ClosedLoopSlot.kSlot0)
                 .d(kd, ClosedLoopSlot.kSlot0);
-
+        
         motorL.configure(config, null, null);
-        motorR.configure(config, null, null);
+        motorR.configure(config.inverted(true), null, null);
 
         controllerL = motorL.getClosedLoopController();
         controllerR = motorR.getClosedLoopController();
@@ -113,9 +114,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private LimitSwitchTrigger checkLimtis() {
-        System.out.println("sorry you need limit switches!");
-        return LimitSwitchTrigger.TEST;
-
+        // System.out.println("sorry you need limit switches!");
+        return LimitSwitchTrigger.NONE;
     }
 
     private void motorBreak() {
@@ -126,7 +126,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         motorR.stopMotor();
     }
 
-    public void runControlLoop() {
+    @Override
+    public void periodic() {
         double ffValue = 0.0;
         // TODO: change limits
         boolean running = false;
@@ -169,7 +170,10 @@ public class ElevatorSubsystem extends SubsystemBase {
                     ffValue);
         }
         pt = t;
-
+        
+        SmartDashboard.putNumber("elevator/current-position", preRenfernce.position);
+        SmartDashboard.putNumber("elevator/current-velocity", preRenfernce.velocity);
+        SmartDashboard.putNumber("elevator/end-position", ffState.position);
     }
 
     public Command setPos(DoubleSupplier height) {
@@ -198,6 +202,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 ffState.velocity = 0.0;
             }
 
+            SmartDashboard.putNumber("elevator/velocity-setpoint", currentMaxVel);
         });
     }
 

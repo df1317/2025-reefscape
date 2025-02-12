@@ -12,8 +12,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -28,11 +30,13 @@ import swervelib.SwerveInputStream;
  */
 public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final CommandXboxController driverXbox = new CommandXboxController(0);
-  private final ControllerActions m_ControllerActions = new ControllerActions(driverXbox);
+  private final CommandXboxController driverXbox = new CommandXboxController(0);
+  private final CommandJoystick m_JoystickL = new CommandJoystick(1);
+  private final CommandJoystick m_JoystickR = new CommandJoystick(2);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
+  private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -117,7 +121,12 @@ public class RobotContainer {
       // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("test Mode: Reset Gyro")));
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-
+      
+      m_JoystickL.trigger().onTrue(elevatorSubsystem.setSpeed(m_JoystickL::getY)).onFalse(elevatorSubsystem.setSpeed(() -> 0));
+      m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0));
+      m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.5));
+      m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 1));
+      m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 2));
     } else {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
@@ -130,7 +139,6 @@ public class RobotContainer {
       driverXbox.rightBumper().onTrue(Commands.none());
       driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("Other Mode: Reset Gyro")));
     }
-
   }
 
   /**
