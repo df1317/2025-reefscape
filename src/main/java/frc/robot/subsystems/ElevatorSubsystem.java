@@ -225,6 +225,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         ffState.position = preRenfernce.position;
         ffState.velocity = 0.0;
       }
+    }).finallyDo(() -> {
+      ffState.position = preRenfernce.position;
+      ffState.velocity = 0.0;
     });
   }
 
