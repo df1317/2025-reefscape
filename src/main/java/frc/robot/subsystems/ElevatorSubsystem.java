@@ -202,7 +202,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public Command setPos(DoubleSupplier height) {
     return Commands.runOnce(() -> {
-      System.out.println("setPos called");
       currentMaxVel = maxV;
       ffState.position = height.getAsDouble();
       ffState.velocity = 0.0;
