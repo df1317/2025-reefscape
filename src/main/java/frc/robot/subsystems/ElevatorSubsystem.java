@@ -19,10 +19,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -30,11 +30,6 @@ import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-  private final double EncoderL0 = 1.1;
-  private final double EncoderL1 = 2.2;
-  private final double EncoderL2 = 3.3;
-  private final double EncoderL3 = 4.4;
-  private final double EncoderL4 = 5.5;
   private final double maxHeight = 3.0;
   private final double minHeight = 0;
   private long t = System.nanoTime();
@@ -47,23 +42,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     TEST,
   }
 
-  private LimitSwitchTrigger state = LimitSwitchTrigger.TEST;
   private SparkMax motorL;
   private SparkMax motorR;
   private SparkClosedLoopController controllerL;
   private SparkClosedLoopController controllerR;
   private SparkMaxConfig config = new SparkMaxConfig();
-  // private DutyCycleEncoder encoderL = new DutyCycleEncoder(2);
-  // private DutyCycleEncoder encoderR = new DutyCycleEncoder(3);
   private double kp = 0.1, ki = 0, kd = 0;
   private double maxV = 1, maxA = 1;
   private double krot = 144.0; // rotations/meter
-  // private ProfiledPIDController elevatorPID = new ProfiledPIDController(kp, ki,
-  // kd, new Constraints(maxV, maxA));
   private static final double upSpeed = 0.5;
   private static final double downSpeed = 0.1;
-  private double ks = 0, kg = 0, kv = 0.01, ka = 0;
-  // private ElevatorFeedforward elevatorFF = new ElevatorFeedforward(ks, kg, kv);
+  private double ks = 0, kg = 0, kv = 0.01;
 
   private double currentMaxVel = maxV;
   private TrapezoidProfile.Constraints ffc = new TrapezoidProfile.Constraints(
@@ -77,11 +66,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
-  // Mutable holder for unit-safe linear distance values, persisted to avoid
-  // reallocation.
   private final MutDistance m_distance = Meters.mutable(0);
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid
-  // reallocation.
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
 
   public ElevatorSubsystem() {
@@ -116,8 +101,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     ffState.velocity = 0.0;
   }
 
-  private LimitSwitchTrigger checkLimtis() {
-    // System.out.println("sorry you need limit switches!");
+  private LimitSwitchTrigger checkLimits() {
     return LimitSwitchTrigger.NONE;
   }
 
@@ -132,7 +116,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     double ffValue = 0.0;
-    // TODO: change limits
     boolean running = false;
     preRenfernce.velocity = MathUtil.clamp(
       preRenfernce.velocity,
@@ -149,7 +132,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel)
     );
 
-    switch (checkLimtis()) {
+    switch (checkLimits()) {
       case NONE:
         running = true;
 
@@ -230,21 +213,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     });
   }
 
-  private double getDesiredPosistion(int height) {
-    switch (height) {
-      case 0:
-        return 0;
-      case 1:
-        return 0;
-      case 2:
-        return 0;
-      case 3:
-        return 0;
-      default:
-        return 0;
-    }
-  }
-
   public Command manualElevatorCommand(double input) {
     return this.startEnd(
         () -> {
@@ -263,10 +231,6 @@ public class ElevatorSubsystem extends SubsystemBase {
       );
   }
 
-  public Command setPointElevatorCommand(int height) {
-    return this.runOnce(() -> new PrintCommand("pls put somthing here later"));
-  }
-
   public Command sysIDCommand(
     double quasiTimeout,
     double timeout,
@@ -276,14 +240,14 @@ public class ElevatorSubsystem extends SubsystemBase {
       .quasistatic(Direction.kForward)
       .withTimeout(quasiTimeout)
       .onlyWhile(() -> {
-        return (checkLimtis() != LimitSwitchTrigger.TOP);
+        return (checkLimits() != LimitSwitchTrigger.TOP);
       })
       .andThen(Commands.waitSeconds(timeout))
       .andThen(
         m_sysIdRoutine
           .quasistatic(Direction.kReverse)
           .onlyWhile(() -> {
-            return (checkLimtis() != LimitSwitchTrigger.BOTTOM);
+            return (checkLimits() != LimitSwitchTrigger.BOTTOM);
           })
       )
       .withTimeout(quasiTimeout)
@@ -293,7 +257,7 @@ public class ElevatorSubsystem extends SubsystemBase {
           .dynamic(Direction.kForward)
           .withTimeout(dynamicTimeout)
           .onlyWhile(() -> {
-            return (checkLimtis() != LimitSwitchTrigger.TOP);
+            return (checkLimits() != LimitSwitchTrigger.TOP);
           })
       )
       .andThen(Commands.waitSeconds(timeout))
@@ -302,7 +266,7 @@ public class ElevatorSubsystem extends SubsystemBase {
           .dynamic(Direction.kReverse)
           .withTimeout(dynamicTimeout)
           .onlyWhile(() -> {
-            return (checkLimtis() != LimitSwitchTrigger.BOTTOM);
+            return (checkLimits() != LimitSwitchTrigger.BOTTOM);
           })
       );
   }
@@ -313,20 +277,24 @@ public class ElevatorSubsystem extends SubsystemBase {
     new SysIdRoutine.Mechanism(
       // Tell SysId how to plumb the driving voltage to the motors.
       voltage -> {
-        // if (checkLimtis() == LimitSwitchTrigger.TOP
-        // && Voltage.ofBaseUnits(0, Volts).compareTo(voltage) < 0) {
-        // motorL.setVoltage(voltage);
-        // motorR.setVoltage(voltage);
-        // }
-        // if (checkLimtis() == LimitSwitchTrigger.BOTTOM
-        // && Voltage.ofBaseUnits(0, Volts).compareTo(voltage) > 0) {
-        // motorL.setVoltage(voltage);
-        // motorR.setVoltage(voltage);
-        // }
-        // if (checkLimtis() == LimitSwitchTrigger.NONE) {
-        // motorL.setVoltage(voltage);
-        // motorR.setVoltage(voltage);
-        // }
+        if (
+          checkLimits() == LimitSwitchTrigger.TOP &&
+          Voltage.ofBaseUnits(0, Volts).compareTo(voltage) < 0
+        ) {
+          motorL.setVoltage(voltage);
+          motorR.setVoltage(voltage);
+        }
+        if (
+          checkLimits() == LimitSwitchTrigger.BOTTOM &&
+          Voltage.ofBaseUnits(0, Volts).compareTo(voltage) > 0
+        ) {
+          motorL.setVoltage(voltage);
+          motorR.setVoltage(voltage);
+        }
+        if (checkLimits() == LimitSwitchTrigger.NONE) {
+          motorL.setVoltage(voltage);
+          motorR.setVoltage(voltage);
+        }
 
         motorL.setVoltage(voltage);
         motorR.setVoltage(voltage);
@@ -361,11 +329,4 @@ public class ElevatorSubsystem extends SubsystemBase {
       this
     )
   );
-  // public Command runElevator() {
-  // return run(
-  // () -> {
-  // motorL.set(elevatorFF.calculate(elevatorPID.calculate(encoderL.get())));
-  // motorR.set(elevatorFF.calculate(elevatorPID.calculate(encoderR.get())));
-  // });
-  // }
 }
