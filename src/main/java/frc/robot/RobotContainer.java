@@ -137,6 +137,7 @@ public class RobotContainer {
       m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.5));
       m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 1));
       m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 2));
+      m_JoystickL.button(2).onTrue(elevatorSubsystem.sysIDCommand(3, 3, 1));
     } else {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));

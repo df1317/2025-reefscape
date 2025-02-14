@@ -20,6 +20,7 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,6 +35,9 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final double minHeight = 0;
   private long t = System.nanoTime();
   private RelativeEncoder encoder;
+
+  public DigitalInput limitSwitchTop = new DigitalInput(8);
+  public DigitalInput limitSwitchBottom = new DigitalInput(9);
 
   private enum LimitSwitchTrigger {
     TOP,
@@ -102,7 +106,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   private LimitSwitchTrigger checkLimits() {
-    return LimitSwitchTrigger.NONE;
+    if (limitSwitchTop.get()) {
+      return LimitSwitchTrigger.TOP;
+    } else if (limitSwitchBottom.get()) {
+      return LimitSwitchTrigger.BOTTOM;
+    } else {
+      return LimitSwitchTrigger.NONE;
+    }
   }
 
   private void motorBreak() {
@@ -181,6 +191,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     );
     SmartDashboard.putNumber("elevator/end-position", ffState.position);
     SmartDashboard.putNumber("elevator/currentMaxVal", currentMaxVel);
+    SmartDashboard.putBoolean("elevator/topLimitSwitch", limitSwitchTop.get());
+    SmartDashboard.putBoolean(
+      "elevator/bottomLimitSwitch",
+      limitSwitchBottom.get()
+    );
   }
 
   public Command setPos(DoubleSupplier height) {
