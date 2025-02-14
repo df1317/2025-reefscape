@@ -31,7 +31,7 @@ import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-  private final double maxHeight = 3.0;
+  private final double maxHeight = 1.1;
   private final double minHeight = 0;
   private long t = System.nanoTime();
   private RelativeEncoder encoderL;
@@ -54,7 +54,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private SparkMaxConfig config = new SparkMaxConfig();
   private double kp = 0.1, ki = 0, kd = 0;
   private double maxV = 1, maxA = 1;
-  private double krot = 144.0; // rotations/meter
+  private double krot = 42.4; // rotations/meter
   private static final double upSpeed = 0.5;
   private static final double downSpeed = 0.1;
   private double ks = 0, kg = 0, kv = 0.01;
@@ -85,12 +85,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     config.smartCurrentLimit(25);
 
     motorL.configure(
-      config,
+      config.inverted(true),
       ResetMode.kResetSafeParameters,
       PersistMode.kNoPersistParameters
     );
     motorR.configure(
-      config.inverted(true),
+      config,
       ResetMode.kResetSafeParameters,
       PersistMode.kNoPersistParameters
     );
