@@ -145,18 +145,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     switch (checkLimits()) {
       case NONE:
         running = true;
-
         break;
       case BOTTOM:
-        this.motorBreak();
         if (preRenfernce.velocity > 0) {
           running = true;
+        } else {
+          this.motorBreak();
         }
         break;
       case TOP:
-        this.motorBreak();
         if (preRenfernce.velocity < 0) {
           running = true;
+        } else {
+          this.motorBreak();
         }
         break;
       case TEST:
