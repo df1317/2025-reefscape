@@ -34,7 +34,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final double maxHeight = 3.0;
   private final double minHeight = 0;
   private long t = System.nanoTime();
-  private RelativeEncoder encoder;
+  private RelativeEncoder encoderL;
+  private RelativeEncoder encoderR;
 
   public DigitalInput limitSwitchTop = new DigitalInput(8);
   public DigitalInput limitSwitchBottom = new DigitalInput(9);
@@ -97,7 +98,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     controllerL = motorL.getClosedLoopController();
     controllerR = motorR.getClosedLoopController();
 
-    encoder = motorL.getEncoder();
+    encoderL = motorL.getEncoder();
+    encoderR = motorR.getEncoder();
   }
 
   public void setDesiredPosistion(double height, double time) {
@@ -197,6 +199,8 @@ public class ElevatorSubsystem extends SubsystemBase {
       "elevator/bottomLimitSwitch",
       limitSwitchBottom.get()
     );
+    SmartDashboard.putNumber("elevator/encoderL", encoderL.getPosition());
+    SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
   }
 
   public Command setPos(DoubleSupplier height) {
@@ -330,11 +334,11 @@ public class ElevatorSubsystem extends SubsystemBase {
             )
           )
           .linearPosition(
-            m_distance.mut_replace(encoder.getPosition() / krot, Meters)
+            m_distance.mut_replace(encoderL.getPosition() / krot, Meters)
           )
           .linearVelocity(
             m_velocity.mut_replace(
-              encoder.getVelocity() / 60.0 / krot,
+              encoderL.getVelocity() / 60.0 / krot,
               MetersPerSecond
             )
           );
