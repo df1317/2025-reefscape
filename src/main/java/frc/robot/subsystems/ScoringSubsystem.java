@@ -23,8 +23,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
     public Command runIntakeCommand(boolean out) {
         return this.startEnd(() -> {
-            motor1.set(out ? 1 : -1);
-            motor2.set(out ? 1 : -1);
+            motor1.set(out ? 0.5 : -0.5);
+            motor2.set(out ? 0.5 : -0.5);
         }, () -> {
             motor1.set(0);
             motor2.set(0);

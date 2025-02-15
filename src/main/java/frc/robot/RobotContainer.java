@@ -17,6 +17,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.ScoringSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -34,6 +35,7 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
 
+  private final ScoringSubsystem m_ScoringSubsystem = new ScoringSubsystem();
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
    * by angular velocity.
@@ -98,6 +100,12 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+
+    // run motors forward for 3 sec
+    m_ControllerActions.scoreButton.onTrue(m_ScoringSubsystem.runIntakeCommand(true).withTimeout(3));
+
+    m_ControllerActions.intakeButton
+        .onTrue(m_ScoringSubsystem.runIntakeCommand(false).until(m_ScoringSubsystem.getCoralSensorState));
 
     Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
 
