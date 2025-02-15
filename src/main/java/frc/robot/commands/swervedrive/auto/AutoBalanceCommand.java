@@ -7,19 +7,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
-
 /**
  * Auto Balance command using a simple PID controller. Created by Team 3512
  * <a href="https://github.com/frc3512/Robot-2023/blob/main/src/main/java/frc3512/robot/commands/AutoBalance.java">...</a>
  */
-public class AutoBalanceCommand extends Command
-{
+public class AutoBalanceCommand extends Command {
 
   private final SwerveSubsystem swerveSubsystem;
-  private final PIDController   controller;
+  private final PIDController controller;
 
-  public AutoBalanceCommand(SwerveSubsystem swerveSubsystem)
-  {
+  public AutoBalanceCommand(SwerveSubsystem swerveSubsystem) {
     this.swerveSubsystem = swerveSubsystem;
     controller = new PIDController(1.0, 0.0, 0.0);
     controller.setTolerance(1);
@@ -33,22 +30,21 @@ public class AutoBalanceCommand extends Command
    * The initial subroutine of a command.  Called once when the command is initially scheduled.
    */
   @Override
-  public void initialize()
-  {
-
-  }
+  public void initialize() {}
 
   /**
    * The main body of a command.  Called repeatedly while the command is scheduled. (That is, it is called repeatedly
    * until {@link #isFinished()}) returns true.)
    */
   @Override
-  public void execute()
-  {
+  public void execute() {
     SmartDashboard.putBoolean("At Tolerance", controller.atSetpoint());
 
-    double translationVal = MathUtil.clamp(controller.calculate(swerveSubsystem.getPitch().getDegrees(), 0.0), -0.5,
-                                           0.5);
+    double translationVal = MathUtil.clamp(
+      controller.calculate(swerveSubsystem.getPitch().getDegrees(), 0.0),
+      -0.5,
+      0.5
+    );
     swerveSubsystem.drive(new Translation2d(translationVal, 0.0), 0.0, true);
   }
 
@@ -66,8 +62,7 @@ public class AutoBalanceCommand extends Command
    * @return whether this command has finished.
    */
   @Override
-  public boolean isFinished()
-  {
+  public boolean isFinished() {
     return controller.atSetpoint();
   }
 
@@ -79,8 +74,7 @@ public class AutoBalanceCommand extends Command
    * @param interrupted whether the command was interrupted/canceled
    */
   @Override
-  public void end(boolean interrupted)
-  {
+  public void end(boolean interrupted) {
     swerveSubsystem.lock();
   }
 }
