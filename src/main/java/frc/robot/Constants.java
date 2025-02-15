@@ -49,4 +49,38 @@ public final class Constants {
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT = 6;
   }
+
+  public static class CanConstants {
+
+    // // Drive Motor IDs
+    // driveMotorFR = 12;
+    // driveMotorFL = 13;
+    // driveMotorBR = 14;
+    // driveMotorBL = 15;
+
+    // // Turn motor IDs
+    // turnMotorFR = 16;
+    // turnMotorFL = 17;
+    // turnMotorBR = 18;
+    // turnMotorBL = 19;
+
+    // // CanCoder IDs
+    // canCoderFR = 20;
+    // canCoderRL = 21;
+    // canCoderBR = 22;
+    // canCoderBL = 23;
+
+    // Scoring Motor IDs
+    public static final int scoreMotor1 = 24;
+    public static final int scoreMotor2 = 25;
+
+    // Elevator Motor IDs
+    public static final int elevatorMotorL = 26;
+    public static final int elevatorMotorR = 27;
+
+    // Sensor ports
+    public static final int coralSensorPort = 1;
+    public static final int elevatorEncoderL = 2;
+    public static final int elevatorEncoderR = 3;
+  }
 }

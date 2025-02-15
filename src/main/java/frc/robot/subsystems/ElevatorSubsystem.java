@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.CanConstants;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -75,8 +76,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
 
   public ElevatorSubsystem() {
-    motorL = new SparkMax(26, MotorType.kBrushless);
-    motorR = new SparkMax(27, MotorType.kBrushless);
+    motorL = new SparkMax(CanConstants.elevatorMotorL, MotorType.kBrushless);
+    motorR = new SparkMax(CanConstants.elevatorMotorR, MotorType.kBrushless);
     // the defualt is lsot zero
     config.closedLoop
         .p(kp, ClosedLoopSlot.kSlot0)
