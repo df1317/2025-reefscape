@@ -135,7 +135,7 @@ public class RobotContainer {
                         m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0));
                         m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3));
                         m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6));
-                        m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.1));
+                        m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2));
                         m_JoystickL.button(2).onTrue(elevatorSubsystem.sysIDCommand(4, 2, 2));
                         // m_JoystickL.button(11)
                         // .whileTrue(elevatorSubsystem.sysIDQuasistatic(Direction.kReverse, 3.0));

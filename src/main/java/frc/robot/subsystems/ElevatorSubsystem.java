@@ -35,7 +35,7 @@ import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-  private final double maxHeight = 1.1;
+  private final double maxHeight = 1.2;
   private final double minHeight = 0;
   private long t = System.nanoTime();
   private RelativeEncoder encoderL;
@@ -56,12 +56,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   private SparkClosedLoopController controllerL;
   private SparkClosedLoopController controllerR;
   private SparkMaxConfig config = new SparkMaxConfig();
-  private double kp = 0.0, ki = 0, kd = 0;
+  private double kp = 0.00065323, ki = 0, kd = 0;
   private double maxV = 1, maxA = 1;
   private double krot = 42.4; // rotations/meter
   private static final double upSpeed = 0.5;
   private static final double downSpeed = 0.1;
-  private double ks = 0, kg = 0.0, kv = 0.0;
+  private double ks = 0.36656, kg = 0.48642, kv = 4.7049;
 
   private double currentMaxVel = maxV;
   private TrapezoidProfile.Constraints ffc = new TrapezoidProfile.Constraints(
@@ -129,89 +129,87 @@ public class ElevatorSubsystem extends SubsystemBase {
     motorR.stopMotor();
   }
 
-  /*
-   * @Override
-   * public void periodic() {
-   * double ffValue = 0.0;
-   * boolean running = false;
-   * 
-   * ffState.position = MathUtil.clamp(ffState.position, 0, maxHeight);
-   * ffState.velocity = 0.0;
-   * 
-   * preRenfernce.velocity = MathUtil.clamp(
-   * preRenfernce.velocity,
-   * -currentMaxVel,
-   * currentMaxVel);
-   * preRenfernce.position = MathUtil.clamp(preRenfernce.position, 0, maxHeight);
-   * // preRenfernce.velocity = MathUtil.applyDeadband(preRenfernce.velocity,
-   * 0.01);
-   * 
-   * preRenfernce = Profiler.calculate(
-   * (System.nanoTime() - t) / 1e9,
-   * preRenfernce,
-   * ffState);
-   * 
-   * t = System.nanoTime();
-   * ffValue = ff.calculate(
-   * MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel));
-   * 
-   * switch (checkLimits()) {
-   * case NONE:
-   * running = true;
-   * break;
-   * case BOTTOM:
-   * if (preRenfernce.velocity > 0) {
-   * running = true;
-   * } else {
-   * this.motorBreak();
-   * }
-   * break;
-   * case TOP:
-   * if (preRenfernce.velocity < 0) {
-   * running = true;
-   * } else {
-   * this.motorBreak();
-   * }
-   * break;
-   * case TEST:
-   * System.out.println(
-   * "why did you run this? you forgot to program in the limits");
-   * running = false;
-   * break;
-   * }
-   * if (running) {
-   * controllerL.setReference(
-   * preRenfernce.position * krot,
-   * ControlType.kPosition,
-   * ClosedLoopSlot.kSlot0,
-   * ffValue);
-   * controllerR.setReference(
-   * preRenfernce.position * krot,
-   * ControlType.kPosition,
-   * ClosedLoopSlot.kSlot0,
-   * ffValue);
-   * 
-   * }
-   * 
-   * SmartDashboard.putNumber(
-   * "elevator/current-position",
-   * preRenfernce.position);
-   * SmartDashboard.putNumber(
-   * "elevator/current-velocity",
-   * preRenfernce.velocity);
-   * SmartDashboard.putNumber("elevator/end-position", ffState.position);
-   * SmartDashboard.putNumber("elevator/currentMaxVal", currentMaxVel);
-   * SmartDashboard.putBoolean("elevator/topLimitSwitch", limitSwitchTop.get());
-   * SmartDashboard.putBoolean(
-   * "elevator/bottomLimitSwitch",
-   * limitSwitchBottom.get());
-   * SmartDashboard.putNumber("elevator/encoderL", encoderL.getPosition());
-   * SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
-   * SmartDashboard.putNumber("elevator/motorL current",
-   * motorL.getOutputCurrent());
-   * SmartDashboard.putNumber("elevator/motorL voltage", motorL.getBusVoltage());
-   * }
-   */
+  @Override
+  public void periodic() {
+    double ffValue = 0.0;
+    boolean running = false;
+
+    ffState.position = MathUtil.clamp(ffState.position, 0, maxHeight);
+    ffState.velocity = 0.0;
+
+    preRenfernce.velocity = MathUtil.clamp(
+        preRenfernce.velocity,
+        -currentMaxVel,
+        currentMaxVel);
+    preRenfernce.position = MathUtil.clamp(preRenfernce.position, 0, maxHeight);
+    // preRenfernce.velocity = MathUtil.applyDeadband(preRenfernce.velocity,
+    // 0.01);
+
+    preRenfernce = Profiler.calculate(
+        (System.nanoTime() - t) / 1e9,
+        preRenfernce,
+        ffState);
+
+    t = System.nanoTime();
+    ffValue = ff.calculate(
+        MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel));
+
+    switch (checkLimits()) {
+      case NONE:
+        running = true;
+        break;
+      case BOTTOM:
+        if (preRenfernce.velocity > 0) {
+          running = true;
+        } else {
+          this.motorBreak();
+        }
+        break;
+      case TOP:
+        if (preRenfernce.velocity < 0) {
+          running = true;
+        } else {
+          this.motorBreak();
+        }
+        break;
+      case TEST:
+        System.out.println(
+            "why did you run this? you forgot to program in the limits");
+        running = false;
+        break;
+    }
+    if (running) {
+      controllerL.setReference(
+          preRenfernce.position * krot,
+          ControlType.kPosition,
+          ClosedLoopSlot.kSlot0,
+          ffValue);
+      controllerR.setReference(
+          preRenfernce.position * krot,
+          ControlType.kPosition,
+          ClosedLoopSlot.kSlot0,
+          ffValue);
+
+    }
+
+    SmartDashboard.putNumber(
+        "elevator/current-position",
+        preRenfernce.position);
+    SmartDashboard.putNumber(
+        "elevator/current-velocity",
+        preRenfernce.velocity);
+    SmartDashboard.putNumber("elevator/end-position", ffState.position);
+    SmartDashboard.putNumber("elevator/currentMaxVal", currentMaxVel);
+    SmartDashboard.putBoolean("elevator/topLimitSwitch", limitSwitchTop.get());
+    SmartDashboard.putBoolean(
+        "elevator/bottomLimitSwitch",
+        limitSwitchBottom.get());
+    SmartDashboard.putNumber("elevator/encoderL", encoderL.getPosition());
+    SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
+    SmartDashboard.putNumber("elevator/motorL current",
+        motorL.getOutputCurrent());
+    SmartDashboard.putNumber("elevator/motorL voltage", motorL.getBusVoltage());
+  }
 
   public Command setPos(DoubleSupplier height) {
     return Commands.runOnce(() -> {
