@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.CanConstants;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -14,6 +15,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -33,7 +36,7 @@ import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-  private final double maxHeight = 1.1;
+  private final double maxHeight = 1.2;
   private final double minHeight = 0;
   private long t = System.nanoTime();
   private RelativeEncoder encoderL;
@@ -54,12 +57,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   private SparkClosedLoopController controllerL;
   private SparkClosedLoopController controllerR;
   private SparkMaxConfig config = new SparkMaxConfig();
-  private double kp = 0.1, ki = 0, kd = 0;
+  private double kp = 0.00065323, ki = 0, kd = 0;
   private double maxV = 1, maxA = 1;
   private double krot = 42.4; // rotations/meter
   private static final double upSpeed = 0.5;
   private static final double downSpeed = 0.1;
-  private double ks = 0, kg = 0, kv = 0.01;
+  private double ks = 0.36656, kg = 0.48642, kv = 4.7049;
 
   private double currentMaxVel = maxV;
   private TrapezoidProfile.Constraints ffc = new TrapezoidProfile.Constraints(
@@ -81,10 +84,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     motorR = new SparkMax(CanConstants.elevatorMotorR, MotorType.kBrushless);
     // the defualt is lsot zero
     config.closedLoop
-      .p(kp, ClosedLoopSlot.kSlot0)
-      .i(ki, ClosedLoopSlot.kSlot0)
-      .d(kd, ClosedLoopSlot.kSlot0);
-    config.smartCurrentLimit(25);
+        .p(kp, ClosedLoopSlot.kSlot0)
+        .i(ki, ClosedLoopSlot.kSlot0)
+        .d(kd, ClosedLoopSlot.kSlot0);
+    config.smartCurrentLimit(25).idleMode(IdleMode.kBrake);
 
     motorL.configure(
       config.inverted(false),
@@ -102,6 +105,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     encoderL = motorL.getEncoder();
     encoderR = motorR.getEncoder();
+
+    System.out.println(
+        "TODO: please put reset encodes pos in");
   }
 
   public void setDesiredPosistion(double height, double time) {
@@ -141,7 +147,8 @@ public class ElevatorSubsystem extends SubsystemBase {
       currentMaxVel
     );
     preRenfernce.position = MathUtil.clamp(preRenfernce.position, 0, maxHeight);
-    // preRenfernce.velocity = MathUtil.applyDeadband(preRenfernce.velocity, 0.01);
+    // preRenfernce.velocity = MathUtil.applyDeadband(preRenfernce.velocity,
+    // 0.01);
 
     preRenfernce = Profiler.calculate(
       (System.nanoTime() - t) / 1e9,
@@ -187,13 +194,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         ffValue
       );
       controllerR.setReference(
-        preRenfernce.position * krot,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        ffValue
-      );
-      // System.out.println(
-      // "TODO: please put reset encodes pos in");
+          preRenfernce.position * krot,
+          ControlType.kPosition,
+          ClosedLoopSlot.kSlot0,
+          ffValue);
+
     }
 
     SmartDashboard.putNumber(
@@ -213,6 +218,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     );
     SmartDashboard.putNumber("elevator/encoderL", encoderL.getPosition());
     SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
+    SmartDashboard.putNumber("elevator/motorL current",
+        motorL.getOutputCurrent());
+    SmartDashboard.putNumber("elevator/motorL voltage", motorL.getBusVoltage());
   }
 
   public Command setPos(DoubleSupplier height) {
@@ -264,102 +272,74 @@ public class ElevatorSubsystem extends SubsystemBase {
       );
   }
 
+  public Command sysIDQuasistatic(Direction dir, double timeout) {
+    return m_sysIdRoutine.quasistatic(dir).withTimeout(timeout);
+  }
+
+  public Command sysIDDynamic(Direction dir, double timeout) {
+    return m_sysIdRoutine.dynamic(dir).withTimeout(timeout);
+  }
+
   public Command sysIDCommand(
     double quasiTimeout,
     double timeout,
     double dynamicTimeout
   ) {
     return m_sysIdRoutine
-      .quasistatic(Direction.kForward)
-      .withTimeout(quasiTimeout)
-      .onlyWhile(() -> {
-        return (checkLimits() != LimitSwitchTrigger.TOP);
-      })
-      .andThen(Commands.waitSeconds(timeout))
-      .andThen(
-        m_sysIdRoutine
-          .quasistatic(Direction.kReverse)
-          .onlyWhile(() -> {
-            return (checkLimits() != LimitSwitchTrigger.BOTTOM);
-          })
-      )
-      .withTimeout(quasiTimeout)
-      .andThen(Commands.waitSeconds(timeout))
-      .andThen(
-        m_sysIdRoutine
-          .dynamic(Direction.kForward)
-          .withTimeout(dynamicTimeout)
-          .onlyWhile(() -> {
-            return (checkLimits() != LimitSwitchTrigger.TOP);
-          })
-      )
-      .andThen(Commands.waitSeconds(timeout))
-      .andThen(
-        m_sysIdRoutine
-          .dynamic(Direction.kReverse)
-          .withTimeout(dynamicTimeout)
-          .onlyWhile(() -> {
-            return (checkLimits() != LimitSwitchTrigger.BOTTOM);
-          })
-      );
+        .quasistatic(
+            SysIdRoutine.Direction.kForward)
+        .withTimeout(quasiTimeout)
+        .andThen(Commands.waitSeconds(timeout))
+        .andThen(
+            m_sysIdRoutine
+                .quasistatic(
+                    SysIdRoutine.Direction.kReverse)
+                .withTimeout(quasiTimeout))
+        .andThen(Commands.waitSeconds(timeout))
+        .andThen(
+            m_sysIdRoutine
+                .dynamic(
+                    SysIdRoutine.Direction.kForward)
+                .withTimeout(dynamicTimeout))
+        .andThen(Commands.waitSeconds(timeout))
+        .andThen(
+            m_sysIdRoutine
+                .dynamic(
+                    SysIdRoutine.Direction.kReverse)
+                .withTimeout(dynamicTimeout));
   }
 
   private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-    // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-    new SysIdRoutine.Config(null, null, null, null),
-    new SysIdRoutine.Mechanism(
-      // Tell SysId how to plumb the driving voltage to the motors.
-      voltage -> {
-        if (
-          checkLimits() == LimitSwitchTrigger.TOP &&
-          Voltage.ofBaseUnits(0, Volts).compareTo(voltage) < 0
-        ) {
-          motorL.setVoltage(voltage);
-          motorR.setVoltage(voltage);
-        }
-        if (
-          checkLimits() == LimitSwitchTrigger.BOTTOM &&
-          Voltage.ofBaseUnits(0, Volts).compareTo(voltage) > 0
-        ) {
-          motorL.setVoltage(voltage);
-          motorR.setVoltage(voltage);
-        }
-        if (checkLimits() == LimitSwitchTrigger.NONE) {
-          motorL.setVoltage(voltage);
-          motorR.setVoltage(voltage);
-        }
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+      new SysIdRoutine.Config(null, Voltage.ofBaseUnits(5, Volts), null, null),
+      new SysIdRoutine.Mechanism(
+          // Tell SysId how to plumb the driving voltage to the motors.
+          voltage -> {
+            motorL.setVoltage(voltage);
+            motorR.setVoltage(voltage);
+          },
+          // Tell SysId how to record a frame of data for each motor on the mechanism
+          // being
+          // characterized.
+          log -> {
 
-        motorL.setVoltage(voltage);
-        motorR.setVoltage(voltage);
-      },
-      // Tell SysId how to record a frame of data for each motor on the mechanism
-      // being
-      // characterized.
-      log -> {
-        // Record a frame for the left motors. Since these share an encoder, we consider
-        // the entire group to be one motor.
-        log
-          .motor("elevator")
-          .voltage(
-            m_appliedVoltage.mut_replace(
-              motorL.get() * motorL.getBusVoltage(),
-              Volts
-            )
-          )
-          .linearPosition(
-            m_distance.mut_replace(encoderL.getPosition() / krot, Meters)
-          )
-          .linearVelocity(
-            m_velocity.mut_replace(
-              encoderL.getVelocity() / 60.0 / krot,
-              MetersPerSecond
-            )
-          );
-      },
-      // Tell SysId to make generated commands require this subsystem, suffix test
-      // state in
-      // WPILog with this subsystem's name ("drive")
-      this
-    )
-  );
+            // Record a frame for the left motors. Since these share an encoder, we consider
+            // the entire group to be one motor.
+            log
+                .motor("elevator")
+                .voltage(
+                    m_appliedVoltage.mut_replace(
+                        motorL.getBusVoltage() * motorL.getAppliedOutput(),
+                        Volts))
+                .linearPosition(
+                    m_distance.mut_replace(encoderL.getPosition() / krot, Meters))
+                .linearVelocity(
+                    m_velocity.mut_replace(
+                        encoderL.getVelocity() / 60.0 / krot,
+                        MetersPerSecond));
+          },
+          // Tell SysId to make generated commands require this subsystem, suffix test
+          // state in
+          // WPILog with this subsystem's name ("drive")
+          this));
 }
