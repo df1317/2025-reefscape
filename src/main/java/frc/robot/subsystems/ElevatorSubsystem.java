@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.CanConstants;
 
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.revrobotics.RelativeEncoder;
@@ -65,8 +66,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private double currentMaxVel = maxV;
   private TrapezoidProfile.Constraints ffc = new TrapezoidProfile.Constraints(
-      maxV,
-      maxA);
+    maxV,
+    maxA
+  );
   private TrapezoidProfile.State ffState = new TrapezoidProfile.State();
   private TrapezoidProfile.State preRenfernce = new TrapezoidProfile.State();
   private TrapezoidProfile Profiler = new TrapezoidProfile(ffc);
@@ -78,8 +80,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   private final MutLinearVelocity m_velocity = MetersPerSecond.mutable(0);
 
   public ElevatorSubsystem() {
-    motorL = new SparkMax(26, MotorType.kBrushless);
-    motorR = new SparkMax(27, MotorType.kBrushless);
+    motorL = new SparkMax(CanConstants.elevatorMotorL, MotorType.kBrushless);
+    motorR = new SparkMax(CanConstants.elevatorMotorR, MotorType.kBrushless);
     // the defualt is lsot zero
     config.closedLoop
         .p(kp, ClosedLoopSlot.kSlot0)
@@ -88,13 +90,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     config.smartCurrentLimit(25).idleMode(IdleMode.kBrake);
 
     motorL.configure(
-        config.inverted(false),
-        ResetMode.kResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+      config.inverted(false),
+      ResetMode.kResetSafeParameters,
+      PersistMode.kNoPersistParameters
+    );
     motorR.configure(
-        config.inverted(true),
-        ResetMode.kResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+      config.inverted(true),
+      ResetMode.kResetSafeParameters,
+      PersistMode.kNoPersistParameters
+    );
 
     controllerL = motorL.getClosedLoopController();
     controllerR = motorR.getClosedLoopController();
@@ -138,21 +142,24 @@ public class ElevatorSubsystem extends SubsystemBase {
     ffState.velocity = 0.0;
 
     preRenfernce.velocity = MathUtil.clamp(
-        preRenfernce.velocity,
-        -currentMaxVel,
-        currentMaxVel);
+      preRenfernce.velocity,
+      -currentMaxVel,
+      currentMaxVel
+    );
     preRenfernce.position = MathUtil.clamp(preRenfernce.position, 0, maxHeight);
     // preRenfernce.velocity = MathUtil.applyDeadband(preRenfernce.velocity,
     // 0.01);
 
     preRenfernce = Profiler.calculate(
-        (System.nanoTime() - t) / 1e9,
-        preRenfernce,
-        ffState);
+      (System.nanoTime() - t) / 1e9,
+      preRenfernce,
+      ffState
+    );
 
     t = System.nanoTime();
     ffValue = ff.calculate(
-        MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel));
+      MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel)
+    );
 
     switch (checkLimits()) {
       case NONE:
@@ -174,16 +181,18 @@ public class ElevatorSubsystem extends SubsystemBase {
         break;
       case TEST:
         System.out.println(
-            "why did you run this? you forgot to program in the limits");
+          "why did you run this? you forgot to program in the limits"
+        );
         running = false;
         break;
     }
     if (running) {
       controllerL.setReference(
-          preRenfernce.position * krot,
-          ControlType.kPosition,
-          ClosedLoopSlot.kSlot0,
-          ffValue);
+        preRenfernce.position * krot,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        ffValue
+      );
       controllerR.setReference(
           preRenfernce.position * krot,
           ControlType.kPosition,
@@ -193,17 +202,20 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     SmartDashboard.putNumber(
-        "elevator/current-position",
-        preRenfernce.position);
+      "elevator/current-position",
+      preRenfernce.position
+    );
     SmartDashboard.putNumber(
-        "elevator/current-velocity",
-        preRenfernce.velocity);
+      "elevator/current-velocity",
+      preRenfernce.velocity
+    );
     SmartDashboard.putNumber("elevator/end-position", ffState.position);
     SmartDashboard.putNumber("elevator/currentMaxVal", currentMaxVel);
     SmartDashboard.putBoolean("elevator/topLimitSwitch", limitSwitchTop.get());
     SmartDashboard.putBoolean(
-        "elevator/bottomLimitSwitch",
-        limitSwitchBottom.get());
+      "elevator/bottomLimitSwitch",
+      limitSwitchBottom.get()
+    );
     SmartDashboard.putNumber("elevator/encoderL", encoderL.getPosition());
     SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
     SmartDashboard.putNumber("elevator/motorL current",
@@ -256,7 +268,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         () -> {
           motorL.set(0);
           motorR.set(0);
-        });
+        }
+      );
   }
 
   public Command sysIDQuasistatic(Direction dir, double timeout) {
@@ -268,9 +281,10 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public Command sysIDCommand(
-      double quasiTimeout,
-      double timeout,
-      double dynamicTimeout) {
+    double quasiTimeout,
+    double timeout,
+    double dynamicTimeout
+  ) {
     return m_sysIdRoutine
         .quasistatic(
             SysIdRoutine.Direction.kForward)
@@ -301,21 +315,6 @@ public class ElevatorSubsystem extends SubsystemBase {
       new SysIdRoutine.Mechanism(
           // Tell SysId how to plumb the driving voltage to the motors.
           voltage -> {
-            // if (checkLimits() == LimitSwitchTrigger.TOP &&
-            // Voltage.ofBaseUnits(0, Volts).compareTo(voltage) < 0) {
-            // motorL.setVoltage(voltage);
-            // motorR.setVoltage(voltage);
-            // }
-            // if (checkLimits() == LimitSwitchTrigger.BOTTOM &&
-            // Voltage.ofBaseUnits(0, Volts).compareTo(voltage) > 0) {
-            // motorL.setVoltage(voltage);
-            // motorR.setVoltage(voltage);
-            // }
-            // if (checkLimits() == LimitSwitchTrigger.NONE) {
-            // motorL.setVoltage(voltage);
-            // motorR.setVoltage(voltage);
-            // }
-
             motorL.setVoltage(voltage);
             motorR.setVoltage(voltage);
           },

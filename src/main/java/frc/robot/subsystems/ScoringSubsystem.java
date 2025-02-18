@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.CanConstants;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -14,9 +16,9 @@ public class ScoringSubsystem extends SubsystemBase {
   public DigitalInput coralSensor;
 
   public ScoringSubsystem() {
-    motor1 = new SparkMax(24, MotorType.kBrushless);
-    motor2 = new SparkMax(25, MotorType.kBrushless);
-    coralSensor = new DigitalInput(1);
+    motor1 = new SparkMax(CanConstants.scoreMotor1, MotorType.kBrushless);
+    motor2 = new SparkMax(CanConstants.scoreMotor2, MotorType.kBrushless);
+    coralSensor = new DigitalInput(CanConstants.coralSensorPort);
   }
 
   public Command runIntakeCommand(boolean out) {
