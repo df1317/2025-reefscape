@@ -118,10 +118,10 @@ public class RobotContainer {
                         driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
                         driverXbox.back().whileTrue(drivebase.centerModulesCommand());
                         driverXbox.leftBumper().onTrue(Commands.none());
-                        driverXbox.rightBumper().onTrue(Commands.none());
-                        // driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("Test Mode:
-                        // Drive SysID")));
-                        // driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
+
+                        driverXbox.rightBumper()
+                                        .onTrue(Commands.runOnce(() -> System.out.println("Test Mode: Drive SysID")));
+                        driverXbox.rightBumper().whileTrue(drivebase.sysIdDriveMotorCommand());
                         driverXbox
                                         .a()
                                         .onTrue(
