@@ -242,7 +242,11 @@ public class ElevatorSubsystem extends SubsystemBase {
           ffState.position = 0;
           ffState.velocity = 0.0;
         }),
-        Commands.waitSeconds(2));
+        Commands.waitSeconds(2)).andThen(
+            Commands.runOnce(() -> {
+              ffState.position = preRenfernce.position;
+              ffState.velocity = 0.0;
+            }));
   }
 
   public Command setSpeed(DoubleSupplier velo) {
