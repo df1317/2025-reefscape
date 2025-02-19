@@ -220,20 +220,9 @@ public class ElevatorSubsystem extends SubsystemBase {
   public Command demo() {
     return Commands.repeatingSequence(
         Commands.runOnce(() -> {
-          ffState.position = 0.3;
+          ffState.position = 0;
           ffState.velocity = 0.0;
         }),
-        Commands.waitSeconds(2),
-        Commands.runOnce(() -> {
-          ffState.position = 0.6;
-          ffState.velocity = 0.0;
-        }),
-        Commands.waitSeconds(2),
-        Commands.runOnce(() -> {
-          ffState.position = 1.2;
-          ffState.velocity = 0.0;
-        }),
-        Commands.waitSeconds(2),
         Commands.runOnce(() -> {
           ffState.position = 0.3;
           ffState.velocity = 0.0;
@@ -248,11 +237,12 @@ public class ElevatorSubsystem extends SubsystemBase {
           ffState.position = 1.2;
           ffState.velocity = 0.0;
         }),
-        Commands.waitSeconds(2)).andThen(
-            Commands.runOnce(() -> {
-              ffState.position = minHeight;
-              ffState.velocity = 0.0;
-            }));
+        Commands.waitSeconds(2),
+        Commands.runOnce(() -> {
+          ffState.position = 0;
+          ffState.velocity = 0.0;
+        }),
+        Commands.waitSeconds(2));
   }
 
   public Command setSpeed(DoubleSupplier velo) {
