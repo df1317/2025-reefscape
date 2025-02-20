@@ -73,6 +73,7 @@ public final class Constants {
     // Scoring Motor IDs
     public static final int scoreMotor1 = 24;
     public static final int scoreMotor2 = 25;
+    public static final int scoreTiltMotor = 28;
 
     // Elevator Motor IDs
     public static final int elevatorMotorL = 26;
@@ -82,5 +83,6 @@ public final class Constants {
     public static final int coralSensorPort = 1;
     public static final int elevatorEncoderL = 2;
     public static final int elevatorEncoderR = 3;
+    public static final int homingTiltClickySwitch = 4;
   }
 }

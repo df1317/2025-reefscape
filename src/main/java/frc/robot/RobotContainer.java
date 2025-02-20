@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -38,6 +39,8 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), "swerve/neo"));
   private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+  private final ScoringSubsystem scoringSubsystem = new ScoringSubsystem();
+  
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -143,6 +146,8 @@ public class RobotContainer {
       // .whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kReverse, 1.0));
       // m_JoystickL.button(10).whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kForward,
       // 0.5));
+      
+      m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.5));
     } else {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
