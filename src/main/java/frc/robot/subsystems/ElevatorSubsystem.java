@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.CanConstants;
 
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -14,9 +13,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -66,9 +64,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private double currentMaxVel = maxV;
   private TrapezoidProfile.Constraints ffc = new TrapezoidProfile.Constraints(
-    maxV,
-    maxA
-  );
+      maxV,
+      maxA);
   private TrapezoidProfile.State ffState = new TrapezoidProfile.State();
   private TrapezoidProfile.State preRenfernce = new TrapezoidProfile.State();
   private TrapezoidProfile Profiler = new TrapezoidProfile(ffc);
@@ -90,15 +87,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     config.smartCurrentLimit(25).idleMode(IdleMode.kBrake);
 
     motorL.configure(
-      config.inverted(false),
-      ResetMode.kResetSafeParameters,
-      PersistMode.kNoPersistParameters
-    );
+        config.inverted(false),
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
     motorR.configure(
-      config.inverted(true),
-      ResetMode.kResetSafeParameters,
-      PersistMode.kNoPersistParameters
-    );
+        config.inverted(true),
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
 
     controllerL = motorL.getClosedLoopController();
     controllerR = motorR.getClosedLoopController();
@@ -106,8 +101,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     encoderL = motorL.getEncoder();
     encoderR = motorR.getEncoder();
 
-    System.out.println(
-        "TODO: please put reset encodes pos in");
+    System.out.println("TODO: please put reset encodes pos in");
   }
 
   public void setDesiredPosistion(double height, double time) {
@@ -142,24 +136,21 @@ public class ElevatorSubsystem extends SubsystemBase {
     ffState.velocity = 0.0;
 
     preRenfernce.velocity = MathUtil.clamp(
-      preRenfernce.velocity,
-      -currentMaxVel,
-      currentMaxVel
-    );
+        preRenfernce.velocity,
+        -currentMaxVel,
+        currentMaxVel);
     preRenfernce.position = MathUtil.clamp(preRenfernce.position, 0, maxHeight);
     // preRenfernce.velocity = MathUtil.applyDeadband(preRenfernce.velocity,
     // 0.01);
 
     preRenfernce = Profiler.calculate(
-      (System.nanoTime() - t) / 1e9,
-      preRenfernce,
-      ffState
-    );
+        (System.nanoTime() - t) / 1e9,
+        preRenfernce,
+        ffState);
 
     t = System.nanoTime();
     ffValue = ff.calculate(
-      MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel)
-    );
+        MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel));
 
     switch (checkLimits()) {
       case NONE:
@@ -181,44 +172,39 @@ public class ElevatorSubsystem extends SubsystemBase {
         break;
       case TEST:
         System.out.println(
-          "why did you run this? you forgot to program in the limits"
-        );
+            "why did you run this? you forgot to program in the limits");
         running = false;
         break;
     }
     if (running) {
       controllerL.setReference(
-        preRenfernce.position * krot,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        ffValue
-      );
+          preRenfernce.position * krot,
+          ControlType.kPosition,
+          ClosedLoopSlot.kSlot0,
+          ffValue);
       controllerR.setReference(
           preRenfernce.position * krot,
           ControlType.kPosition,
           ClosedLoopSlot.kSlot0,
           ffValue);
-
     }
 
     SmartDashboard.putNumber(
-      "elevator/current-position",
-      preRenfernce.position
-    );
+        "elevator/current-position",
+        preRenfernce.position);
     SmartDashboard.putNumber(
-      "elevator/current-velocity",
-      preRenfernce.velocity
-    );
+        "elevator/current-velocity",
+        preRenfernce.velocity);
     SmartDashboard.putNumber("elevator/end-position", ffState.position);
     SmartDashboard.putNumber("elevator/currentMaxVal", currentMaxVel);
     SmartDashboard.putBoolean("elevator/topLimitSwitch", limitSwitchTop.get());
     SmartDashboard.putBoolean(
-      "elevator/bottomLimitSwitch",
-      limitSwitchBottom.get()
-    );
+        "elevator/bottomLimitSwitch",
+        limitSwitchBottom.get());
     SmartDashboard.putNumber("elevator/encoderL", encoderL.getPosition());
     SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
-    SmartDashboard.putNumber("elevator/motorL current",
+    SmartDashboard.putNumber(
+        "elevator/motorL current",
         motorL.getOutputCurrent());
     SmartDashboard.putNumber("elevator/motorL voltage", motorL.getBusVoltage());
   }
@@ -229,6 +215,38 @@ public class ElevatorSubsystem extends SubsystemBase {
       ffState.position = height.getAsDouble();
       ffState.velocity = 0.0;
     }).andThen(new PrintCommand("Set pos was called"));
+  }
+
+  public Command demo() {
+    return Commands.repeatingSequence(
+        Commands.runOnce(() -> {
+          ffState.position = 0;
+          ffState.velocity = 0.0;
+        }),
+        Commands.runOnce(() -> {
+          ffState.position = 0.3;
+          ffState.velocity = 0.0;
+        }),
+        Commands.waitSeconds(2),
+        Commands.runOnce(() -> {
+          ffState.position = 0.6;
+          ffState.velocity = 0.0;
+        }),
+        Commands.waitSeconds(2),
+        Commands.runOnce(() -> {
+          ffState.position = 1.2;
+          ffState.velocity = 0.0;
+        }),
+        Commands.waitSeconds(2),
+        Commands.runOnce(() -> {
+          ffState.position = 0;
+          ffState.velocity = 0.0;
+        }),
+        Commands.waitSeconds(2)).andThen(
+            Commands.runOnce(() -> {
+              ffState.position = preRenfernce.position;
+              ffState.velocity = 0.0;
+            }));
   }
 
   public Command setSpeed(DoubleSupplier velo) {
@@ -268,8 +286,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         () -> {
           motorL.set(0);
           motorR.set(0);
-        }
-      );
+        });
   }
 
   public Command sysIDQuasistatic(Direction dir, double timeout) {
@@ -281,31 +298,26 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public Command sysIDCommand(
-    double quasiTimeout,
-    double timeout,
-    double dynamicTimeout
-  ) {
+      double quasiTimeout,
+      double timeout,
+      double dynamicTimeout) {
     return m_sysIdRoutine
-        .quasistatic(
-            SysIdRoutine.Direction.kForward)
+        .quasistatic(SysIdRoutine.Direction.kForward)
         .withTimeout(quasiTimeout)
         .andThen(Commands.waitSeconds(timeout))
         .andThen(
             m_sysIdRoutine
-                .quasistatic(
-                    SysIdRoutine.Direction.kReverse)
+                .quasistatic(SysIdRoutine.Direction.kReverse)
                 .withTimeout(quasiTimeout))
         .andThen(Commands.waitSeconds(timeout))
         .andThen(
             m_sysIdRoutine
-                .dynamic(
-                    SysIdRoutine.Direction.kForward)
+                .dynamic(SysIdRoutine.Direction.kForward)
                 .withTimeout(dynamicTimeout))
         .andThen(Commands.waitSeconds(timeout))
         .andThen(
             m_sysIdRoutine
-                .dynamic(
-                    SysIdRoutine.Direction.kReverse)
+                .dynamic(SysIdRoutine.Direction.kReverse)
                 .withTimeout(dynamicTimeout));
   }
 
@@ -322,7 +334,6 @@ public class ElevatorSubsystem extends SubsystemBase {
           // being
           // characterized.
           log -> {
-
             // Record a frame for the left motors. Since these share an encoder, we consider
             // the entire group to be one motor.
             log
