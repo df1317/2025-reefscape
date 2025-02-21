@@ -47,7 +47,9 @@ public class ScoringSubsystem extends SubsystemBase {
 					motor1.set(0);
 					motor2.set(0);
 				}
-			).until(() -> coralSensor.get());
+			)
+			.until(() -> coralSensor.get())
+			.withTimeout(3);
 	}
 
 	public Command tiltCommand(double position) {
