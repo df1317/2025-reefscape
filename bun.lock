@@ -3,6 +3,7 @@
   "workspaces": {
     "": {
       "dependencies": {
+        "prettier": "^3.5.1",
         "prettier-plugin-java": "^2.6.7",
       },
     },
