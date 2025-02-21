@@ -45,12 +45,7 @@
 			"version": "5.35.1",
 			"isJar": false,
 			"skipInvalidPlatforms": true,
-			"validPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"linuxathena"
-			],
+			"validPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "linuxathena"],
 			"simMode": "hwsim"
 		},
 		{
@@ -59,12 +54,7 @@
 			"version": "5.35.1",
 			"isJar": false,
 			"skipInvalidPlatforms": true,
-			"validPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"osxuniversal"
-			],
+			"validPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "osxuniversal"],
 			"simMode": "swsim"
 		}
 	],
@@ -77,12 +67,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"linuxathena"
-			],
+			"binaryPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "linuxathena"],
 			"simMode": "hwsim"
 		},
 		{
@@ -93,12 +78,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"linuxathena"
-			],
+			"binaryPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "linuxathena"],
 			"simMode": "hwsim"
 		},
 		{
@@ -109,12 +89,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"linuxathena"
-			],
+			"binaryPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "linuxathena"],
 			"simMode": "hwsim"
 		},
 		{
@@ -125,12 +100,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"osxuniversal"
-			],
+			"binaryPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "osxuniversal"],
 			"simMode": "swsim"
 		},
 		{
@@ -141,12 +111,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"osxuniversal"
-			],
+			"binaryPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "osxuniversal"],
 			"simMode": "swsim"
 		},
 		{
@@ -157,12 +122,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxx86-64",
-				"linuxarm64",
-				"osxuniversal"
-			],
+			"binaryPlatforms": ["windowsx86-64", "linuxx86-64", "linuxarm64", "osxuniversal"],
 			"simMode": "swsim"
 		}
 	]
