@@ -16,12 +16,7 @@
 			"version": "v2025.1.1",
 			"skipInvalidPlatforms": true,
 			"isJar": false,
-			"validPlatforms": [
-				"windowsx86-64",
-				"linuxathena",
-				"linuxx86-64",
-				"osxuniversal"
-			]
+			"validPlatforms": ["windowsx86-64", "linuxathena", "linuxx86-64", "osxuniversal"]
 		}
 	],
 	"cppDependencies": [
@@ -33,12 +28,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxathena",
-				"linuxx86-64",
-				"osxuniversal"
-			]
+			"binaryPlatforms": ["windowsx86-64", "linuxathena", "linuxx86-64", "osxuniversal"]
 		},
 		{
 			"groupId": "org.photonvision",
@@ -48,12 +38,7 @@
 			"headerClassifier": "headers",
 			"sharedLibrary": true,
 			"skipInvalidPlatforms": true,
-			"binaryPlatforms": [
-				"windowsx86-64",
-				"linuxathena",
-				"linuxx86-64",
-				"osxuniversal"
-			]
+			"binaryPlatforms": ["windowsx86-64", "linuxathena", "linuxx86-64", "osxuniversal"]
 		}
 	],
 	"javaDependencies": [
