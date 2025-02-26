@@ -17,7 +17,7 @@ import frc.robot.Constants.CanConstants;
 public class ClimberSubsystem extends SubsystemBase {
 
 	private final TalonFX beefyMotor;
-	private final Orchestra sandstormOrchestra;
+	private final Orchestra marioUnderwater;
 	private final Orchestra duckOrchestra;
 	private static final Angle ROTATIONS_DOWN = Angle.ofBaseUnits(60, Degrees);
 	private static final Current CURRENT_THRESHOLD = Current.ofBaseUnits(40, Amps);
@@ -35,10 +35,10 @@ public class ClimberSubsystem extends SubsystemBase {
 
 		beefyMotor.setPosition(0);
 
-		sandstormOrchestra = new Orchestra();
-		sandstormOrchestra.addInstrument(beefyMotor);
-		sandstormOrchestra.loadMusic("music/sandstorm.chrp");
-		sandstormOrchestra.play();
+		marioUnderwater = new Orchestra();
+		marioUnderwater.addInstrument(beefyMotor);
+		marioUnderwater.loadMusic("music/mario-underwater.chrp");
+		marioUnderwater.play();
 
 		duckOrchestra = new Orchestra();
 		duckOrchestra.addInstrument(beefyMotor);
