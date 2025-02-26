@@ -76,13 +76,18 @@ public final class Constants {
 		public static final int elevatorMotorL = 26;
 		public static final int elevatorMotorR = 27;
 
+		// Climber Motor IDs
+		public static final int beefyMotor = 29;
+	}
+
+	public static class DIOConstants {
+
 		// Sensor ports
 		public static final int coralSensorPort = 1;
 		public static final int elevatorEncoderL = 2;
 		public static final int elevatorEncoderR = 3;
 		public static final int homingTiltClickySwitch = 4;
-
-		// Climber Motor IDs
-		public static final int beefyMotor = 29;
+		public static final int elevatorBottomLimitSwitch = 5;
+		public static final int elevatorTopLimitSwitch = 6;
 	}
 }
