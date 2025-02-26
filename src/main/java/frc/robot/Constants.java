@@ -81,5 +81,8 @@ public final class Constants {
 		public static final int elevatorEncoderL = 2;
 		public static final int elevatorEncoderR = 3;
 		public static final int homingTiltClickySwitch = 4;
+
+		// Climber Motor IDs
+		public static final int beefyMotor = 29;
 	}
 }
