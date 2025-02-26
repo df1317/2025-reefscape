@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanConstants;
+import frc.robot.Constants.DIOConstants;
 
 public class ScoringSubsystem extends SubsystemBase {
 
@@ -26,7 +27,7 @@ public class ScoringSubsystem extends SubsystemBase {
 	public ScoringSubsystem() {
 		motor1 = new SparkMax(CanConstants.scoreMotor1, MotorType.kBrushless);
 		motor2 = new SparkMax(CanConstants.scoreMotor2, MotorType.kBrushless);
-		coralSensor = new DigitalInput(CanConstants.coralSensorPort);
+		coralSensor = new DigitalInput(DIOConstants.coralSensorPort);
 
 		canTiltMax = new SparkMax(CanConstants.scoreTiltMotor, MotorType.kBrushless);
 
@@ -34,7 +35,7 @@ public class ScoringSubsystem extends SubsystemBase {
 		canTiltMax.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		canTiltController = canTiltMax.getClosedLoopController();
 
-		homingTiltClickySwitch = new DigitalInput(CanConstants.homingTiltClickySwitch);
+		homingTiltClickySwitch = new DigitalInput(DIOConstants.homingTiltClickySwitch);
 	}
 
 	public Command runIntakeCommand(boolean out) {

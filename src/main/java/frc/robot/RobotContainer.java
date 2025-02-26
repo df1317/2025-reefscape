@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -41,6 +42,7 @@ public class RobotContainer {
 	);
 	private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 	private final ScoringSubsystem scoringSubsystem = new ScoringSubsystem();
+	private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
 	/**
 	 * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -115,11 +117,8 @@ public class RobotContainer {
 			driverXbox.y().onTrue(drivebase.driveToDistanceCommand(1.0, (double) 0.2));
 			driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 			driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-			driverXbox.leftBumper().onTrue(Commands.none());
+			driverXbox.leftBumper().onTrue(climberSubsystem.playMusicCommand());
 			driverXbox.rightBumper().onTrue(Commands.none());
-			// driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("Test Mode:
-			// Drive SysID")));
-			// driverXbox.a().whileTrue(drivebase.sysIdDriveMotorCommand());
 			driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("test Mode: Reset Gyro")));
 			driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 
@@ -141,6 +140,8 @@ public class RobotContainer {
 			// 0.5));
 
 			m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.5));
+			m_JoystickL.button(9).whileTrue(climberSubsystem.climbCommand());
+			m_JoystickL.button(10).whileTrue(climberSubsystem.descendCommand());
 		} else {
 			driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 			driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));

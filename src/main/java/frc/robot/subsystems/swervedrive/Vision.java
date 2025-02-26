@@ -78,6 +78,11 @@ public class Vision {
 	private Field2d field2d;
 
 	/**
+	 * Alert to show when no PhotonVision clients are found
+	 */
+	private final Alert noPhotonVisionAlert = new Alert("No PhotonVision clients found", AlertType.kWarning);
+
+	/**
 	 * Constructor for the Vision class.
 	 *
 	 * @param currentPose Current pose supplier, should reference
@@ -98,6 +103,16 @@ public class Vision {
 
 			openSimCameraViews();
 		}
+
+		// Check if any cameras are connected
+		boolean hasCamera = false;
+		for (Cameras c : Cameras.values()) {
+			if (c.camera.isConnected()) {
+				hasCamera = true;
+				break;
+			}
+		}
+		noPhotonVisionAlert.set(!hasCamera);
 	}
 
 	/**
@@ -139,6 +154,9 @@ public class Vision {
 			visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
 		}
 		for (Cameras camera : Cameras.values()) {
+			if (!camera.camera.isConnected()) {
+				continue;
+			}
 			Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
 			if (poseEst.isPresent()) {
 				var pose = poseEst.get();
