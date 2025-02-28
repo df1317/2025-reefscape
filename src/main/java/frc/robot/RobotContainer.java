@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -118,7 +119,8 @@ public class RobotContainer {
 			driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 			driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 			driverXbox.leftBumper().onTrue(climberSubsystem.playMusicCommand());
-			driverXbox.rightBumper().onTrue(Commands.none());
+			driverXbox.rightBumper().onTrue(scoringSubsystem.runIntakeCommand());
+			driverXbox.rightTrigger().onTrue(scoringSubsystem.runEjectCommand());
 			driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("test Mode: Reset Gyro")));
 			driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 
@@ -129,17 +131,14 @@ public class RobotContainer {
 			m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2));
 			m_JoystickL.button(2).onTrue(elevatorSubsystem.sysIDCommand(4, 2, 2));
 			m_JoystickL.button(7).toggleOnTrue(elevatorSubsystem.demo());
-			// m_JoystickL.button(11)
-			// .whileTrue(elevatorSubsystem.sysIDQuasistatic(Direction.kReverse, 3.0));
-			// m_JoystickL.button(9).whileTrue(elevatorSubsystem.sysIDQuasistatic(Direction.kForward,
-			// 3.0));
+			// m_JoystickL.button(11).whileTrue(elevatorSubsystem.sysIDQuasistatic(Direction.kReverse, 3.0));
+			// m_JoystickL.button(9).whileTrue(elevatorSubsystem.sysIDQuasistatic(Direction.kForward, 3.0));
 
-			// m_JoystickL.button(12)
-			// .whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kReverse, 1.0));
-			// m_JoystickL.button(10).whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kForward,
-			// 0.5));
+			m_JoystickL.button(12).whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kReverse, 1.0));
+			m_JoystickL.button(10).whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kForward, 0.5));
 
-			m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.5));
+			m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.4));
+			m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltCommand(0.2));
 			m_JoystickL.button(9).whileTrue(climberSubsystem.climbCommand());
 			m_JoystickL.button(10).whileTrue(climberSubsystem.descendCommand());
 		} else {
