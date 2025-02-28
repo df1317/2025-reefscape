@@ -150,7 +150,7 @@ public class RobotContainer {
 			driverXbox.start().whileTrue(Commands.none());
 			driverXbox.back().whileTrue(Commands.none());
 			driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-			driverXbox.rightBumper().onTrue(Commands.none());
+			driverXbox.rightBumper().onTrue(climberSubsystem.playMusicCommand());
 			driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("Other Mode: Reset Gyro")));
 		}
 	}

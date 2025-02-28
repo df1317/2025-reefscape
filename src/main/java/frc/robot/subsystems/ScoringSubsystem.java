@@ -29,15 +29,11 @@ public class ScoringSubsystem extends SubsystemBase {
 	public DigitalInput coralSensor;
 
 	public ScoringSubsystem() {
-		motorConfig.smartCurrentLimit(10);
+		motorConfig.smartCurrentLimit(20);
 		motor1 = new SparkMax(CanConstants.scoreMotor1, MotorType.kBrushless);
 		motor2 = new SparkMax(CanConstants.scoreMotor2, MotorType.kBrushless);
 		motor1.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-		motor2.configure(
-			motorConfig.follow(motor1).inverted(true),
-			ResetMode.kResetSafeParameters,
-			PersistMode.kNoPersistParameters
-		);
+		motor2.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
 		coralSensor = new DigitalInput(DIOConstants.coralSensorPort);
 
@@ -57,6 +53,11 @@ public class ScoringSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("scoring/tilt current", canTiltMax.getOutputCurrent());
 		SmartDashboard.putNumber("scoring/tilt voltage", canTiltMax.getBusVoltage() * canTiltMax.getAppliedOutput());
 		SmartDashboard.putNumber("scoring/tilt encoder", canTiltMax.getEncoder().getPosition());
+		SmartDashboard.putBoolean("scoring/coral sensor", coralSensor.get());
+		SmartDashboard.putNumber("scoring/motor1 current", motor1.getOutputCurrent());
+		SmartDashboard.putNumber("scoring/motor1 voltage", motor1.getBusVoltage() * motor1.getAppliedOutput());
+		SmartDashboard.putNumber("scoring/motor2 current", motor2.getOutputCurrent());
+		SmartDashboard.putNumber("scoring/motor2 voltage", motor2.getBusVoltage() * motor2.getAppliedOutput());
 	}
 
 	public Command runIntakeCommand() {
@@ -70,7 +71,7 @@ public class ScoringSubsystem extends SubsystemBase {
 					motor2.set(0);
 				}
 			)
-			.until(() -> coralSensor.get() || motor1.getOutputCurrent() > 8)
+			.until(() -> !coralSensor.get())
 			.withTimeout(3);
 	}
 
@@ -85,7 +86,7 @@ public class ScoringSubsystem extends SubsystemBase {
 					motor2.set(0);
 				}
 			)
-			.until(() -> !coralSensor.get())
+			.until(() -> coralSensor.get())
 			.withTimeout(3);
 	}
 
