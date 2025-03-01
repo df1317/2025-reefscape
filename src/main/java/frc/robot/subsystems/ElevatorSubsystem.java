@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants.DIOConstants;
 import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -40,8 +41,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private RelativeEncoder encoderL;
 	private RelativeEncoder encoderR;
 
-	public DigitalInput limitSwitchTop = new DigitalInput(8);
-	public DigitalInput limitSwitchBottom = new DigitalInput(9);
+	public DigitalInput limitSwitchTop = new DigitalInput(DIOConstants.elevatorTopLimitSwitch);
+	public DigitalInput limitSwitchBottom = new DigitalInput(DIOConstants.elevatorBottomLimitSwitch);
 
 	private enum LimitSwitchTrigger {
 		TOP,
