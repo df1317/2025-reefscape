@@ -183,6 +183,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
 		SmartDashboard.putNumber("elevator/motorL current", motorL.getOutputCurrent());
 		SmartDashboard.putNumber("elevator/motorL voltage", motorL.getBusVoltage());
+		SmartDashboard.putNumber("elevator/motorR current", motorR.getOutputCurrent());
+		SmartDashboard.putNumber("elevator/motorR voltage", motorR.getBusVoltage());
 	}
 
 	public Command setPos(DoubleSupplier height) {
