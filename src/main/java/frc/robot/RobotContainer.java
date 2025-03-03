@@ -119,8 +119,8 @@ public class RobotContainer {
 			driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 			driverXbox.back().whileTrue(drivebase.centerModulesCommand());
 			driverXbox.leftBumper().onTrue(climberSubsystem.playMusicCommand());
-			driverXbox.rightBumper().onTrue(scoringSubsystem.runIntakeCommand());
-			driverXbox.rightTrigger().onTrue(scoringSubsystem.runEjectCommand());
+			driverXbox.rightBumper().whileTrue(scoringSubsystem.runIntakeCommand());
+			driverXbox.rightTrigger().whileTrue(scoringSubsystem.runEjectCommand());
 			driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("test Mode: Reset Gyro")));
 			driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
 
@@ -152,6 +152,14 @@ public class RobotContainer {
 			driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 			driverXbox.rightBumper().onTrue(climberSubsystem.playMusicCommand());
 			driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("Other Mode: Reset Gyro")));
+
+			m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.4));
+			m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltCommand(0.2));
+
+			m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0));
+			m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3));
+			m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6));
+			m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2));
 		}
 	}
 
