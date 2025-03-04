@@ -88,19 +88,20 @@ public class ScoringSubsystem extends SubsystemBase {
 				spinnyController.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
 				spinnyController2.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
 			})
-			.finallyDo(() -> {
-				System.out.println("intake command finished");
-				spinnyController.setReference(0, ControlType.kCurrent);
-				spinnyController2.setReference(0, ControlType.kCurrent);
-			})
 			.until(() -> !coralSensor.get())
+			.withTimeout(3)
 			.andThen(
 				this.run(() -> {
 						spinnyController.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
 						spinnyController2.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
-					}).withTimeout(0.2)
-			)
-			.withTimeout(3);
+					})
+					.finallyDo(() -> {
+						System.out.println("intake command finished");
+						spinnyController.setReference(0, ControlType.kCurrent);
+						spinnyController2.setReference(0, ControlType.kCurrent);
+					})
+					.withTimeout(0.2)
+			);
 	}
 
 	public Command runEjectCommand() {
@@ -114,7 +115,7 @@ public class ScoringSubsystem extends SubsystemBase {
 				spinnyController.setReference(0, ControlType.kCurrent);
 				spinnyController2.setReference(0, ControlType.kCurrent);
 			})
-			.withTimeout(3);
+			.withTimeout(1.7);
 	}
 
 	public Command tiltCommand(double position) {
