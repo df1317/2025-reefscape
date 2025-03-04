@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanConstants;
 import frc.robot.Constants.DIOConstants;
+import frc.robot.Constants.FunSpeedyConstants;
 
 public class ScoringSubsystem extends SubsystemBase {
 
@@ -84,30 +85,35 @@ public class ScoringSubsystem extends SubsystemBase {
 	public Command runIntakeCommand() {
 		return this.run(() -> {
 				System.out.println("intake command started");
-				spinnyController.setReference(20, ControlType.kCurrent);
-				spinnyController2.setReference(20, ControlType.kCurrent);
+				spinnyController.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
+				spinnyController2.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
 			})
 			.finallyDo(() -> {
 				System.out.println("intake command finished");
 				spinnyController.setReference(0, ControlType.kCurrent);
 				spinnyController2.setReference(0, ControlType.kCurrent);
 			})
-			// .until(() -> !coralSensor.get())
+			.until(() -> !coralSensor.get())
+			.andThen(
+				this.run(() -> {
+						spinnyController.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
+						spinnyController2.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
+					}).withTimeout(0.2)
+			)
 			.withTimeout(3);
 	}
 
 	public Command runEjectCommand() {
 		return this.run(() -> {
 				System.out.println("eject command started");
-				spinnyController.setReference(-20, ControlType.kCurrent);
-				spinnyController2.setReference(-20, ControlType.kCurrent);
+				spinnyController.setReference(-FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
+				spinnyController2.setReference(-FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
 			})
 			.finallyDo(() -> {
 				System.out.println("eject command ended");
 				spinnyController.setReference(0, ControlType.kCurrent);
 				spinnyController2.setReference(0, ControlType.kCurrent);
 			})
-			// .until(() -> coralSensor.get())
 			.withTimeout(3);
 	}
 
