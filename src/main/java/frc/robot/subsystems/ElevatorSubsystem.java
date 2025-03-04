@@ -270,6 +270,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 			);
 	}
 
+	public Command zeroCommand() {
+		return this.runOnce(() -> {
+				preRenfernce.position = 0;
+				ffState.position = 0;
+				encoderL.setPosition(0);
+				encoderR.setPosition(0);
+			});
+	}
+
 	public Command sysIDQuasistatic(Direction dir, double timeout) {
 		return m_sysIdRoutine.quasistatic(dir).withTimeout(timeout);
 	}

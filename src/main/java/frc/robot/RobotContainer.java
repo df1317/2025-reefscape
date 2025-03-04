@@ -173,7 +173,7 @@ public class RobotContainer {
 			.b()
 			.whileTrue(
 				Commands.either(
-					Commands.none(),
+					elevatorSubsystem.zeroCommand(),
 					drivebase.driveToPose(new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))),
 					DriverStation::isTest
 				)
@@ -191,10 +191,10 @@ public class RobotContainer {
 			);
 
 		// Common elevator position bindings
-		m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0));
-		m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3));
-		m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6));
-		m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2));
+		m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0)); //.alongWith(scoringSubsystem.tiltCommand(0.3)));
+		m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3)); //.alongWith(scoringSubsystem.tiltCommand(0.16)));
+		m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6)); //.alongWith(scoringSubsystem.tiltCommand(0.16)));
+		m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2)); //.alongWith(scoringSubsystem.tiltCommand(0.05)));
 
 		// Test-mode specific joystick bindings
 		m_JoystickL
@@ -206,32 +206,21 @@ public class RobotContainer {
 			.toggleOnTrue(Commands.either(elevatorSubsystem.demo(), Commands.none(), DriverStation::isTest));
 
 		m_JoystickL
-			.button(12)
-			.whileTrue(
-				Commands.either(
-					elevatorSubsystem.sysIDDynamic(Direction.kReverse, 1.0),
-					scoringSubsystem.tiltCommand(0.2),
-					DriverStation::isTest
-				)
-			);
-
-		m_JoystickL
-			.button(10)
-			.whileTrue(
-				Commands.either(
-					elevatorSubsystem.sysIDDynamic(Direction.kForward, 0.5),
-					Commands.none(),
-					DriverStation::isTest
-				)
-			);
-
-		m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.4));
-		m_JoystickL
-			.button(9)
+			.button(8)
 			.whileTrue(Commands.either(climberSubsystem.climbCommand(), Commands.none(), DriverStation::isTest));
 		m_JoystickL
-			.button(10)
+			.button(9)
 			.whileTrue(Commands.either(climberSubsystem.descendCommand(), Commands.none(), DriverStation::isTest));
+
+		m_JoystickL
+			.button(10)
+			.whileTrue(Commands.either(scoringSubsystem.tiltCommand(0), Commands.none(), DriverStation::isTest));
+		m_JoystickL
+			.button(11)
+			.whileTrue(Commands.either(scoringSubsystem.tiltNudge(false), Commands.none(), DriverStation::isTest));
+		m_JoystickL
+			.button(12)
+			.whileTrue(Commands.either(scoringSubsystem.tiltNudge(true), Commands.none(), DriverStation::isTest));
 	}
 
 	/**

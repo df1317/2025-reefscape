@@ -10,9 +10,11 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanConstants;
 import frc.robot.Constants.DIOConstants;
@@ -32,6 +34,7 @@ public class ScoringSubsystem extends SubsystemBase {
 	private SparkClosedLoopController canTiltController;
 	private DigitalInput homingTiltClickySwitch;
 	public DigitalInput coralSensor;
+	private double setpoint = 0;
 
 	public ScoringSubsystem() {
 		motorConfig
@@ -61,10 +64,9 @@ public class ScoringSubsystem extends SubsystemBase {
 
 		tiltEncoderConfig.countsPerRevolution(8192).inverted(true);
 
-		tiltConfig.inverted(true).smartCurrentLimit(15).apply(tiltEncoderConfig);
-		tiltConfig.closedLoop.p(0.1, ClosedLoopSlot.kSlot0).i(0, ClosedLoopSlot.kSlot0).d(0, ClosedLoopSlot.kSlot0);
+		tiltConfig.inverted(false).smartCurrentLimit(15).apply(tiltEncoderConfig);
+		tiltConfig.closedLoop.p(4, ClosedLoopSlot.kSlot0).i(0, ClosedLoopSlot.kSlot0).d(0.4, ClosedLoopSlot.kSlot0);
 		canTiltMax = new SparkMax(CanConstants.scoreTiltMotor, MotorType.kBrushed);
-		canTiltMax.configure(tiltConfig, null, null);
 		canTiltMax.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		canTiltController = canTiltMax.getClosedLoopController();
 		homingTiltClickySwitch = new DigitalInput(DIOConstants.homingTiltClickySwitch);
@@ -72,6 +74,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		setpoint = MathUtil.clamp(setpoint, 0, 0.4);
+		canTiltController.setReference(setpoint, ControlType.kPosition);
+
+		SmartDashboard.putNumber("scoring/setpoint", setpoint);
 		SmartDashboard.putNumber("scoring/tilt current", canTiltMax.getOutputCurrent());
 		SmartDashboard.putNumber("scoring/tilt voltage", canTiltMax.getBusVoltage() * canTiltMax.getAppliedOutput());
 		SmartDashboard.putNumber("scoring/tilt encoder", canTiltMax.getEncoder().getPosition());
@@ -119,14 +125,21 @@ public class ScoringSubsystem extends SubsystemBase {
 	}
 
 	public Command tiltCommand(double position) {
-		return this.runEnd(
-				() -> {
-					canTiltController.setReference(position, ControlType.kPosition);
-				},
-				() -> {
-					canTiltController.setReference(0, ControlType.kPosition);
-				}
-			);
+		return this.runOnce(() -> {
+				setpoint = position;
+			});
+	}
+
+	public Command tiltNudge(boolean direction) {
+		return Commands.runOnce(() -> {
+			if (direction) {
+				setpoint += 5.0 / 360.0;
+				System.out.println(setpoint);
+			} else {
+				setpoint -= 5.0 / 360.0;
+				System.out.println(setpoint);
+			}
+		});
 	}
 
 	public Command homeCommand() {
