@@ -109,58 +109,129 @@ public class RobotContainer {
 		Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
 
 		drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+		// Common bindings for both modes
+		driverXbox
+			.a()
+			.onTrue(
+				Commands.runOnce(drivebase::zeroGyro).andThen(
+					Commands.runOnce(() ->
+						System.out.println(DriverStation.isTest() ? "Test Mode: Reset Gyro" : "Other Mode: Reset Gyro")
+					)
+				)
+			);
 
-		if (DriverStation.isTest()) {
-			drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command
-			// above!
+		// Xbox controller bindings
+		driverXbox
+			.x()
+			.whileTrue(
+				Commands.either(
+					Commands.runOnce(drivebase::lock, drivebase).repeatedly(),
+					Commands.runOnce(drivebase::addFakeVisionReading),
+					DriverStation::isTest
+				)
+			);
 
-			driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-			driverXbox.y().onTrue(drivebase.driveToDistanceCommand(1.0, (double) 0.2));
-			driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-			driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-			driverXbox.leftBumper().onTrue(climberSubsystem.playMusicCommand());
-			driverXbox.rightBumper().whileTrue(scoringSubsystem.runIntakeCommand());
-			driverXbox.rightTrigger().whileTrue(scoringSubsystem.runEjectCommand());
-			driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("test Mode: Reset Gyro")));
-			driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+		driverXbox
+			.y()
+			.onTrue(
+				Commands.either(drivebase.driveToDistanceCommand(1.0, 0.2), Commands.none(), DriverStation::isTest)
+			);
 
-			m_JoystickL.trigger().whileTrue(elevatorSubsystem.setSpeed(() -> m_JoystickL.getY() * -1));
-			m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0));
-			m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3));
-			m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6));
-			m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2));
-			m_JoystickL.button(2).onTrue(elevatorSubsystem.sysIDCommand(4, 2, 2));
-			m_JoystickL.button(7).toggleOnTrue(elevatorSubsystem.demo());
-			// m_JoystickL.button(11).whileTrue(elevatorSubsystem.sysIDQuasistatic(Direction.kReverse, 3.0));
-			// m_JoystickL.button(9).whileTrue(elevatorSubsystem.sysIDQuasistatic(Direction.kForward, 3.0));
+		driverXbox
+			.start()
+			.onTrue(Commands.either(Commands.runOnce(drivebase::zeroGyro), Commands.none(), DriverStation::isTest));
 
-			m_JoystickL.button(12).whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kReverse, 1.0));
-			m_JoystickL.button(10).whileTrue(elevatorSubsystem.sysIDDynamic(Direction.kForward, 0.5));
+		driverXbox
+			.back()
+			.whileTrue(Commands.either(drivebase.centerModulesCommand(), Commands.none(), DriverStation::isTest));
 
-			m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.4));
-			m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltCommand(0.2));
-			m_JoystickL.button(9).whileTrue(climberSubsystem.climbCommand());
-			m_JoystickL.button(10).whileTrue(climberSubsystem.descendCommand());
-		} else {
-			driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-			driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-			driverXbox
-				.b()
-				.whileTrue(drivebase.driveToPose(new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
-			driverXbox.start().whileTrue(Commands.none());
-			driverXbox.back().whileTrue(Commands.none());
-			driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-			driverXbox.rightBumper().onTrue(climberSubsystem.playMusicCommand());
-			driverXbox.a().onTrue(Commands.runOnce(() -> System.out.println("Other Mode: Reset Gyro")));
+		driverXbox
+			.leftBumper()
+			.whileTrue(
+				Commands.either(
+					climberSubsystem.playMusicCommand(),
+					Commands.runOnce(drivebase::lock, drivebase).repeatedly(),
+					DriverStation::isTest
+				)
+			);
 
-			m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.4));
-			m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltCommand(0.2));
+		driverXbox
+			.rightBumper()
+			.onTrue(
+				Commands.either(
+					scoringSubsystem.runIntakeCommand(),
+					climberSubsystem.playMusicCommand(),
+					DriverStation::isTest
+				)
+			);
 
-			m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0));
-			m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3));
-			m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6));
-			m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2));
-		}
+		driverXbox
+			.rightTrigger()
+			.onTrue(Commands.either(scoringSubsystem.runEjectCommand(), Commands.none(), DriverStation::isTest));
+
+		driverXbox
+			.b()
+			.whileTrue(
+				Commands.either(
+					Commands.none(),
+					drivebase.driveToPose(new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))),
+					DriverStation::isTest
+				)
+			);
+
+		// Joystick bindings
+		m_JoystickL
+			.trigger()
+			.whileTrue(
+				Commands.either(
+					elevatorSubsystem.setSpeed(() -> m_JoystickL.getY() * -1),
+					Commands.none(),
+					DriverStation::isTest
+				)
+			);
+
+		// Common elevator position bindings
+		m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0));
+		m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3));
+		m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6));
+		m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2));
+
+		// Test-mode specific joystick bindings
+		m_JoystickL
+			.button(2)
+			.onTrue(Commands.either(elevatorSubsystem.sysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest));
+
+		m_JoystickL
+			.button(7)
+			.toggleOnTrue(Commands.either(elevatorSubsystem.demo(), Commands.none(), DriverStation::isTest));
+
+		m_JoystickL
+			.button(12)
+			.whileTrue(
+				Commands.either(
+					elevatorSubsystem.sysIDDynamic(Direction.kReverse, 1.0),
+					scoringSubsystem.tiltCommand(0.2),
+					DriverStation::isTest
+				)
+			);
+
+		m_JoystickL
+			.button(10)
+			.whileTrue(
+				Commands.either(
+					elevatorSubsystem.sysIDDynamic(Direction.kForward, 0.5),
+					Commands.none(),
+					DriverStation::isTest
+				)
+			);
+
+		m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltCommand(0.4));
+		m_JoystickL
+			.button(9)
+			.whileTrue(Commands.either(climberSubsystem.climbCommand(), Commands.none(), DriverStation::isTest));
+		m_JoystickL
+			.button(10)
+			.whileTrue(Commands.either(climberSubsystem.descendCommand(), Commands.none(), DriverStation::isTest));
 	}
 
 	/**
