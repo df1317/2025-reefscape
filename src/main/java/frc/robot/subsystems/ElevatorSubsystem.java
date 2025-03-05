@@ -35,7 +35,7 @@ import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-	private final double maxHeight = 1.2;
+	private final double maxHeight = 1.23;
 	private final double minHeight = 0;
 	private long t = System.nanoTime();
 	private RelativeEncoder encoderL;
