@@ -191,15 +191,23 @@ public class RobotContainer {
 			);
 
 		// Common elevator position bindings
-		m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0)); //.alongWith(scoringSubsystem.tiltCommand(0.3)));
-		m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.3)); //.alongWith(scoringSubsystem.tiltCommand(0.16)));
-		m_JoystickL.button(4).onTrue(elevatorSubsystem.setPos(() -> 0.6)); //.alongWith(scoringSubsystem.tiltCommand(0.16)));
-		m_JoystickL.button(6).onTrue(elevatorSubsystem.setPos(() -> 1.2)); //.alongWith(scoringSubsystem.tiltCommand(0.05)));
+		m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0).alongWith(scoringSubsystem.tiltCommand(0.38)));
+		m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.2).alongWith(scoringSubsystem.tiltCommand(0.18)));
+		m_JoystickL
+			.button(4)
+			.onTrue(elevatorSubsystem.setPos(() -> 0.64).alongWith(scoringSubsystem.tiltCommand(0.15)));
+		m_JoystickL
+			.button(6)
+			.onTrue(
+				(elevatorSubsystem.setPos(() -> 1.23).alongWith(scoringSubsystem.tiltCommand(0.20))).andThen(
+						scoringSubsystem.tiltCommand(0.4)
+					)
+			);
 
 		// Test-mode specific joystick bindings
-		m_JoystickL
-			.button(2)
-			.onTrue(Commands.either(elevatorSubsystem.sysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest));
+		// m_JoystickL
+		// 	.button(2)
+		// 	.onTrue(Commands.either(elevatorSubsystem.sysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest));
 
 		m_JoystickL
 			.button(7)
