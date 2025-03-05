@@ -205,9 +205,11 @@ public class RobotContainer {
 			);
 
 		// Test-mode specific joystick bindings
-		// m_JoystickL
-		// 	.button(2)
-		// 	.onTrue(Commands.either(elevatorSubsystem.sysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest));
+		m_JoystickL
+			.button(2)
+			.onTrue(
+				Commands.either(scoringSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
+			);
 
 		m_JoystickL
 			.button(7)

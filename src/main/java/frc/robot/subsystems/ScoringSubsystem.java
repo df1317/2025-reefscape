@@ -1,5 +1,12 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -11,11 +18,18 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.CanConstants;
 import frc.robot.Constants.DIOConstants;
 import frc.robot.Constants.FunSpeedyConstants;
@@ -29,12 +43,18 @@ public class ScoringSubsystem extends SubsystemBase {
 	private SparkMax canTiltMax;
 	private SparkMaxConfig tiltConfig = new SparkMaxConfig();
 	private EncoderConfig tiltEncoderConfig = new EncoderConfig();
+	private RelativeEncoder canTiltEncoder;
 	private SparkMaxConfig motorConfig = new SparkMaxConfig();
 	private SparkMaxConfig motorConfig2 = new SparkMaxConfig();
 	private SparkClosedLoopController canTiltController;
 	private DigitalInput homingTiltClickySwitch;
 	public DigitalInput coralSensor;
 	private double setpoint = 0;
+
+	// Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+	private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+	private final MutAngle m_rotation = Rotations.mutable(0);
+	private final MutAngularVelocity m_velocity = RotationsPerSecond.mutable(0);
 
 	public ScoringSubsystem() {
 		motorConfig
@@ -65,10 +85,11 @@ public class ScoringSubsystem extends SubsystemBase {
 		tiltEncoderConfig.countsPerRevolution(8192).inverted(true);
 
 		tiltConfig.inverted(false).smartCurrentLimit(15).apply(tiltEncoderConfig);
-		tiltConfig.closedLoop.p(4, ClosedLoopSlot.kSlot0).i(0, ClosedLoopSlot.kSlot0).d(0.4, ClosedLoopSlot.kSlot0);
+		tiltConfig.closedLoop.p(4.5, ClosedLoopSlot.kSlot0).i(0, ClosedLoopSlot.kSlot0).d(0.4, ClosedLoopSlot.kSlot0);
 		canTiltMax = new SparkMax(CanConstants.scoreTiltMotor, MotorType.kBrushed);
 		canTiltMax.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		canTiltController = canTiltMax.getClosedLoopController();
+		canTiltEncoder = canTiltMax.getEncoder();
 		homingTiltClickySwitch = new DigitalInput(DIOConstants.homingTiltClickySwitch);
 	}
 
@@ -81,7 +102,7 @@ public class ScoringSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("scoring/tilt current", canTiltMax.getOutputCurrent());
 		SmartDashboard.putNumber("scoring/tilt voltage", canTiltMax.getBusVoltage() * canTiltMax.getAppliedOutput());
 		SmartDashboard.putNumber("scoring/tilt encoder", canTiltMax.getEncoder().getPosition());
-		SmartDashboard.putBoolean("scoring/coral sensor", coralSensor.get());
+		SmartDashboard.putBoolean("scoring/coral sensor", !coralSensor.get());
 		SmartDashboard.putNumber("scoring/motor1 current", motor1.getOutputCurrent());
 		SmartDashboard.putNumber("scoring/motor1 voltage", motor1.getBusVoltage() * motor1.getAppliedOutput());
 		SmartDashboard.putNumber("scoring/motor2 current", motor2.getOutputCurrent());
@@ -153,4 +174,43 @@ public class ScoringSubsystem extends SubsystemBase {
 				}
 			).until(() -> homingTiltClickySwitch.get());
 	}
+
+	public Command tiltSysIDCommand(double quasiTimeout, double timeout, double dynamicTimeout) {
+		return m_sysIdRoutine
+			.quasistatic(SysIdRoutine.Direction.kForward)
+			.withTimeout(quasiTimeout)
+			.andThen(Commands.waitSeconds(timeout))
+			.andThen(m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).withTimeout(quasiTimeout))
+			.andThen(Commands.waitSeconds(timeout))
+			.andThen(m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).withTimeout(dynamicTimeout))
+			.andThen(Commands.waitSeconds(timeout))
+			.andThen(m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).withTimeout(dynamicTimeout));
+	}
+
+	private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+		// Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+		new SysIdRoutine.Config(null, Voltage.ofBaseUnits(5, Volts), null, null),
+		new SysIdRoutine.Mechanism(
+			// Tell SysId how to plumb the driving voltage to the motors.
+			voltage -> {
+				canTiltMax.setVoltage(voltage);
+			},
+			// Tell SysId how to record a frame of data for each motor on the mechanism
+			// being
+			// characterized.
+			log -> {
+				log
+					.motor("tilt")
+					.voltage(
+						m_appliedVoltage.mut_replace(canTiltMax.getBusVoltage() * canTiltMax.getAppliedOutput(), Volts)
+					)
+					.angularPosition(m_rotation.mut_replace(canTiltEncoder.getPosition(), Rotations))
+					.angularVelocity(m_velocity.mut_replace(canTiltEncoder.getVelocity(), RotationsPerSecond));
+			},
+			// Tell SysId to make generated commands require this subsystem, suffix test
+			// state in
+			// WPILog with this subsystem's name ("drive")
+			this
+		)
+	);
 }
