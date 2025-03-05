@@ -80,6 +80,11 @@ public final class Constants {
 		public static final int beefyMotor = 29;
 	}
 
+	public static class FunSpeedyConstants {
+
+		public static final int scoringCurrent = 20;
+	}
+
 	public static class DIOConstants {
 
 		// Sensor ports

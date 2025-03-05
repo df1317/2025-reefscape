@@ -35,7 +35,7 @@ import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-	private final double maxHeight = 1.2;
+	private final double maxHeight = 1.23;
 	private final double minHeight = 0;
 	private long t = System.nanoTime();
 	private RelativeEncoder encoderL;
@@ -61,6 +61,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private double krot = 42.4; // rotations/meter
 	private static final double upSpeed = 0.5;
 	private static final double downSpeed = 0.1;
+	private static final int elevatorCurrentLimit = 30;
 	private double ks = 0.36656, kg = 0.48642, kv = 4.7049;
 
 	private double currentMaxVel = maxV;
@@ -80,7 +81,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		motorR = new SparkMax(CanConstants.elevatorMotorR, MotorType.kBrushless);
 		// the defualt is lsot zero
 		config.closedLoop.p(kp, ClosedLoopSlot.kSlot0).i(ki, ClosedLoopSlot.kSlot0).d(kd, ClosedLoopSlot.kSlot0);
-		config.smartCurrentLimit(25).idleMode(IdleMode.kBrake);
+		config.smartCurrentLimit(elevatorCurrentLimit).idleMode(IdleMode.kBrake);
 
 		motorL.configure(config.inverted(false), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		motorR.configure(config.inverted(true), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
@@ -121,14 +122,16 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public void periodic() {
 		double ffValue = 0.0;
 		boolean running = false;
+		double height = encoderL.getPosition() / krot;
 
 		ffState.position = MathUtil.clamp(ffState.position, 0, maxHeight);
 		ffState.velocity = 0.0;
 
+		preRenfernce.position = MathUtil.isNear(ffState.position, height, 0.1) ? preRenfernce.position : height;
+		// preRenfernce.velocity = (encoderL.getVelocity() / krot) / 60.0;
+
 		preRenfernce.velocity = MathUtil.clamp(preRenfernce.velocity, -currentMaxVel, currentMaxVel);
 		preRenfernce.position = MathUtil.clamp(preRenfernce.position, 0, maxHeight);
-		// preRenfernce.velocity = MathUtil.applyDeadband(preRenfernce.velocity,
-		// 0.01);
 
 		preRenfernce = Profiler.calculate((System.nanoTime() - t) / 1e9, preRenfernce, ffState);
 
@@ -268,6 +271,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 					motorR.set(0);
 				}
 			);
+	}
+
+	public Command zeroCommand() {
+		return this.runOnce(() -> {
+				preRenfernce.position = 0;
+				ffState.position = 0;
+				encoderL.setPosition(0);
+				encoderR.setPosition(0);
+			});
 	}
 
 	public Command sysIDQuasistatic(Direction dir, double timeout) {

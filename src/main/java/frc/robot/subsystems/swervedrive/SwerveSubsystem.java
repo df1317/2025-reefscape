@@ -112,6 +112,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		// increases. Start with a
 		// coefficient of 0.1.
 		swerveDrive.setModuleEncoderAutoSynchronize(false, 1); // Enable if you want to resynchronize your absolute encoders
+		// anti jitter
+		Arrays.stream(swerveDrive.getModules()).forEach(m -> m.setAntiJitter(true));
 		// and motor encoders
 		// periodically when they are not moving.
 		// swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
