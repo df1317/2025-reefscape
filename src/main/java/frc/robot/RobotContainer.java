@@ -36,7 +36,7 @@ public class RobotContainer {
 	// Replace with CommandPS4Controller or CommandJoystick if needed
 	private final CommandXboxController driverXbox = new CommandXboxController(0);
 	private final CommandJoystick m_JoystickL = new CommandJoystick(1);
-	// private final CommandJoystick m_JoystickR = new CommandJoystick(2);
+	private final CommandJoystick m_JoystickR = new CommandJoystick(2);
 	// The robot's subsystems and commands are defined here...
 	private final SwerveSubsystem drivebase = new SwerveSubsystem(
 		new File(Filesystem.getDeployDirectory(), "swerve/neo")
@@ -231,6 +231,25 @@ public class RobotContainer {
 		m_JoystickL
 			.button(12)
 			.whileTrue(Commands.either(scoringSubsystem.tiltNudge(true), Commands.none(), DriverStation::isTest));
+
+		// sysid
+		m_JoystickR
+			.button(9)
+			.whileTrue(
+				Commands.either(elevatorSubsystem.sysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
+			);
+
+		m_JoystickR
+			.button(10)
+			.whileTrue(
+				Commands.either(scoringSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
+			);
+		m_JoystickR
+			.button(11)
+			.whileTrue(Commands.either(drivebase.sysIdAngleMotorCommand(), Commands.none(), DriverStation::isTest));
+		m_JoystickR
+			.button(12)
+			.whileTrue(Commands.either(drivebase.sysIdDriveMotorCommand(), Commands.none(), DriverStation::isTest));
 	}
 
 	/**
