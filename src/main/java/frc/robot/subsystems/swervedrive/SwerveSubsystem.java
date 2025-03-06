@@ -30,6 +30,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,7 +65,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	/**
 	 * Enable vision odometry updates while driving.
 	 */
-	private final boolean visionDriveTest = true;
+	private boolean visionDriveTest = true;
 	/**
 	 * PhotonVision class to keep an accurate odometry.
 	 */
@@ -135,6 +136,8 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)), Rotation2d.fromDegrees(0))
 		);
 		// Epilogue.bind(this);
+
+		SmartDashboard.putBoolean("swerve/vision enabled", visionDriveTest);
 	}
 
 	/**
@@ -146,6 +149,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		visionDriveTest = SmartDashboard.getBoolean("swerve/vision enabled", visionDriveTest);
+
 		// When vision is enabled we must manually update odometry in SwerveDrive
 		if (visionDriveTest) {
 			swerveDrive.updateOdometry();
