@@ -84,7 +84,7 @@ public class FieldConstants {
 			Rotation2d.fromRadians(-rightCenterFace.getRotation().getRadians())
 		);
 
-		public static final double height = 0, pitch = 137;
+		public static final double height = 0, pitch = 130;
 	}
 
 	public static class Reef {
