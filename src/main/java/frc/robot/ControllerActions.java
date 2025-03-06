@@ -1,3 +1,6 @@
+/* ----------
+ * Copywrite 2025 FRC team 1317 under AGPL-3.0
+ * ----------- */
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;

@@ -1,6 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/* ----------
+ * Copywrite 2025 FRC team 1317 under AGPL-3.0 adapted from YAGSL Docs
+ * ----------- */
 
 package frc.robot.commands.swervedrive.drivebase;
 

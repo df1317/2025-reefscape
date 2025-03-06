@@ -1,3 +1,7 @@
+/* ----------
+ * Copywrite 2025 FRC team 1317 under AGPL-3.0
+ * ----------- */
+
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
