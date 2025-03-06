@@ -43,24 +43,6 @@ public final class Constants {
 
 	public static class CanConstants {
 
-		// // Drive Motor IDs
-		// driveMotorFR = 12;
-		// driveMotorFL = 13;
-		// driveMotorBR = 14;
-		// driveMotorBL = 15;
-
-		// // Turn motor IDs
-		// turnMotorFR = 16;
-		// turnMotorFL = 17;
-		// turnMotorBR = 18;
-		// turnMotorBL = 19;
-
-		// // CanCoder IDs
-		// canCoderFR = 20;
-		// canCoderRL = 21;
-		// canCoderBR = 22;
-		// canCoderBL = 23;
-
 		// Scoring Motor IDs
 		public static final int scoreMotor1 = 24;
 		public static final int scoreMotor2 = 25;
