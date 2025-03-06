@@ -18,8 +18,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -63,12 +61,6 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * Swerve drive object.
 	 */
 	private final SwerveDrive swerveDrive;
-	/**
-	 * AprilTag field layout.
-	 */
-	private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(
-		AprilTagFields.k2025ReefscapeWelded
-	);
 	/**
 	 * Enable vision odometry updates while driving.
 	 */
