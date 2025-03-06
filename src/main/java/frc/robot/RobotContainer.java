@@ -1,13 +1,9 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/* ----------
+ * Copywrite 2025 FRC team 1317 under AGPL-3.0
+ * ----------- */
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.libs.FieldConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
@@ -22,27 +19,38 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
 
-/**
+/** ----------
+ * RobotContainer Class
+ * ---
  * This class is where the bulk of the robot should be declared. Since
- * Command-based is a "declarative" paradigm, very
- * little robot logic should actually be handled in the {@link Robot} periodic
- * methods (other than the scheduler calls).
- * Instead, the structure of the robot (including subsystems, commands, and
- * trigger mappings) should be declared here.
+ * Command-based is a "declarative" paradigm, very little robot logic
+ * should actually be handled in the {@link Robot} periodic methods
+ * (other than the scheduler calls). Instead, the structure of the robot
+ * (including subsystems, commands, and trigger mappings) should be declared here.
+ * ---
  */
 public class RobotContainer {
 
-	// Replace with CommandPS4Controller or CommandJoystick if needed
+	/** ----------
+	 * HID Initialization
+	 * ------------ */
 	private final CommandXboxController driverXbox = new CommandXboxController(0);
 	private final CommandJoystick m_JoystickL = new CommandJoystick(1);
 	private final CommandJoystick m_JoystickR = new CommandJoystick(2);
-	// The robot's subsystems and commands are defined here...
+
+	/** ----------
+	 * Subsystems
+	 * ------------ */
 	private final SwerveSubsystem drivebase = new SwerveSubsystem(
 		new File(Filesystem.getDeployDirectory(), "swerve/neo")
 	);
 	private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 	private final ScoringSubsystem scoringSubsystem = new ScoringSubsystem();
 	private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+
+	/** ----------
+	 * Swerve Drive Input Streams
+	 * ------------ */
 
 	/**
 	 * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -94,32 +102,41 @@ public class RobotContainer {
 		)
 		.headingWhile(true);
 
-	/**
-	 * The container for the robot. Contains subsystems, OI devices, and commands.
+	/** ----------
+	 * RobotContainer Root Class
+	 * ---
+	 * This is the root class for the robot. It is responsible for configuring the robot, its subsystems, and bindings.
+	 * ---
 	 */
 	public RobotContainer() {
-		// Configure the trigger bindings
 		configureBindings();
 		DriverStation.silenceJoystickConnectionWarning(true);
-		NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 	}
 
+	/** ----------
+	 * Configure the button bindings
+	 * ---
+	 * Use this method to define your button->command mappings. Buttons can be created by
+	 * instantiating a {@link CommandButton} with a {@link Command} and then calling the
+	 * various button-press functions on it.
+	 * ---
+	 */
 	private void configureBindings() {
 		Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
 
 		drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-		// Common bindings for both modes
-		driverXbox
-			.a()
-			.onTrue(
-				Commands.runOnce(drivebase::zeroGyro).andThen(
-					Commands.runOnce(() ->
-						System.out.println(DriverStation.isTest() ? "Test Mode: Reset Gyro" : "Other Mode: Reset Gyro")
-					)
-				)
-			);
 
-		// Xbox controller bindings
+		/** ------------------------------------- *
+		 * Xbox Swerve and Navigation bindings
+		 * ---
+		 * drivebase locking and fake vision reading
+		 * zero gyro and print mode
+		 * center modules and none
+		 * zero elevator and none
+		 * drive to pose (for sysid) and none
+		 * ---
+		 */
+
 		driverXbox
 			.x()
 			.whileTrue(
@@ -131,18 +148,37 @@ public class RobotContainer {
 			);
 
 		driverXbox
+			.start()
+			.onTrue(
+				Commands.runOnce(drivebase::zeroGyro).andThen(
+					Commands.runOnce(() ->
+						System.out.println(DriverStation.isTest() ? "Test Mode: Reset Gyro" : "Other Mode: Reset Gyro")
+					)
+				)
+			);
+
+		driverXbox
+			.back()
+			.whileTrue(Commands.either(drivebase.centerModulesCommand(), Commands.none(), DriverStation::isTest));
+
+		driverXbox
+			.b()
+			.whileTrue(Commands.either(elevatorSubsystem.zeroCommand(), Commands.none(), DriverStation::isTest));
+
+		driverXbox
 			.y()
 			.onTrue(
 				Commands.either(drivebase.driveToDistanceCommand(1.0, 0.2), Commands.none(), DriverStation::isTest)
 			);
 
-		driverXbox
-			.start()
-			.onTrue(Commands.either(Commands.runOnce(drivebase::zeroGyro), Commands.none(), DriverStation::isTest));
-
-		driverXbox
-			.back()
-			.whileTrue(Commands.either(drivebase.centerModulesCommand(), Commands.none(), DriverStation::isTest));
+		/** -------------------------------------
+		 * Xbox Scoring and Intake bindings
+		 * ---
+		 * duck song and drivebase locking
+		 * intake and duck song
+		 * eject and none
+		 * ---
+		 */
 
 		driverXbox
 			.leftBumper()
@@ -168,17 +204,15 @@ public class RobotContainer {
 			.rightTrigger()
 			.onTrue(Commands.either(scoringSubsystem.runEjectCommand(), Commands.none(), DriverStation::isTest));
 
-		driverXbox
-			.b()
-			.whileTrue(
-				Commands.either(
-					elevatorSubsystem.zeroCommand(),
-					drivebase.driveToPose(new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))),
-					DriverStation::isTest
-				)
-			);
+		/** -------------------------------------
+		 * Elevator position bindings
+		 * ---
+		 * positions are staggered so it is in an increasing u shape on the joystick
+		 * demo command will be toggled via binding and will continuially run elevator positions
+		 * manual control sets elevator position and speed based on joystick position
+		 * ---
+		 */
 
-		// Joystick bindings
 		m_JoystickL
 			.trigger()
 			.whileTrue(
@@ -189,30 +223,71 @@ public class RobotContainer {
 				)
 			);
 
-		// Common elevator position bindings
-		m_JoystickL.button(5).onTrue(elevatorSubsystem.setPos(() -> 0).alongWith(scoringSubsystem.tiltCommand(0.38)));
-		m_JoystickL.button(3).onTrue(elevatorSubsystem.setPos(() -> 0.2).alongWith(scoringSubsystem.tiltCommand(0.18)));
+		m_JoystickL
+			.button(5)
+			.onTrue(
+				elevatorSubsystem
+					.setPos(() -> FieldConstants.CoralStation.height)
+					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
+			);
+		m_JoystickL
+			.button(3)
+			.onTrue(
+				elevatorSubsystem
+					.setPos(() -> FieldConstants.ReefHeight.L2.height)
+					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
+			);
 		m_JoystickL
 			.button(4)
-			.onTrue(elevatorSubsystem.setPos(() -> 0.64).alongWith(scoringSubsystem.tiltCommand(0.15)));
+			.onTrue(
+				elevatorSubsystem
+					.setPos(() -> FieldConstants.ReefHeight.L3.height)
+					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
+			);
 		m_JoystickL
 			.button(6)
 			.onTrue(
-				(elevatorSubsystem.setPos(() -> 1.23).alongWith(scoringSubsystem.tiltCommand(0.20))).andThen(
-						scoringSubsystem.tiltCommand(0.4)
+				(elevatorSubsystem
+						.setPos(() -> FieldConstants.ReefHeight.L4.height)
+						.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))).andThen(
+						scoringSubsystem.tiltCommand(144)
 					)
-			);
-
-		// Test-mode specific joystick bindings
-		m_JoystickL
-			.button(2)
-			.onTrue(
-				Commands.either(scoringSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
 			);
 
 		m_JoystickL
 			.button(7)
-			.toggleOnTrue(Commands.either(elevatorSubsystem.demo(), Commands.none(), DriverStation::isTest));
+			.toggleOnTrue(
+				Commands.either(
+					Commands.repeatingSequence(
+						elevatorSubsystem
+							.setPos(() -> FieldConstants.CoralStation.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch)),
+						Commands.waitSeconds(2),
+						elevatorSubsystem
+							.setPos(() -> FieldConstants.ReefHeight.L2.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch)),
+						Commands.waitSeconds(2),
+						elevatorSubsystem
+							.setPos(() -> FieldConstants.ReefHeight.L3.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch)),
+						Commands.waitSeconds(2),
+						elevatorSubsystem
+							.setPos(() -> FieldConstants.ReefHeight.L4.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
+							.andThen(scoringSubsystem.tiltCommand(144)),
+						Commands.waitSeconds(2)
+					),
+					Commands.none(),
+					DriverStation::isTest
+				)
+			);
+
+		/** -------------------------------------
+		 * Test-mode specific climber bindings
+		 * ---
+		 * climb and descend
+		 * ---
+		 */
 
 		m_JoystickL
 			.button(8)
@@ -220,6 +295,14 @@ public class RobotContainer {
 		m_JoystickL
 			.button(9)
 			.whileTrue(Commands.either(climberSubsystem.descendCommand(), Commands.none(), DriverStation::isTest));
+
+		/** -------------------------------------
+		 * Test-mode specific tilt bindings
+		 * ---
+		 * tilt command and tilt nudge
+		 * tilt sysid command
+		 * ---
+		 */
 
 		m_JoystickL
 			.button(10)
@@ -231,7 +314,19 @@ public class RobotContainer {
 			.button(12)
 			.whileTrue(Commands.either(scoringSubsystem.tiltNudge(true), Commands.none(), DriverStation::isTest));
 
-		// sysid
+		/** -------------------------------------
+		 * Test-mode specific sysid bindings
+		 * ---
+		 * sysid command for elevator, tilt, and drivebase
+		 * ---
+		 */
+
+		m_JoystickL
+			.button(2)
+			.onTrue(
+				Commands.either(scoringSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
+			);
+
 		m_JoystickR
 			.button(9)
 			.whileTrue(
@@ -251,10 +346,11 @@ public class RobotContainer {
 			.whileTrue(Commands.either(drivebase.sysIdDriveMotorCommand(), Commands.none(), DriverStation::isTest));
 	}
 
-	/**
+	/** ----------
 	 * Use this to pass the autonomous command to the main {@link Robot} class.
-	 *
+	 * ---
 	 * @return the command to run in autonomous
+	 * ---
 	 */
 	public Command getAutonomousCommand() {
 		// An example command will be run in autonomous

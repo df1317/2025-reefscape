@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -141,9 +142,9 @@ public class ScoringSubsystem extends SubsystemBase {
 			.withTimeout(1.7);
 	}
 
-	public Command tiltCommand(double position) {
+	public Command tiltCommand(double degrees) {
 		return this.runOnce(() -> {
-				setpoint = position;
+				setpoint = Units.degreesToRotations(degrees);
 			});
 	}
 
