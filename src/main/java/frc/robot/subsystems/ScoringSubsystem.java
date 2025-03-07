@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.CanConstants;
 import frc.robot.Constants.DIOConstants;
-import frc.robot.Constants.FunSpeedyConstants;
 
 public class ScoringSubsystem extends SubsystemBase {
 
@@ -48,6 +47,8 @@ public class ScoringSubsystem extends SubsystemBase {
 	public DigitalInput coralSensor;
 	private double setpoint = 0;
 
+	private static final int scoringCurrent = 25;
+
 	// Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
 	private final MutVoltage m_appliedVoltage = Volts.mutable(0);
 	private final MutAngle m_rotation = Rotations.mutable(0);
@@ -55,7 +56,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	public ScoringSubsystem() {
 		motorConfig
-			.smartCurrentLimit(25)
+			.smartCurrentLimit(35)
 			.idleMode(IdleMode.kBrake)
 			.inverted(true)
 			.closedLoop.p(kp, ClosedLoopSlot.kSlot0)
@@ -66,7 +67,7 @@ public class ScoringSubsystem extends SubsystemBase {
 		motor1.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
 		motorConfig2
-			.smartCurrentLimit(25)
+			.smartCurrentLimit(35)
 			.idleMode(IdleMode.kBrake)
 			.closedLoop.p(kp, ClosedLoopSlot.kSlot0)
 			.i(ki, ClosedLoopSlot.kSlot0)
@@ -104,20 +105,23 @@ public class ScoringSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("scoring/motor1 voltage", motor1.getBusVoltage() * motor1.getAppliedOutput());
 		SmartDashboard.putNumber("scoring/motor2 current", motor2.getOutputCurrent());
 		SmartDashboard.putNumber("scoring/motor2 voltage", motor2.getBusVoltage() * motor2.getAppliedOutput());
+
+		SmartDashboard.putNumber("scoring/motor1 temp", motor1.getMotorTemperature());
+		SmartDashboard.putNumber("scoring/motor2 temp", motor2.getMotorTemperature());
 	}
 
 	public Command runIntakeCommand() {
 		return this.run(() -> {
 				System.out.println("intake command started");
-				spinnyController.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
-				spinnyController2.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
+				spinnyController.setReference(scoringCurrent, ControlType.kCurrent);
+				spinnyController2.setReference(scoringCurrent, ControlType.kCurrent);
 			})
 			.until(() -> !coralSensor.get())
 			.withTimeout(3)
 			.andThen(
 				this.run(() -> {
-						spinnyController.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
-						spinnyController2.setReference(FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
+						spinnyController.setReference(scoringCurrent, ControlType.kCurrent);
+						spinnyController2.setReference(scoringCurrent, ControlType.kCurrent);
 					})
 					.finallyDo(() -> {
 						System.out.println("intake command finished");
@@ -131,8 +135,8 @@ public class ScoringSubsystem extends SubsystemBase {
 	public Command runEjectCommand() {
 		return this.run(() -> {
 				System.out.println("eject command started");
-				spinnyController.setReference(-FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
-				spinnyController2.setReference(-FunSpeedyConstants.scoringCurrent, ControlType.kCurrent);
+				spinnyController.setReference(-scoringCurrent, ControlType.kCurrent);
+				spinnyController2.setReference(-scoringCurrent, ControlType.kCurrent);
 			})
 			.finallyDo(() -> {
 				System.out.println("eject command ended");
@@ -144,18 +148,17 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	public Command tiltCommand(double degrees) {
 		return this.runOnce(() -> {
-				setpoint = Units.degreesToRotations(degrees);
+				setpoint = MathUtil.clamp(Units.degreesToRotations(degrees), 0, 0.4);
 			});
 	}
 
 	public Command tiltNudge(boolean direction) {
-		return Commands.runOnce(() -> {
+		double amount = Units.degreesToRotations(0.4);
+		return Commands.run(() -> {
 			if (direction) {
-				setpoint += 5.0 / 360.0;
-				System.out.println(setpoint);
+				setpoint = MathUtil.clamp(setpoint + amount, 0, 0.4);
 			} else {
-				setpoint -= 5.0 / 360.0;
-				System.out.println(setpoint);
+				setpoint = MathUtil.clamp(setpoint - amount, 0, 0.4);
 			}
 		});
 	}

@@ -148,7 +148,7 @@ public class RobotContainer {
 			);
 
 		driverXbox
-			.start()
+			.a()
 			.onTrue(
 				Commands.runOnce(drivebase::zeroGyro).andThen(
 					Commands.runOnce(() ->
@@ -247,11 +247,9 @@ public class RobotContainer {
 		m_JoystickL
 			.button(6)
 			.onTrue(
-				(elevatorSubsystem
-						.setPos(() -> FieldConstants.ReefHeight.L4.height)
-						.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))).andThen(
-						scoringSubsystem.tiltCommand(144)
-					)
+				elevatorSubsystem
+					.setPos(() -> FieldConstants.ReefHeight.L4.height)
+					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
 			);
 
 		m_JoystickL
