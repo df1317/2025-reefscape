@@ -136,8 +136,6 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)), Rotation2d.fromDegrees(0))
 		);
 		// Epilogue.bind(this);
-
-		SmartDashboard.putBoolean("swerve/vision enabled", visionDriveTest);
 	}
 
 	/**
@@ -149,7 +147,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		visionDriveTest = SmartDashboard.getBoolean("swerve/vision enabled", visionDriveTest);
+		visionDriveTest = SmartDashboard.getBoolean("Swerve Drive/vision enabled", visionDriveTest);
 
 		// When vision is enabled we must manually update odometry in SwerveDrive
 		if (visionDriveTest) {
