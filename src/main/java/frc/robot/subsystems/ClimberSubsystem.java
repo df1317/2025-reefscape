@@ -4,17 +4,11 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,8 +19,6 @@ public class ClimberSubsystem extends SubsystemBase {
 	private final TalonFX beefyMotor;
 	private final Orchestra marioUnderwater;
 	private final Orchestra duckOrchestra;
-	private static final Angle ROTATIONS_DOWN = Angle.ofBaseUnits(60 * 450, Degrees);
-	private static final Current CURRENT_THRESHOLD = Current.ofBaseUnits(40, Amps);
 
 	public ClimberSubsystem() {
 		beefyMotor = new TalonFX(CanConstants.beefyMotor);
@@ -61,10 +53,7 @@ public class ClimberSubsystem extends SubsystemBase {
 	public Command climbCommand() {
 		return this.run(() -> {
 				beefyMotor.setControl(new VelocityVoltage(100));
-			})// 	() -> // .until(
-			// 		beefyMotor.getPosition().getValue().compareTo(ROTATIONS_DOWN) > 0 &&
-			// 		beefyMotor.getSupplyCurrent().getValue().compareTo(CURRENT_THRESHOLD) < 0
-			// )
+			})// ) // 		beefyMotor.getSupplyCurrent().getValue().compareTo(CURRENT_THRESHOLD) < 0 // 		beefyMotor.getPosition().getValue().compareTo(ROTATIONS_DOWN) > 0 && // 	() -> // .until(
 			.andThen(() -> {
 				beefyMotor.setControl(new VelocityVoltage(0));
 			});
@@ -73,10 +62,7 @@ public class ClimberSubsystem extends SubsystemBase {
 	public Command descendCommand() {
 		return run(() -> {
 			beefyMotor.setControl(new VelocityVoltage(-100));
-		})// 	() -> // .until(
-		// 		beefyMotor.getPosition().getValue().compareTo(ROTATIONS_DOWN) > 0 &&
-		// 		beefyMotor.getSupplyCurrent().getValue().compareTo(CURRENT_THRESHOLD) < 0
-		// )
+		})// ) // 		beefyMotor.getSupplyCurrent().getValue().compareTo(CURRENT_THRESHOLD) < 0 // 		beefyMotor.getPosition().getValue().compareTo(ROTATIONS_DOWN) > 0 && // 	() -> // .until(
 		.andThen(() -> {
 			beefyMotor.setControl(new VelocityVoltage(0));
 		});
