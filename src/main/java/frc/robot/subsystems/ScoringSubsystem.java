@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.CanConstants;
 import frc.robot.Constants.DIOConstants;
+import java.util.function.DoubleSupplier;
 
 public class ScoringSubsystem extends SubsystemBase {
 
@@ -117,7 +118,7 @@ public class ScoringSubsystem extends SubsystemBase {
 				spinnyController2.setReference(scoringCurrent, ControlType.kCurrent);
 			})
 			.until(() -> !coralSensor.get())
-			.withTimeout(3)
+			.withTimeout(4.5)
 			.andThen(
 				this.run(() -> {
 						spinnyController.setReference(scoringCurrent, ControlType.kCurrent);
@@ -160,6 +161,17 @@ public class ScoringSubsystem extends SubsystemBase {
 		double amount = Units.degreesToRotations(0.4);
 		return Commands.run(() -> {
 			if (direction) {
+				setpoint = MathUtil.clamp(setpoint + amount, 0, 0.4);
+			} else {
+				setpoint = MathUtil.clamp(setpoint - amount, 0, 0.4);
+			}
+		});
+	}
+
+	public Command tiltJoy(DoubleSupplier joy) {
+		return Commands.run(() -> {
+			double amount = Units.degreesToRotations(joy.getAsDouble());
+			if (joy.getAsDouble() > 0) {
 				setpoint = MathUtil.clamp(setpoint + amount, 0, 0.4);
 			} else {
 				setpoint = MathUtil.clamp(setpoint - amount, 0, 0.4);

@@ -341,10 +341,14 @@ public class RobotContainer {
 		m_JoystickL
 			.button(9)
 			.and(DriverStation::isTest)
-			.onTrue(elevatorSubsystem.setPos(() -> 0).alongWith(scoringSubsystem.tiltCommand(0)));
+			.onTrue(elevatorSubsystem.setPos(() -> 0).andThen(scoringSubsystem.tiltCommand(0)));
 
-		m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltNudge(false));
-		m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltNudge(true));
+		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(false));
+		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(true));
+		m_JoystickL
+			.button(11)
+			.and(() -> !DriverStation.isTest())
+			.whileTrue(scoringSubsystem.tiltJoy(() -> m_JoystickL.getY()));
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings
