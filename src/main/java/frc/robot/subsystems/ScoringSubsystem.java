@@ -170,12 +170,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	public Command tiltJoy(DoubleSupplier joy) {
 		return Commands.run(() -> {
-			double amount = Units.degreesToRotations(joy.getAsDouble());
-			if (joy.getAsDouble() > 0) {
-				setpoint = MathUtil.clamp(setpoint + amount, 0, 0.4);
-			} else {
-				setpoint = MathUtil.clamp(setpoint - amount, 0, 0.4);
-			}
+			double joyVal = MathUtil.applyDeadband(joy.getAsDouble(), 0.05);
+			setpoint = MathUtil.clamp(setpoint + Units.degreesToRotations(joyVal), 0, 0.4);
 		});
 	}
 

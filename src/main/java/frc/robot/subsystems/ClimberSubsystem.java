@@ -69,17 +69,30 @@ public class ClimberSubsystem extends SubsystemBase {
 
 	public Command climbCommand() {
 		return run(() -> {
-			beefyMotor.setControl(m_voltage.withOutput(-10).withEnableFOC(false));
+			duckOrchestra.stop();
+			marioUnderwater.stop();
+			// beefyMotor.setControl(m_voltage.withOutput(-10).withEnableFOC(false));
+			beefyMotor.setVoltage(-10);
+
+			System.out.println("climbCommand set to -10");
 		}).finallyDo(() -> {
-			beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
+			beefyMotor.setVoltage(0);
+			// beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
+			System.out.println("turn off climb command set to 0");
 		});
 	}
 
 	public Command descendCommand() {
 		return run(() -> {
-			beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
+			duckOrchestra.stop();
+			marioUnderwater.stop();
+			beefyMotor.setVoltage(10);
+			// beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
+			System.out.println("descendCommand set to 10");
 		}).finallyDo(() -> {
-			beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
+			beefyMotor.setVoltage(0);
+			// beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
+			System.out.println("turn off descend command set to 0");
 		});
 	}
 

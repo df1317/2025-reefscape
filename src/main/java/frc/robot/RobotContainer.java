@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -345,10 +346,10 @@ public class RobotContainer {
 
 		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(false));
 		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(true));
-		m_JoystickL
-			.button(11)
-			.and(() -> !DriverStation.isTest())
-			.whileTrue(scoringSubsystem.tiltJoy(() -> m_JoystickL.getY()));
+
+		Command tiltJoyCommand = scoringSubsystem.tiltJoy(() -> m_JoystickL.getY());
+		tiltJoyCommand.addRequirements(scoringSubsystem);
+		scoringSubsystem.setDefaultCommand(tiltJoyCommand);
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings
