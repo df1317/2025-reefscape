@@ -146,6 +146,10 @@ public class ScoringSubsystem extends SubsystemBase {
 			.withTimeout(1.7);
 	}
 
+	public boolean getCoralSensor() {
+		return coralSensor.get();
+	}
+
 	public Command tiltCommand(double degrees) {
 		return this.runOnce(() -> {
 				setpoint = MathUtil.clamp(Units.degreesToRotations(degrees), 0, 0.4);

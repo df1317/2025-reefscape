@@ -208,9 +208,27 @@ public class RobotContainer {
 				)
 			);
 
-		driverXbox
-			.rightTrigger()
-			.onTrue(Commands.either(scoringSubsystem.runEjectCommand(), Commands.none(), DriverStation::isTest));
+		/** -------------------------------------
+		 * Scoring Bindings
+		 * ---
+		 * positions are staggered so it is in an increasing u shape on the joystick
+		 * demo command will be toggled via binding and will continuially run elevator positions
+		 * manual control sets elevator position and speed based on joystick position
+		 * ---
+		 */
+
+		m_JoystickL
+			.trigger()
+			.onTrue(
+				Commands.either(
+					scoringSubsystem.runEjectCommand(),
+					scoringSubsystem.runEjectCommand(),
+					scoringSubsystem::getCoralSensor
+				)
+			);
+
+		m_JoystickL.trigger().and(m_JoystickL.button(7)).onTrue(scoringSubsystem.runEjectCommand());
+		m_JoystickL.trigger().and(m_JoystickL.button(8)).onTrue(scoringSubsystem.runIntakeCommand());
 
 		/** -------------------------------------
 		 * Elevator position bindings
@@ -223,13 +241,13 @@ public class RobotContainer {
 
 		m_JoystickL
 			.trigger()
-			.whileTrue(
-				Commands.either(
-					elevatorSubsystem.setSpeed(() -> m_JoystickL.getY() * -1),
-					Commands.none(),
-					DriverStation::isTest
-				)
-			);
+			.and(DriverStation::isTest)
+			.whileTrue(elevatorSubsystem.setSpeed(() -> m_JoystickL.getY() * -1));
+
+		m_JoystickL
+			.button(2)
+			.and(() -> !DriverStation.isTest())
+			.whileTrue(elevatorSubsystem.setSpeed(() -> m_JoystickL.getY() * -1));
 
 		m_JoystickL
 			.button(5)
@@ -297,22 +315,12 @@ public class RobotContainer {
 
 		m_JoystickL
 			.button(8)
-			.whileTrue(
-				Commands.either(
-					climberSubsystem.climbCommand().alongWith(Commands.print("climber up")),
-					Commands.none(),
-					DriverStation::isTest
-				)
-			);
+			.and(DriverStation::isTest)
+			.whileTrue(climberSubsystem.climbCommand().alongWith(Commands.print("climber up")));
 		m_JoystickL
 			.button(9)
-			.whileTrue(
-				Commands.either(
-					climberSubsystem.descendCommand().alongWith(Commands.print("climber down")),
-					Commands.none(),
-					DriverStation::isTest
-				)
-			);
+			.and(DriverStation::isTest)
+			.whileTrue(climberSubsystem.descendCommand().alongWith(Commands.print("climber down")));
 
 		/** -------------------------------------
 		 * Test-mode specific tilt bindings
@@ -322,15 +330,16 @@ public class RobotContainer {
 		 * ---
 		 */
 
+		m_JoystickL.button(10).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltCommand(0));
+
+		// stow command
 		m_JoystickL
-			.button(10)
-			.whileTrue(Commands.either(scoringSubsystem.tiltCommand(0), Commands.none(), DriverStation::isTest));
-		m_JoystickL
-			.button(11)
-			.whileTrue(Commands.either(scoringSubsystem.tiltNudge(false), Commands.none(), DriverStation::isTest));
-		m_JoystickL
-			.button(12)
-			.whileTrue(Commands.either(scoringSubsystem.tiltNudge(true), Commands.none(), DriverStation::isTest));
+			.button(9)
+			.and(DriverStation::isTest)
+			.onTrue(elevatorSubsystem.setPos(() -> 0).alongWith(scoringSubsystem.tiltCommand(0)));
+
+		m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltNudge(false));
+		m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltNudge(true));
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings

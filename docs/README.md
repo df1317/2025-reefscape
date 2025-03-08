@@ -13,17 +13,23 @@
 |---------|--------|-------------|
 | A Button | Zero gyro | Resets gyro heading |
 | X Button | Lock drive | Locks drivebase |
-| Right Bumper | Intake | Runs intake |
-| Right Trigger | Eject | Runs eject |
+| Left Bumper | Lock drive | Locks drivebase |
+| Right Bumper | play music | Kraken sings the duck song |
 
 #### Left Joystick (Operator) [`Port 1`]
 | Binding | Action | Description |
 |---------|--------|-------------|
-| Trigger | Manual elevator | Controls elevator speed manually |
-| Button 5 | Coral station | Moves elevator and tilt to coral station height |
-| Button 3 | L2 position | Moves elevator and tilt to L2 height |
-| Button 4 | L3 position | Moves elevator and tilt to L3 height |
-| Button 6 | L4 position | Moves elevator and tilt to L4 height |
+| Trigger | Auto Intake / Eject | based on coral sensor | 
+| Trigger & Button 7 | Eject Coral | manual mode overrides coral sensor | 
+| Trigger & Button 8 | Intake Coral | manual mode overrides coral sensor | 
+| Button 2 | Manual elevator | Controls elevator speed manually |
+| Button 5 on cluster | Coral station | Moves elevator and tilt to coral station height |
+| Button 3 on cluster | L2 position | Moves elevator and tilt to L2 height |
+| Button 4 on cluster | L3 position | Moves elevator and tilt to L3 height |
+| Button 6 on cluster | L4 position | Moves elevator and tilt to L4 height |
+| Button 9 | stow elevator | moves elevator to bottom and zero tilt |
+| Button 11 | tilt nudge down | nudge the tilt angle down while held |
+| Button 12 | tilt nudge up | nudge the tilt angle up while held |
 
 ### Test Mode
 
