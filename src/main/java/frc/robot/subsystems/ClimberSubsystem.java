@@ -68,17 +68,17 @@ public class ClimberSubsystem extends SubsystemBase {
 
 	public Command climbCommand() {
 		return this.run(() -> {
-				beefyMotor.setControl(m_voltage.withOutput(-10));
+				beefyMotor.setControl(m_voltage.withOutput(-10).withEnableFOC(false));
 			}).andThen(() -> {
-				beefyMotor.setControl(m_voltage.withOutput(0));
+				beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
 			});
 	}
 
 	public Command descendCommand() {
 		return run(() -> {
-			beefyMotor.setControl(m_voltage.withOutput(10));
+			beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
 		}).andThen(() -> {
-			beefyMotor.setControl(m_voltage.withOutput(0));
+			beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
 		});
 	}
 
