@@ -62,14 +62,14 @@ public class ClimberSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		SmartDashboard.putNumber("climber/climber speed", beefyMotor.get());
-		SmartDashboard.putNumber("climber/climber current", beefyMotor.getSupplyCurrent().getValueAsDouble());
+		SmartDashboard.putNumber("climber/climber current", beefyMotor.getStatorCurrent().getValueAsDouble());
 		SmartDashboard.putNumber("climber/climber temp", beefyMotor.getDeviceTemp().getValueAsDouble());
 	}
 
 	public Command climbCommand() {
 		return this.run(() -> {
 				beefyMotor.setControl(m_voltage.withOutput(-10).withEnableFOC(false));
-			}).andThen(() -> {
+			}).finallyDo(() -> {
 				beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
 			});
 	}
@@ -77,7 +77,7 @@ public class ClimberSubsystem extends SubsystemBase {
 	public Command descendCommand() {
 		return run(() -> {
 			beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
-		}).andThen(() -> {
+		}).finallyDo(() -> {
 			beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
 		});
 	}
