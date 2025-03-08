@@ -307,7 +307,7 @@ public class RobotContainer {
 			);
 
 		/** -------------------------------------
-		 * Test-mode specific climber bindings
+		 * Climber bindings
 		 * ---
 		 * climb and descend
 		 * ---
@@ -321,6 +321,11 @@ public class RobotContainer {
 			.button(9)
 			.and(DriverStation::isTest)
 			.whileTrue(climberSubsystem.descendCommand().alongWith(Commands.print("climber down")));
+
+		m_JoystickL
+			.button(10)
+			.and(() -> !DriverStation.isTest())
+			.whileTrue(climberSubsystem.joyCommand(() -> m_JoystickL.getY()));
 
 		/** -------------------------------------
 		 * Test-mode specific tilt bindings

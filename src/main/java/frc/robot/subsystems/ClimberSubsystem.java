@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanConstants;
+import java.util.function.DoubleSupplier;
 
 public class ClimberSubsystem extends SubsystemBase {
 
@@ -77,6 +78,14 @@ public class ClimberSubsystem extends SubsystemBase {
 	public Command descendCommand() {
 		return run(() -> {
 			beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
+		}).finallyDo(() -> {
+			beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
+		});
+	}
+
+	public Command joyCommand(DoubleSupplier pos) {
+		return run(() -> {
+			beefyMotor.setControl(m_voltage.withOutput(pos.getAsDouble() * 10).withEnableFOC(false));
 		}).finallyDo(() -> {
 			beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
 		});
