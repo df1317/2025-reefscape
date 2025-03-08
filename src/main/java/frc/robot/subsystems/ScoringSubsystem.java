@@ -147,7 +147,7 @@ public class ScoringSubsystem extends SubsystemBase {
 	}
 
 	public boolean getCoralSensor() {
-		return !coralSensor.get();
+		return coralSensor.get();
 	}
 
 	public Command tiltCommand(double degrees) {

@@ -221,7 +221,7 @@ public class RobotContainer {
 			.trigger()
 			.onTrue(
 				Commands.either(
-					scoringSubsystem.runEjectCommand(),
+					scoringSubsystem.runIntakeCommand(),
 					scoringSubsystem.runEjectCommand(),
 					scoringSubsystem::getCoralSensor
 				)
