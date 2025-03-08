@@ -1,30 +1,31 @@
 # Docs
 
 ## Table of Contents
-- [Bindings](#bindings)
+- [Bindings](#bindings)  
 - [CAN IDs](#can-ids)
 
 ## Bindings
 
 ### Teleop
 
-#### Xbox Controller (Driver)
+#### Xbox Controller (Driver) [`Port 0`]
 | Binding | Action | Description |
 |---------|--------|-------------|
-| Start Button | Zero gyro | Resets gyro heading |
-| Left Bumper | Lock drive | Locks drivebase |
+| A Button | Zero gyro | Resets gyro heading |
+| X Button | Lock drive | Locks drivebase |
 | Right Bumper | Intake | Runs intake |
+| Right Trigger | Eject | Runs eject |
 
 #### Left Joystick (Operator) [`Port 1`]
 | Binding | Action | Description |
 |---------|--------|-------------|
+| Trigger | Manual elevator | Controls elevator speed manually |
 | Button 5 | Coral station | Moves elevator and tilt to coral station height |
 | Button 3 | L2 position | Moves elevator and tilt to L2 height |
 | Button 4 | L3 position | Moves elevator and tilt to L3 height |
 | Button 6 | L4 position | Moves elevator and tilt to L4 height |
 
 ### Test Mode
-
 
 #### Xbox Controller (Driver)
 | Binding | Action | Description |
@@ -37,7 +38,7 @@
 | Right Bumper | Play music | Plays music |
 | Right Trigger | Eject | Runs eject |
 
-#### Left Joystick (Control 1) - Test Mode
+#### Left Joystick (Operator) - Test Mode
 | Binding | Action | Description |
 |---------|--------|-------------|
 | Trigger | Manual elevator | Controls elevator speed manually |
