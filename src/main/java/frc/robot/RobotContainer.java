@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
@@ -30,6 +33,8 @@ import swervelib.SwerveInputStream;
  * ---
  */
 public class RobotContainer {
+
+	private final SendableChooser<Command> autoChooser;
 
 	/** ----------
 	 * HID Initialization
@@ -111,6 +116,9 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		DriverStation.silenceJoystickConnectionWarning(true);
+
+		autoChooser = AutoBuilder.buildAutoChooser();
+		SmartDashboard.putData("misc/Auto Chooser", autoChooser);
 	}
 
 	/** ----------
@@ -289,10 +297,22 @@ public class RobotContainer {
 
 		m_JoystickL
 			.button(8)
-			.whileTrue(Commands.either(climberSubsystem.climbCommand(), Commands.none(), DriverStation::isTest));
+			.whileTrue(
+				Commands.either(
+					climberSubsystem.climbCommand().alongWith(Commands.print("climber up")),
+					Commands.none(),
+					DriverStation::isTest
+				)
+			);
 		m_JoystickL
 			.button(9)
-			.whileTrue(Commands.either(climberSubsystem.descendCommand(), Commands.none(), DriverStation::isTest));
+			.whileTrue(
+				Commands.either(
+					climberSubsystem.descendCommand().alongWith(Commands.print("climber down")),
+					Commands.none(),
+					DriverStation::isTest
+				)
+			);
 
 		/** -------------------------------------
 		 * Test-mode specific tilt bindings
@@ -351,8 +371,7 @@ public class RobotContainer {
 	 * ---
 	 */
 	public Command getAutonomousCommand() {
-		// An example command will be run in autonomous
-		return drivebase.getAutonomousCommand("New Auto");
+		return autoChooser.getSelected();
 	}
 
 	public void setMotorBrake(boolean brake) {
