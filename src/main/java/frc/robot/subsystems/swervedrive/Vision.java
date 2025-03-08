@@ -1,3 +1,7 @@
+/* ----------
+ * Copywrite 2025 FRC team 1317 under AGPL-3.0 adapted from YAGSL Docs
+ * ----------- */
+
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Microseconds;
@@ -55,19 +59,9 @@ public class Vision {
 		AprilTagFields.k2025ReefscapeWelded
 	);
 	/**
-	 * Ambiguity defined as a value between (0,1). Used in
-	 * {@link Vision#filterPose}.
-	 */
-	private final double maximumAmbiguity = 0.25;
-	/**
 	 * Photon Vision Simulation
 	 */
 	public VisionSystemSim visionSim;
-	/**
-	 * Count of times that the odom thinks we're more than 10meters away from the
-	 * april tag.
-	 */
-	private double longDistangePoseEstimationCount = 0;
 	/**
 	 * Current pose from the pose estimator using wheel odometry.
 	 */
@@ -192,46 +186,6 @@ public class Vision {
 			);
 		}
 		return poseEst;
-	}
-
-	/**
-	 * Filter pose via the ambiguity and find best estimate between all of the
-	 * camera's throwing out distances more than
-	 * 10m for a short amount of time.
-	 *
-	 * @param pose Estimated robot pose.
-	 * @return Could be empty if there isn't a good reading.
-	 */
-	@Deprecated(since = "2024", forRemoval = true)
-	private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
-		if (pose.isPresent()) {
-			double bestTargetAmbiguity = 1; // 1 is max ambiguity
-			for (PhotonTrackedTarget target : pose.get().targetsUsed) {
-				double ambiguity = target.getPoseAmbiguity();
-				if (ambiguity != -1 && ambiguity < bestTargetAmbiguity) {
-					bestTargetAmbiguity = ambiguity;
-				}
-			}
-			// ambiguity to high dont use estimate
-			if (bestTargetAmbiguity > maximumAmbiguity) {
-				return Optional.empty();
-			}
-
-			// est pose is very far from recorded robot pose
-			if (PhotonUtils.getDistanceToPose(currentPose.get(), pose.get().estimatedPose.toPose2d()) > 1) {
-				longDistangePoseEstimationCount++;
-
-				// if it calculates that were 10 meter away for more than 10 times in a row its
-				// probably right
-				if (longDistangePoseEstimationCount < 10) {
-					return Optional.empty();
-				}
-			} else {
-				longDistangePoseEstimationCount = 0;
-			}
-			return pose;
-		}
-		return Optional.empty();
 	}
 
 	/**

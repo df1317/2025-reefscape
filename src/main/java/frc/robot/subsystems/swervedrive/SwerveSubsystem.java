@@ -1,6 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+/* ----------
+ * Copywrite 2025 FRC team 1317 under AGPL-3.0 adapted from YAGSL Docs
+ * ----------- */
 
 package frc.robot.subsystems.swervedrive;
 
@@ -18,8 +18,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,6 +30,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,15 +63,9 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	private final SwerveDrive swerveDrive;
 	/**
-	 * AprilTag field layout.
-	 */
-	private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(
-		AprilTagFields.k2025ReefscapeWelded
-	);
-	/**
 	 * Enable vision odometry updates while driving.
 	 */
-	private final boolean visionDriveTest = true;
+	private boolean visionDriveTest = true;
 	/**
 	 * PhotonVision class to keep an accurate odometry.
 	 */
@@ -154,6 +147,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		visionDriveTest = SmartDashboard.getBoolean("Swerve Drive/vision enabled", visionDriveTest);
+
 		// When vision is enabled we must manually update odometry in SwerveDrive
 		if (visionDriveTest) {
 			swerveDrive.updateOdometry();

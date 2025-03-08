@@ -1,16 +1,60 @@
 {
   "version": 1.0,
-  "grid_size": 128,
+  "grid_size": 32,
   "tabs": [
     {
       "name": "Teleoperated",
       "grid_layout": {
-        "layouts": [],
+        "layouts": [
+          {
+            "title": "vision enabled",
+            "x": 0.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 192.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": " ",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Toggle Switch",
+                "properties": {
+                  "topic": "/SmartDashboard/Swerve Drive/vision enabled",
+                  "period": 0.06,
+                  "data_type": "boolean"
+                }
+              },
+              {
+                "title": " ",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Swerve Drive/vision enabled",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          }
+        ],
         "containers": [
           {
             "title": "FMSInfo",
             "x": 0.0,
-            "y": 640.0,
+            "y": 320.0,
             "width": 384.0,
             "height": 128.0,
             "type": "FMSInfo",
@@ -20,24 +64,11 @@
             }
           },
           {
-            "title": "limelight",
-            "x": 1664.0,
-            "y": 0.0,
-            "width": 512.0,
-            "height": 512.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/limelight",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
             "title": "Field",
             "x": 0.0,
             "y": 0.0,
-            "width": 1152.0,
-            "height": 512.0,
+            "width": 704.0,
+            "height": 320.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -53,83 +84,11 @@
             }
           },
           {
-            "title": "JSON",
-            "x": 1920.0,
-            "y": 640.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/JSON",
-              "period": 0.06
-            }
-          },
-          {
-            "title": "IMU",
-            "x": 1664.0,
-            "y": 640.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/IMU",
-              "period": 0.06
-            }
-          },
-          {
-            "title": "Encoders",
-            "x": 1920.0,
-            "y": 1024.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/Encoders",
-              "period": 0.06
-            }
-          },
-          {
-            "title": "Alerts",
-            "x": 1664.0,
-            "y": 1024.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/Alerts",
-              "period": 0.06
-            }
-          },
-          {
-            "title": "Motors",
-            "x": 1408.0,
-            "y": 640.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/Motors",
-              "period": 0.06
-            }
-          },
-          {
-            "title": "Swerve Drive",
-            "x": 1408.0,
-            "y": 1024.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/Swerve Drive",
-              "period": 0.06
-            }
-          },
-          {
             "title": "swerve",
-            "x": 1152.0,
+            "x": 832.0,
             "y": 0.0,
-            "width": 512.0,
-            "height": 512.0,
+            "width": 320.0,
+            "height": 320.0,
             "type": "YAGSL Swerve Drive",
             "properties": {
               "topic": "/SmartDashboard/swerve",
@@ -141,9 +100,9 @@
           },
           {
             "title": "Match Time",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 256.0,
+            "x": 1152.0,
+            "y": 480.0,
+            "width": 576.0,
             "height": 128.0,
             "type": "Match Time",
             "properties": {
@@ -157,24 +116,25 @@
           },
           {
             "title": "icanacia_Port_1182_Output_MJPEG_Server",
-            "x": 384.0,
-            "y": 512.0,
-            "width": 1024.0,
-            "height": 896.0,
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 608.0,
+            "height": 480.0,
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/icanacia_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
               "rotation_turns": 0,
-              "compression": 36
+              "compression": 15,
+              "fps": 30
             }
           },
           {
-            "title": "elevator",
-            "x": 256.0,
-            "y": 768.0,
+            "title": "elevator current-position",
+            "x": 704.0,
+            "y": 0.0,
             "width": 128.0,
-            "height": 512.0,
+            "height": 320.0,
             "type": "Number Bar",
             "properties": {
               "topic": "/SmartDashboard/elevator/current-position",
@@ -182,17 +142,17 @@
               "data_type": "double",
               "min_value": 0.0,
               "max_value": 1.23,
-              "divisions": 10,
+              "divisions": 5,
               "inverted": false,
               "orientation": "vertical"
             }
           },
           {
-            "title": "coral sensor",
-            "x": 0.0,
-            "y": 768.0,
+            "title": "we have coral",
+            "x": 128.0,
+            "y": 448.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 160.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/scoring/coral sensor",
@@ -205,11 +165,11 @@
             }
           },
           {
-            "title": "tilt pos",
-            "x": 0.0,
-            "y": 896.0,
+            "title": "tilt encoder",
+            "x": 384.0,
+            "y": 320.0,
             "width": 256.0,
-            "height": 384.0,
+            "height": 288.0,
             "type": "Radial Gauge",
             "properties": {
               "topic": "/SmartDashboard/scoring/tilt encoder",
@@ -226,37 +186,11 @@
             }
           },
           {
-            "title": "vision enabled",
-            "x": 256.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Toggle Switch",
-            "properties": {
-              "topic": "/SmartDashboard/Swerve Drive/vision enabled",
-              "period": 0.06,
-              "data_type": "boolean"
-            }
-          },
-          {
-            "title": "Auto Chooser",
-            "x": 1408.0,
-            "y": 512.0,
-            "width": 768.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/misc/Auto Chooser",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
-            "title": "motor1 temp",
-            "x": 2176.0,
-            "y": 0.0,
+            "title": "scoring motor temp",
+            "x": 640.0,
+            "y": 320.0,
             "width": 256.0,
-            "height": 384.0,
+            "height": 288.0,
             "type": "Radial Gauge",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor1 temp",
@@ -273,11 +207,11 @@
             }
           },
           {
-            "title": "motor2 temp",
-            "x": 2176.0,
-            "y": 384.0,
+            "title": "scoring motor #2 temp",
+            "x": 896.0,
+            "y": 320.0,
             "width": 256.0,
-            "height": 384.0,
+            "height": 288.0,
             "type": "Radial Gauge",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor2 temp",
@@ -292,22 +226,166 @@
               "show_pointer": true,
               "show_ticks": true
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Debug",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "FMSInfo",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 448.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
           },
           {
-            "title": "climber temp",
-            "x": 2176.0,
-            "y": 768.0,
+            "title": "JSON",
+            "x": 1344.0,
+            "y": 0.0,
             "width": 256.0,
-            "height": 384.0,
+            "height": 256.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/JSON",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "IMU",
+            "x": 832.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/IMU",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Alerts",
+            "x": 1344.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Motors",
+            "x": 1088.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Motors",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Swerve Drive",
+            "x": 1088.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Drive",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "swerve",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 320.0,
+            "height": 320.0,
+            "type": "YAGSL Swerve Drive",
+            "properties": {
+              "topic": "/SmartDashboard/swerve",
+              "period": 0.06,
+              "show_robot_rotation": true,
+              "show_desired_states": true,
+              "angle_offset": 0.0
+            }
+          },
+          {
+            "title": "icanacia_Port_1182_Output_MJPEG_Server",
+            "x": 448.0,
+            "y": 0.0,
+            "width": 320.0,
+            "height": 320.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/icanacia_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0,
+              "compression": 36
+            }
+          },
+          {
+            "title": "elevator height",
+            "x": 320.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 320.0,
+            "type": "Number Bar",
+            "properties": {
+              "topic": "/SmartDashboard/elevator/current-position",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 0.0,
+              "max_value": 1.23,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "vertical"
+            }
+          },
+          {
+            "title": "coral sensor",
+            "x": 256.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/scoring/coral sensor",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "tilt encoder",
+            "x": 448.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Radial Gauge",
             "properties": {
-              "topic": "/SmartDashboard/climber/climber temp",
-              "period": 0.033,
+              "topic": "/SmartDashboard/scoring/tilt encoder",
+              "period": 0.06,
               "data_type": "double",
               "start_angle": -140.0,
               "end_angle": 140.0,
-              "min_value": 15.0,
-              "max_value": 50.0,
+              "min_value": 0.0,
+              "max_value": 0.4,
               "number_of_labels": 8,
               "wrap_value": false,
               "show_pointer": true,
@@ -315,16 +393,58 @@
             }
           },
           {
-            "title": "ADXRS450_Gyro[0]",
-            "x": 2176.0,
-            "y": 1152.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Gyro",
+            "title": "bottomLimitSwitch",
+            "x": 0.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/ADXRS450_Gyro[0]",
+              "topic": "/SmartDashboard/elevator/bottomLimitSwitch",
               "period": 0.06,
-              "counter_clockwise_positive": false
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "topLimitSwitch",
+            "x": 128.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/elevator/topLimitSwitch",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "adjusted",
+            "x": 800.0,
+            "y": 256.0,
+            "width": 288.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/swerve/imu/adjusted",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": 180.0,
+              "end_angle": -180.0,
+              "min_value": 0.0,
+              "max_value": 360.0,
+              "number_of_labels": 8,
+              "wrap_value": true,
+              "show_pointer": true,
+              "show_ticks": true
             }
           }
         ]
@@ -344,10 +464,10 @@
         "containers": [
           {
             "title": "current-position",
-            "x": 1664.0,
+            "x": 1024.0,
             "y": 0.0,
-            "width": 512.0,
-            "height": 384.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/current-position",
@@ -360,10 +480,10 @@
           },
           {
             "title": "current-velocity",
-            "x": 640.0,
-            "y": 256.0,
-            "width": 512.0,
-            "height": 512.0,
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/current-velocity",
@@ -376,10 +496,10 @@
           },
           {
             "title": "end-position",
-            "x": 1152.0,
+            "x": 768.0,
             "y": 0.0,
-            "width": 512.0,
-            "height": 384.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/end-position",
@@ -391,27 +511,11 @@
             }
           },
           {
-            "title": "currentMaxVal",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 384.0,
-            "height": 512.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/SmartDashboard/elevator/currentMaxVal",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
-          },
-          {
-            "title": "bottomLimitSwitch",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 256.0,
+            "title": "bottom limit",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/elevator/bottomLimitSwitch",
@@ -424,27 +528,10 @@
             }
           },
           {
-            "title": "topLimitSwitch",
-            "x": 0.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/elevator/topLimitSwitch",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "FMSInfo",
             "x": 0.0,
             "y": 0.0,
-            "width": 512.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "FMSInfo",
             "properties": {
@@ -453,27 +540,11 @@
             }
           },
           {
-            "title": "Match Time",
-            "x": 0.0,
-            "y": 128.0,
-            "width": 512.0,
-            "height": 128.0,
-            "type": "Match Time",
-            "properties": {
-              "topic": "/SmartDashboard/misc/Match Time",
-              "period": 0.06,
-              "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 15,
-              "yellow_start_time": 30
-            }
-          },
-          {
             "title": "encoderL",
-            "x": 0.0,
-            "y": 768.0,
-            "width": 512.0,
-            "height": 512.0,
+            "x": 512.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 352.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/encoderL",
@@ -486,10 +557,10 @@
           },
           {
             "title": "encoderR",
-            "x": 512.0,
-            "y": 768.0,
-            "width": 512.0,
-            "height": 512.0,
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 352.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/encoderR",
@@ -502,10 +573,10 @@
           },
           {
             "title": "motorL current",
-            "x": 1024.0,
-            "y": 768.0,
-            "width": 512.0,
-            "height": 512.0,
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/motorL current",
@@ -517,70 +588,11 @@
             }
           },
           {
-            "title": "limits status",
-            "x": 640.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/elevator/limits status",
-              "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "height",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/elevator/height",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "encoder",
-            "x": 896.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/coral/encoder",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "sensor",
-            "x": 1024.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/coral/sensor",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "motorL voltage",
-            "x": 1664.0,
-            "y": 384.0,
-            "width": 512.0,
-            "height": 384.0,
+            "x": 0.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/motorL voltage",
@@ -593,10 +605,10 @@
           },
           {
             "title": "motorR current",
-            "x": 1536.0,
-            "y": 768.0,
-            "width": 512.0,
-            "height": 512.0,
+            "x": 256.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/motorR current",
@@ -609,10 +621,10 @@
           },
           {
             "title": "motorR voltage",
-            "x": 1152.0,
-            "y": 384.0,
-            "width": 512.0,
-            "height": 384.0,
+            "x": 256.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/elevator/motorR voltage",
@@ -633,10 +645,10 @@
         "containers": [
           {
             "title": "tilt current",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 384.0,
+            "x": 128.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/tilt current",
@@ -649,10 +661,10 @@
           },
           {
             "title": "tilt encoder",
-            "x": 1152.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 384.0,
+            "x": 384.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/tilt encoder",
@@ -665,10 +677,10 @@
           },
           {
             "title": "tilt voltage",
-            "x": 1536.0,
-            "y": 128.0,
-            "width": 384.0,
-            "height": 384.0,
+            "x": 640.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/tilt voltage",
@@ -682,9 +694,9 @@
           {
             "title": "motor1 current",
             "x": 1152.0,
-            "y": 512.0,
-            "width": 384.0,
-            "height": 384.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 320.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor1 current",
@@ -697,10 +709,10 @@
           },
           {
             "title": "motor1 voltage",
-            "x": 768.0,
-            "y": 512.0,
-            "width": 384.0,
-            "height": 384.0,
+            "x": 896.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 320.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor1 voltage",
@@ -713,10 +725,10 @@
           },
           {
             "title": "motor2 current",
-            "x": 768.0,
-            "y": 896.0,
-            "width": 384.0,
-            "height": 384.0,
+            "x": 1152.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 320.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor2 current",
@@ -729,10 +741,10 @@
           },
           {
             "title": "motor2 voltage",
-            "x": 1152.0,
-            "y": 896.0,
-            "width": 384.0,
-            "height": 384.0,
+            "x": 896.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 320.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor2 voltage",
@@ -745,9 +757,9 @@
           },
           {
             "title": "coral sensor",
-            "x": 768.0,
+            "x": 0.0,
             "y": 0.0,
-            "width": 1152.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -761,68 +773,11 @@
             }
           },
           {
-            "title": "setpoint",
-            "x": 1536.0,
-            "y": 512.0,
-            "width": 384.0,
-            "height": 384.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/SmartDashboard/scoring/setpoint",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
-            }
-          },
-          {
-            "title": "icanacia_Port_1181_Input_MJPEG_Server",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 512.0,
-            "height": 512.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/icanacia_Port_1181_Input_MJPEG_Server",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
-            "title": "elevator current-position",
-            "x": 384.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/elevator/current-position",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "tilt encoder",
-            "x": 384.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/scoring/tilt encoder",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
             "title": "motor1 temp",
-            "x": 0.0,
-            "y": 1024.0,
+            "x": 1408.0,
+            "y": 0.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 320.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor1 temp",
@@ -835,10 +790,10 @@
           },
           {
             "title": "motor2 temp",
-            "x": 256.0,
-            "y": 1024.0,
+            "x": 1408.0,
+            "y": 320.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 320.0,
             "type": "Graph",
             "properties": {
               "topic": "/SmartDashboard/scoring/motor2 temp",
@@ -848,61 +803,86 @@
               "color": 4278238420,
               "line_width": 2.0
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "climber",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
+          },
           {
-            "title": "climber current",
-            "x": 896.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Graph",
+            "title": "motor2 temp",
+            "x": 608.0,
+            "y": 256.0,
+            "width": 288.0,
+            "height": 352.0,
+            "type": "Radial Gauge",
             "properties": {
-              "topic": "/SmartDashboard/climber/climber current",
-              "period": 0.033,
+              "topic": "/SmartDashboard/scoring/motor2 temp",
+              "period": 0.06,
               "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 15.0,
+              "max_value": 50.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
             }
           },
           {
-            "title": "climber speed",
-            "x": 640.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Graph",
+            "title": "motor1 temp",
+            "x": 320.0,
+            "y": 256.0,
+            "width": 288.0,
+            "height": 352.0,
+            "type": "Radial Gauge",
             "properties": {
-              "topic": "/SmartDashboard/climber/climber speed",
-              "period": 0.033,
+              "topic": "/SmartDashboard/scoring/motor1 temp",
+              "period": 0.06,
               "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 15.0,
+              "max_value": 50.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
             }
           },
           {
-            "title": "climber temp",
-            "x": 1152.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Graph",
+            "title": "tilt encoder",
+            "x": 0.0,
+            "y": 352.0,
+            "width": 320.0,
+            "height": 288.0,
+            "type": "Radial Gauge",
             "properties": {
-              "topic": "/SmartDashboard/climber/climber temp",
-              "period": 0.033,
+              "topic": "/SmartDashboard/scoring/tilt encoder",
+              "period": 0.06,
               "data_type": "double",
-              "time_displayed": 5.0,
-              "color": 4278238420,
-              "line_width": 2.0
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 0.4,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
+            }
+          },
+          {
+            "title": "current-position",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 224.0,
+            "type": "Number Bar",
+            "properties": {
+              "topic": "/SmartDashboard/elevator/current-position",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 0.0,
+              "max_value": 1.23,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "vertical"
             }
           }
         ]
