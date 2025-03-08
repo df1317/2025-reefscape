@@ -221,7 +221,7 @@ public class RobotContainer {
 			.trigger()
 			.onTrue(
 				Commands.either(
-					scoringSubsystem.runEjectCommand(),
+					scoringSubsystem.runIntakeCommand(),
 					scoringSubsystem.runEjectCommand(),
 					scoringSubsystem::getCoralSensor
 				)
@@ -307,7 +307,7 @@ public class RobotContainer {
 			);
 
 		/** -------------------------------------
-		 * Test-mode specific climber bindings
+		 * Climber bindings
 		 * ---
 		 * climb and descend
 		 * ---
@@ -321,6 +321,11 @@ public class RobotContainer {
 			.button(9)
 			.and(DriverStation::isTest)
 			.whileTrue(climberSubsystem.descendCommand().alongWith(Commands.print("climber down")));
+
+		m_JoystickL
+			.button(10)
+			.and(() -> !DriverStation.isTest())
+			.whileTrue(climberSubsystem.joyCommand(() -> m_JoystickL.getY()));
 
 		/** -------------------------------------
 		 * Test-mode specific tilt bindings
@@ -336,10 +341,14 @@ public class RobotContainer {
 		m_JoystickL
 			.button(9)
 			.and(DriverStation::isTest)
-			.onTrue(elevatorSubsystem.setPos(() -> 0).alongWith(scoringSubsystem.tiltCommand(0)));
+			.onTrue(elevatorSubsystem.setPos(() -> 0).andThen(scoringSubsystem.tiltCommand(0)));
 
-		m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltNudge(false));
-		m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltNudge(true));
+		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(false));
+		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(true));
+		m_JoystickL
+			.button(11)
+			.and(() -> !DriverStation.isTest())
+			.whileTrue(scoringSubsystem.tiltJoy(() -> m_JoystickL.getY()));
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings
