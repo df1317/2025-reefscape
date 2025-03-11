@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,6 +22,8 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.util.function.BooleanSupplier;
+
 import swervelib.SwerveInputStream;
 
 /** ----------
@@ -385,5 +389,41 @@ public class RobotContainer {
 
 	public void setMotorBrake(boolean brake) {
 		drivebase.setMotorBrake(brake);
+	}
+
+	/**
+	 * goes left or right
+	 * @param left
+	 * if true goes left else right
+	 * @param stop
+	 * stops the robot when true
+	 * @param
+	 * the double to which to add to the left or right prob in meters
+	 * @return
+	 */
+	public Command reefFineTune(double speed, BooleanSupplier left, BooleanSupplier stop){
+		return new Command() {
+			private Translation2d lastPos; 
+			private Translation2d newPos;
+			@Override
+			public void initialize(){
+				lastPos = drivebase.getSwerveDrive().getPose().getTranslation();
+				newPos = lastPos;
+			}
+
+			@Override
+			public void execute(){
+				newPos = new Translation2d(lastPos.getX() + (left.getAsBoolean() ? speed : -speed), lastPos.getY());//find the new pos to be at
+
+				drivebase.getSwerveDrive().drive(newPos, 0, false, true);//goes to the new pos
+
+				lastPos = drivebase.getSwerveDrive().getPose().getTranslation();//update the last posstion we were at
+			}
+
+			@Override
+			public boolean isFinished(){
+				return stop.getAsBoolean();
+			}
+		};
 	}
 }
