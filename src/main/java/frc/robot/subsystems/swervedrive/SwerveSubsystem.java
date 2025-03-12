@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Newton;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
@@ -136,6 +138,64 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)), Rotation2d.fromDegrees(0))
 		);
 		// Epilogue.bind(this);
+	}
+	/**
+	 *
+	 * @param left
+	 * <pre> goes left or right 
+	 * if true goes left else right
+	 * @param speed
+	 * the double to which to add to the left or right prob in meters
+	 * @param tol
+	 * cool, this is the tolerance for the fine positionng and camera stuff so i guess we make it 0.5
+	 * also this could be an error in vision so...
+	 * @param rotation
+	 * you should porbly remove this and not don this during deployed code really get rid of this
+	 * @param test
+	 * WOW! thats a lot of temp requirements hope someone checks the docs and doens just put this as false.
+	 * oh and by the this var changes if the robot moves or doesn't slash is in test/debug mode or not
+	 * @return
+	 * a command to fine tune the reef might work who knows 🤷
+	 */
+	public Command reefFineTune(double speed, BooleanSupplier left, double tol, double rotation, boolean test){
+		return new Command() {
+			private Translation2d lastPos; 
+			private Translation2d newPos;
+			private Optional<Double> targetYaw;
+
+			@Override
+			public void initialize(){
+				lastPos = swerveDrive.getPose().getTranslation();
+				newPos = lastPos;
+			}
+
+			@Override
+			public void execute(){
+				newPos = new Translation2d(lastPos.getX() + (left.getAsBoolean() ? speed : -speed), lastPos.getY());//find the new pos to be at
+				if(!test){
+					swerveDrive.drive(newPos, rotation, false, true);//goes to the new pos
+
+					lastPos = swerveDrive.getPose().getTranslation();//update the last posstion we were at
+				} else{
+					lastPos = newPos;
+				}
+				
+
+				targetYaw = vision.getBarrelTargetYaw();
+
+				SmartDashboard.putNumber("reefFineTune/targetYaw", targetYaw.get());
+				SmartDashboard.putNumber("reefFineTune/newPos X", newPos.getX());
+				SmartDashboard.putNumber("reefFineTune/newPos Y", newPos.getY());
+				SmartDashboard.putNumber("reefFineTune/lastPos X", lastPos.getX());
+				SmartDashboard.putNumber("reefFineTune/lastPos Y", lastPos.getY());
+
+			}
+
+			@Override
+			public boolean isFinished(){
+				return targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false;
+			}
+		};
 	}
 
 	/**
