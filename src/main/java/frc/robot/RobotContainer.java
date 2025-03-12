@@ -5,9 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +19,8 @@ import frc.robot.libs.FieldConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
+import frc.robot.subsystems.TargetingSubsystem;
+import frc.robot.subsystems.TargetingSubsystem.Side;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -53,6 +55,7 @@ public class RobotContainer {
 	private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 	private final ScoringSubsystem scoringSubsystem = new ScoringSubsystem();
 	private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+	private final TargetingSubsystem targetingSubsystem = new TargetingSubsystem();
 
 	/** ----------
 	 * Swerve Drive Input Streams
@@ -146,39 +149,37 @@ public class RobotContainer {
 		 * ---
 		 */
 
+		Command driveIfAllowedCommand = Commands.either(
+			Commands.runOnce(() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0.4)),
+			targetingSubsystem.driveToCoralTarget(drivebase),
+			() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+		);
+
 		driverXbox
 			.x()
-			.whileTrue(
-				Commands.either(
-					Commands.runOnce(drivebase::lock, drivebase).repeatedly(),
-					Commands.runOnce(drivebase::addFakeVisionReading),
-					DriverStation::isTest
-				)
+			.onTrue(
+				targetingSubsystem.autoTargetCommand(drivebase::getPose) //.andThen(driveIfAllowedCommand)
 			);
+
+		driverXbox
+			.b()
+			.onTrue(
+				targetingSubsystem.autoTargetPairCommand(drivebase::getPose, Side.RIGHT) //.andThen(driveIfAllowedCommand)
+			);
+
+		driverXbox.y().onTrue(drivebase.driveToPose(drivebase::getPose));
 
 		driverXbox
 			.a()
 			.onTrue(
 				Commands.runOnce(drivebase::zeroGyro).andThen(
-					Commands.runOnce(() ->
-						System.out.println(DriverStation.isTest() ? "Test Mode: Reset Gyro" : "Other Mode: Reset Gyro")
-					)
+					Commands.print(DriverStation.isTest() ? "Test Mode: Reset Gyro" : "Other Mode: Reset Gyro")
 				)
 			);
 
 		driverXbox
 			.back()
 			.whileTrue(Commands.either(drivebase.centerModulesCommand(), Commands.none(), DriverStation::isTest));
-
-		driverXbox
-			.b()
-			.whileTrue(Commands.either(elevatorSubsystem.zeroCommand(), Commands.none(), DriverStation::isTest));
-
-		driverXbox
-			.y()
-			.onTrue(
-				Commands.either(drivebase.driveToDistanceCommand(1.0, 0.2), Commands.none(), DriverStation::isTest)
-			);
 
 		/** -------------------------------------
 		 * Xbox Scoring and Intake bindings

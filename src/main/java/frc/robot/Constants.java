@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -22,7 +27,7 @@ import swervelib.math.Matter;
 public final class Constants {
 
 	public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
-	public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+	public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Inches.of(8).in(Meters)), ROBOT_MASS);
 	public static final double LOOP_TIME = 0.13; //s, 20ms + 110ms sprk max velocity lag
 	public static final double MAX_SPEED = Units.feetToMeters(14.5);
 
@@ -65,5 +70,53 @@ public final class Constants {
 		public static final int homingTiltClickySwitch = 4;
 		public static final int elevatorBottomLimitSwitch = 5;
 		public static final int elevatorTopLimitSwitch = 6;
+	}
+
+	public static class AutoScoring {
+
+		public static class Processor {
+
+			public static final Transform2d offset = new Transform2d(
+				Inches.of(24).in(Meters),
+				Inches.of(0).in(Meters),
+				Rotation2d.fromDegrees(0)
+			);
+		}
+
+		public static class Reef {
+
+			public static final Transform2d coralOffset = new Transform2d(
+				Inches.of(24).in(Meters),
+				Inches.of(0).in(Meters),
+				Rotation2d.fromDegrees(0)
+			);
+
+			public static final Transform2d algaeOffset = new Transform2d(
+				Inches.of(24).in(Meters),
+				Inches.of(0).in(Meters),
+				Rotation2d.fromDegrees(0)
+			);
+		}
+
+		public static class HumanPlayer {
+
+			public static class Left {
+
+				public static final Transform2d offset = new Transform2d(
+					Inches.of(24).in(Meters),
+					Inches.of(0).in(Meters),
+					Rotation2d.fromDegrees(0)
+				);
+			}
+
+			public static class Right {
+
+				public static final Transform2d offset = new Transform2d(
+					Inches.of(24).in(Meters),
+					Inches.of(0).in(Meters),
+					Rotation2d.fromDegrees(0)
+				);
+			}
+		}
 	}
 }

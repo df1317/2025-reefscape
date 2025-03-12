@@ -12,7 +12,9 @@
 | Binding | Action | Description |
 |---------|--------|-------------|
 | A Button | Zero gyro | Resets gyro heading |
-| X Button | Lock drive | Locks drivebase |
+| X Button | Auto Target left Reef | automatically target and drive to left reef; will rumble if further than 1.5m |
+| B Button | Auto Target right Reef | automatically target and drive to right reef; will rumble if further than 1.5m |
+| Y Button | kill auto drive | restores manual control to the drive system |
 | Left Bumper | Lock drive | Locks drivebase |
 | Right Bumper | play music | Kraken sings the duck song |
 
