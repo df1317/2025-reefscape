@@ -95,7 +95,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		this.replaceSwerveModuleFeedforward(0.45089, 2.4847, 0.36831);
+		this.replaceSwerveModuleFeedforward(0.024309, 2.7435, 2.0788);
 
 		swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
 		// angle.
