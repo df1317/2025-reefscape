@@ -29,8 +29,8 @@
 | Button 3 on cluster | L2 position | Moves elevator and tilt to L2 height |
 | Button 4 on cluster | L3 position | Moves elevator and tilt to L3 height |
 | Button 6 on cluster | L4 position | Moves elevator and tilt to L4 height |
-| Button 9 | stow elevator | moves elevator to bottom and zero tilt |
-| Button 10 | climber | manually move the climber with joystick |
+| Button 9 | Climber descend | Controls climber down |
+| Button 10 | Climber climb | Controls climber up |
 | Button 11 | manual tilt | control the tilt with the joystick |
 
 ### Test Mode
