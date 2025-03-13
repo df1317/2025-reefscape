@@ -172,7 +172,7 @@ public class SwerveSubsystem extends SubsystemBase {
 			@Override
 			public void execute(){
 
-				newPos = new Translation2d(lastPos.getX() + (left.getAsBoolean() ? speed : -speed), lastPos.getY());//find the new pos to be at
+				newPos = new Translation2d(lastPos.getX() + (left ? speed : -speed), lastPos.getY());//find the new pos to be at
 				if(!test){
 					drive(newPos, 0.0, false);//goes to the new pos
 
