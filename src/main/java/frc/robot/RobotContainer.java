@@ -384,6 +384,73 @@ public class RobotContainer {
 	}
 
 	/** ----------
+	 * Auto named commands
+	 * ---
+	 * named commands for reef align and auto scoring on different levels
+	 * ---
+	 */
+
+	public Command autoTargetLeftBranchCommand = targetingSubsystem
+		.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
+		.andThen(
+			Commands.either(
+				targetingSubsystem.driveToCoralTarget(drivebase),
+				Commands.runEnd(
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+				).withTimeout(.2),
+				() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+			)
+		)
+		.withName("autoTargetLeftBranch");
+
+	public Command autoTargetRightBranchCommand = targetingSubsystem
+		.autoTargetPairCommand(drivebase::getPose, Side.RIGHT)
+		.andThen(
+			Commands.either(
+				targetingSubsystem.driveToCoralTarget(drivebase),
+				Commands.runEnd(
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+				).withTimeout(.2),
+				() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+			)
+		)
+		.withName("autoTargetRightBranch");
+
+	public Command autoLvl4Command = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L4.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runIntakeCommand())
+		.withName("autoLvl4");
+
+	public Command autoLvl3Command = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L3.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runIntakeCommand())
+		.withName("autoLvl3");
+
+	public Command autoLvl2Command = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L2.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runEjectCommand())
+		.withName("autoLvl2");
+
+	public Command autoIntakeCommand = elevatorSubsystem
+		.setPos(() -> FieldConstants.CoralStation.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runIntakeCommand())
+		.withName("autoIntake");
+
+	public Command autoAlignSourceCommand = targetingSubsystem
+		.driveToSourceCommand(drivebase)
+		.withName("autoAlignSource");
+
+	/** ----------
 	 * Use this to pass the autonomous command to the main {@link Robot} class.
 	 * ---
 	 * @return the command to run in autonomous
