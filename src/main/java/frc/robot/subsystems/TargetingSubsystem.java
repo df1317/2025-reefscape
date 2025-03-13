@@ -165,7 +165,9 @@ public class TargetingSubsystem {
 		Pose2d targetLocation = allianceRelativeReefBranches.get(targetBranch.ordinal());
 		double distance = currentLocation.getTranslation().getDistance(targetLocation.getTranslation());
 
-		return distance < 1.5;
+		System.out.println(distance);
+
+		return distance < 2.5;
 	}
 
 	public enum Side {

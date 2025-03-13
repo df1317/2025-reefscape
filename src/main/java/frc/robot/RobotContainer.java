@@ -149,22 +149,38 @@ public class RobotContainer {
 		 * ---
 		 */
 
-		Command driveIfAllowedCommand = Commands.either(
-			Commands.runOnce(() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0.4)),
-			targetingSubsystem.driveToCoralTarget(drivebase),
-			() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
-		);
-
 		driverXbox
 			.x()
 			.onTrue(
-				targetingSubsystem.autoTargetCommand(drivebase::getPose) //.andThen(driveIfAllowedCommand)
+				targetingSubsystem
+					.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
+					.andThen(
+						Commands.either(
+							targetingSubsystem.driveToCoralTarget(drivebase),
+							Commands.runEnd(
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+							).withTimeout(.2),
+							() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+						)
+					)
 			);
 
 		driverXbox
 			.b()
 			.onTrue(
-				targetingSubsystem.autoTargetPairCommand(drivebase::getPose, Side.RIGHT) //.andThen(driveIfAllowedCommand)
+				targetingSubsystem
+					.autoTargetPairCommand(drivebase::getPose, Side.RIGHT)
+					.andThen(
+						Commands.either(
+							targetingSubsystem.driveToCoralTarget(drivebase),
+							Commands.runEnd(
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+							).withTimeout(.2),
+							() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+						)
+					)
 			);
 
 		driverXbox.y().onTrue(drivebase.driveToPose(drivebase::getPose));
