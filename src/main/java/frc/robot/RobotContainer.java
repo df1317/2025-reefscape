@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -377,6 +378,17 @@ public class RobotContainer {
 		m_JoystickR
 			.button(12)
 			.whileTrue(Commands.either(drivebase.sysIdDriveMotorCommand(), Commands.none(), DriverStation::isTest));
+
+		driverXbox.povLeft().onTrue(
+			Commands.either(
+				drivebase.reefFineTune(0.1, true, 0.5, true),
+				Commands.none(),
+				DriverStation::isTest));
+		driverXbox.povRight().onTrue(
+			Commands.either(
+				drivebase.reefFineTune(0.1, false, 0.5, true),
+				Commands.none(),
+				DriverStation::isTest));
 	}
 
 	/** ----------

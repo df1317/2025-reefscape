@@ -149,15 +149,15 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @param tol
 	 * cool, this is the tolerance for the fine positionng and camera stuff so i guess we make it 0.5
 	 * also this could be an error in vision so...
-	 * @param rotation
-	 * you should porbly remove this and not don this during deployed code really get rid of this
 	 * @param test
 	 * WOW! thats a lot of temp requirements hope someone checks the docs and doens just put this as false.
 	 * oh and by the this var changes if the robot moves or doesn't slash is in test/debug mode or not
 	 * @return
 	 * a command to fine tune the reef might work who knows 🤷
+	 * @throws
+	 * head off wall debuging this
 	 */
-	public Command reefFineTune(double speed, BooleanSupplier left, double tol, double rotation, boolean test){
+	public Command reefFineTune(double speed, boolean left, double tol, boolean test){
 		return new Command() {
 			private Translation2d lastPos; 
 			private Translation2d newPos;
@@ -171,13 +171,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
 			@Override
 			public void execute(){
+
 				newPos = new Translation2d(lastPos.getX() + (left.getAsBoolean() ? speed : -speed), lastPos.getY());//find the new pos to be at
 				if(!test){
-					swerveDrive.drive(newPos, rotation, false, true);//goes to the new pos
+					drive(newPos, 0.0, false);//goes to the new pos
 
 					lastPos = swerveDrive.getPose().getTranslation();//update the last posstion we were at
 				} else{
 					lastPos = newPos;
+
 				}
 				
 
@@ -188,6 +190,7 @@ public class SwerveSubsystem extends SubsystemBase {
 				SmartDashboard.putNumber("reefFineTune/newPos Y", newPos.getY());
 				SmartDashboard.putNumber("reefFineTune/lastPos X", lastPos.getX());
 				SmartDashboard.putNumber("reefFineTune/lastPos Y", lastPos.getY());
+				SmartDashboard.putBoolean("reefFineTUne/has targets", targetYaw.isPresent());
 
 			}
 
