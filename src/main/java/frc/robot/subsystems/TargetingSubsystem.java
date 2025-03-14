@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoScoring;
 import frc.robot.libs.AllianceFlipUtil;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
  * getAlgaeTargetPose: gets the algae target pose
  * autoTarget: targets the closest reef branch
  */
-public class TargetingSubsystem {
+public class TargetingSubsystem extends SubsystemBase {
 
 	private ReefBranch targetBranch;
 
@@ -178,16 +179,18 @@ public class TargetingSubsystem {
 	 */
 
 	public Command driveToSourceCommand(SwerveSubsystem swerveDrive) {
-		Pose2d currentPose = swerveDrive.getPose();
-		Pose2d sourcePose = currentPose.nearest(FieldConstants.CoralStation.bothPoses);
-		return Commands.print("GOING TO SOURCE")
-			.andThen(
-				Commands.runOnce(() -> {
-					swerveDrive.getSwerveDrive().field.getObject("target").setPose(sourcePose);
-				})
-			)
-			.andThen(swerveDrive.driveToPose(() -> sourcePose))
-			.andThen(Commands.print("DONE GOING TO SOURCE"));
+		return defer(() -> {
+			Pose2d currentPose = swerveDrive.getPose();
+			Pose2d sourcePose = currentPose.nearest(FieldConstants.CoralStation.bothPoses);
+			return Commands.print("GOING TO SOURCE")
+				.andThen(
+					Commands.runOnce(() -> {
+						swerveDrive.getSwerveDrive().field.getObject("target").setPose(sourcePose);
+					})
+				)
+				.andThen(swerveDrive.driveToPose(() -> sourcePose))
+				.andThen(Commands.print("DONE GOING TO SOURCE"));
+		});
 	}
 
 	public enum Side {
