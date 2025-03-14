@@ -160,7 +160,7 @@ public class RobotContainer {
 							Commands.runEnd(
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
-							).withTimeout(.2),
+							).withTimeout(.15),
 							() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
 						)
 					)
@@ -177,7 +177,7 @@ public class RobotContainer {
 							Commands.runEnd(
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
-							).withTimeout(.2),
+							).withTimeout(.15),
 							() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
 						)
 					)
