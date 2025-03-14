@@ -35,7 +35,7 @@ public class ClimberSubsystem extends SubsystemBase {
 			.withForwardLimitSource(ForwardLimitSourceValue.Disabled)
 			.withReverseLimitSource(ReverseLimitSourceValue.Disabled);
 		CurrentLimitsConfigs currentConfigs = new CurrentLimitsConfigs()
-			.withStatorCurrentLimit(30)
+			.withStatorCurrentLimit(60)
 			.withStatorCurrentLimitEnable(true);
 		AudioConfigs audioConfigs = new AudioConfigs().withAllowMusicDurDisable(true);
 		TalonFXConfiguration config = new TalonFXConfiguration()

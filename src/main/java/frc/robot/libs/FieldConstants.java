@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -83,6 +84,8 @@ public class FieldConstants {
 			fieldWidth - rightCenterFace.getY(),
 			Rotation2d.fromRadians(-rightCenterFace.getRotation().getRadians())
 		);
+
+		public static final List<Pose2d> bothPoses = List.of(rightCenterFace, leftCenterFace);
 
 		public static final double height = 0, pitch = 130;
 	}
