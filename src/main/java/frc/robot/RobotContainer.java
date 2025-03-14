@@ -448,6 +448,7 @@ public class RobotContainer {
 
 	public Command autoAlignSourceCommand = targetingSubsystem
 		.driveToSourceCommand(drivebase)
+		.alongWith(autoIntakeCommand)
 		.withName("autoAlignSource");
 
 	/** ----------
