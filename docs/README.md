@@ -12,9 +12,12 @@
 | Binding | Action | Description |
 |---------|--------|-------------|
 | A Button | Zero gyro | Resets gyro heading |
-| X Button | Lock drive | Locks drivebase |
+| X Button | Auto Target left Reef | automatically target and drive to left reef; will rumble if further than 1.5m |
+| B Button | Auto Target right Reef | automatically target and drive to right reef; will rumble if further than 1.5m |
+| Y Button | kill auto drive | restores manual control to the drive system |
 | Left Bumper | Lock drive | Locks drivebase |
 | Right Bumper | play music | Kraken sings the duck song |
+| Right Numper | toggles robot relative | <----
 
 #### Left Joystick (Operator) [`Port 1`]
 | Binding | Action | Description |
@@ -27,9 +30,9 @@
 | Button 3 on cluster | L2 position | Moves elevator and tilt to L2 height |
 | Button 4 on cluster | L3 position | Moves elevator and tilt to L3 height |
 | Button 6 on cluster | L4 position | Moves elevator and tilt to L4 height |
-| Button 9 | stow elevator | moves elevator to bottom and zero tilt |
-| Button 11 | tilt nudge down | nudge the tilt angle down while held |
-| Button 12 | tilt nudge up | nudge the tilt angle up while held |
+| Button 9 | Climber descend | Controls climber down |
+| Button 10 | Climber climb | Controls climber up |
+| Button 11 | manual tilt | control the tilt with the joystick |
 
 ### Test Mode
 

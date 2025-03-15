@@ -114,6 +114,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		// swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
 		// over the internal encoder and push the offsets onto it. Throws warning if not
 		// possible
+		SmartDashboard.putBoolean("Swerve Drive/vision enabled", visionDriveTest);
 		if (visionDriveTest) {
 			setupPhotonVision();
 			// Stop the odometry thread if we are using vision that way we can synchronize
@@ -216,8 +217,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		visionDriveTest = SmartDashboard.getBoolean("Swerve Drive/vision enabled", visionDriveTest);
 
 		// When vision is enabled we must manually update odometry in SwerveDrive
+		swerveDrive.updateOdometry();
 		if (visionDriveTest) {
-			swerveDrive.updateOdometry();
 			vision.updatePoseEstimation(swerveDrive);
 		}
 	}
@@ -327,21 +328,23 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @param pose Target {@link Pose2d} to go to.
 	 * @return PathFinding command
 	 */
-	public Command driveToPose(Pose2d pose) {
-		// Create the constraints to use while pathfinding
-		PathConstraints constraints = new PathConstraints(
-			swerveDrive.getMaximumChassisVelocity(),
-			4.0,
-			swerveDrive.getMaximumChassisAngularVelocity(),
-			Units.degreesToRadians(720)
-		);
+	public Command driveToPose(Supplier<Pose2d> pose) {
+		return defer(() -> {
+			// Create the constraints to use while pathfinding
+			PathConstraints constraints = new PathConstraints(
+				1,
+				1,
+				swerveDrive.getMaximumChassisAngularVelocity(),
+				Units.degreesToRadians(720)
+			);
 
-		// Since AutoBuilder is configured, we can use it to build pathfinding commands
-		return AutoBuilder.pathfindToPose(
-			pose,
-			constraints,
-			edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
-		);
+			// Since AutoBuilder is configured, we can use it to build pathfinding commands
+			return AutoBuilder.pathfindToPose(
+				pose.get(),
+				constraints,
+				edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
+			);
+		});
 	}
 
 	/**
@@ -625,6 +628,15 @@ public class SwerveSubsystem extends SubsystemBase {
 	public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
 		return run(() -> {
 			swerveDrive.driveFieldOriented(velocity.get());
+		});
+	}
+	public Command robotDriveCommand(Supplier<ChassisSpeeds> velocity, BooleanSupplier robotRelative){
+		return run(() ->{
+			if(robotRelative.getAsBoolean()){
+				swerveDrive.driveFieldOrientedAndRobotOriented(new ChassisSpeeds(0, 0, 0), velocity.get());
+			} else{
+				swerveDrive.driveFieldOriented(velocity.get());
+			}
 		});
 	}
 

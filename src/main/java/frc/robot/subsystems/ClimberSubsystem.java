@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanConstants;
+import java.util.function.DoubleSupplier;
 
 public class ClimberSubsystem extends SubsystemBase {
 
@@ -34,7 +35,7 @@ public class ClimberSubsystem extends SubsystemBase {
 			.withForwardLimitSource(ForwardLimitSourceValue.Disabled)
 			.withReverseLimitSource(ReverseLimitSourceValue.Disabled);
 		CurrentLimitsConfigs currentConfigs = new CurrentLimitsConfigs()
-			.withStatorCurrentLimit(30)
+			.withStatorCurrentLimit(60)
 			.withStatorCurrentLimitEnable(true);
 		AudioConfigs audioConfigs = new AudioConfigs().withAllowMusicDurDisable(true);
 		TalonFXConfiguration config = new TalonFXConfiguration()
@@ -62,22 +63,43 @@ public class ClimberSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		SmartDashboard.putNumber("climber/climber speed", beefyMotor.get());
-		SmartDashboard.putNumber("climber/climber current", beefyMotor.getSupplyCurrent().getValueAsDouble());
+		SmartDashboard.putNumber("climber/climber current", beefyMotor.getStatorCurrent().getValueAsDouble());
 		SmartDashboard.putNumber("climber/climber temp", beefyMotor.getDeviceTemp().getValueAsDouble());
 	}
 
 	public Command climbCommand() {
-		return this.run(() -> {
-				beefyMotor.setControl(m_voltage.withOutput(-10).withEnableFOC(false));
-			}).andThen(() -> {
-				beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
-			});
+		return run(() -> {
+			duckOrchestra.stop();
+			marioUnderwater.stop();
+			// beefyMotor.setControl(m_voltage.withOutput(-10).withEnableFOC(false));
+			beefyMotor.setVoltage(-10);
+
+			System.out.println("climbCommand set to -10");
+		}).finallyDo(() -> {
+			beefyMotor.setVoltage(0);
+			// beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
+			System.out.println("turn off climb command set to 0");
+		});
 	}
 
 	public Command descendCommand() {
 		return run(() -> {
-			beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
-		}).andThen(() -> {
+			duckOrchestra.stop();
+			marioUnderwater.stop();
+			beefyMotor.setVoltage(10);
+			// beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
+			System.out.println("descendCommand set to 10");
+		}).finallyDo(() -> {
+			beefyMotor.setVoltage(0);
+			// beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
+			System.out.println("turn off descend command set to 0");
+		});
+	}
+
+	public Command joyCommand(DoubleSupplier pos) {
+		return run(() -> {
+			beefyMotor.setControl(m_voltage.withOutput(pos.getAsDouble() * 10).withEnableFOC(false));
+		}).finallyDo(() -> {
 			beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
 		});
 	}

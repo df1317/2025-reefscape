@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +22,8 @@ import frc.robot.libs.FieldConstants;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
+import frc.robot.subsystems.TargetingSubsystem;
+import frc.robot.subsystems.TargetingSubsystem.Side;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
 
@@ -43,6 +46,8 @@ public class RobotContainer {
 
 	private final SendableChooser<Command> autoChooser;
 
+	public boolean robotRelative = false;
+
 	/** ----------
 	 * HID Initialization
 	 * ------------ */
@@ -59,6 +64,7 @@ public class RobotContainer {
 	private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 	private final ScoringSubsystem scoringSubsystem = new ScoringSubsystem();
 	private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+	private final TargetingSubsystem targetingSubsystem = new TargetingSubsystem();
 
 	/** ----------
 	 * Swerve Drive Input Streams
@@ -137,7 +143,7 @@ public class RobotContainer {
 	 * ---
 	 */
 	private void configureBindings() {
-		Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+		Command driveFieldOrientedAnglularVelocity = drivebase.robotDriveCommand(driveAngularVelocity, () -> robotRelative);
 
 		drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
@@ -154,21 +160,45 @@ public class RobotContainer {
 
 		driverXbox
 			.x()
-			.whileTrue(
-				Commands.either(
-					Commands.runOnce(drivebase::lock, drivebase).repeatedly(),
-					Commands.runOnce(drivebase::addFakeVisionReading),
-					DriverStation::isTest
-				)
+			.onTrue(
+				targetingSubsystem
+					.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
+					.andThen(
+						Commands.either(
+							targetingSubsystem.driveToCoralTarget(drivebase),
+							Commands.runEnd(
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+							).withTimeout(.15),
+							() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+						)
+					)
 			);
+
+		driverXbox
+			.b()
+			.onTrue(
+				targetingSubsystem
+					.autoTargetPairCommand(drivebase::getPose, Side.RIGHT)
+					.andThen(
+						Commands.either(
+							targetingSubsystem.driveToCoralTarget(drivebase),
+							Commands.runEnd(
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+							).withTimeout(.15),
+							() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+						)
+					)
+			);
+
+		driverXbox.y().onTrue(drivebase.driveToPose(drivebase::getPose));
 
 		driverXbox
 			.a()
 			.onTrue(
 				Commands.runOnce(drivebase::zeroGyro).andThen(
-					Commands.runOnce(() ->
-						System.out.println(DriverStation.isTest() ? "Test Mode: Reset Gyro" : "Other Mode: Reset Gyro")
-					)
+					Commands.print(DriverStation.isTest() ? "Test Mode: Reset Gyro" : "Other Mode: Reset Gyro")
 				)
 			);
 
@@ -176,15 +206,7 @@ public class RobotContainer {
 			.back()
 			.whileTrue(Commands.either(drivebase.centerModulesCommand(), Commands.none(), DriverStation::isTest));
 
-		driverXbox
-			.b()
-			.whileTrue(Commands.either(elevatorSubsystem.zeroCommand(), Commands.none(), DriverStation::isTest));
-
-		driverXbox
-			.y()
-			.onTrue(
-				Commands.either(drivebase.driveToDistanceCommand(1.0, 0.2), Commands.none(), DriverStation::isTest)
-			);
+		driverXbox.rightBumper().onTrue(Commands.runOnce(() -> {robotRelative = robotRelative ? false : true;})).and(DriverStation::isTeleop);
 
 		/** -------------------------------------
 		 * Xbox Scoring and Intake bindings
@@ -228,14 +250,14 @@ public class RobotContainer {
 			.trigger()
 			.onTrue(
 				Commands.either(
-					scoringSubsystem.runEjectCommand(),
+					scoringSubsystem.runIntakeCommand(),
 					scoringSubsystem.runEjectCommand(),
 					scoringSubsystem::getCoralSensor
 				)
 			);
 
-		m_JoystickL.trigger().and(m_JoystickL.button(7)).onTrue(scoringSubsystem.runEjectCommand());
-		m_JoystickL.trigger().and(m_JoystickL.button(8)).onTrue(scoringSubsystem.runIntakeCommand());
+		m_JoystickL.trigger().and(m_JoystickL.button(7)).whileTrue(scoringSubsystem.runEjectCommand());
+		m_JoystickL.trigger().and(m_JoystickL.button(8)).whileTrue(scoringSubsystem.runIntakeCommand());
 
 		/** -------------------------------------
 		 * Elevator position bindings
@@ -314,20 +336,14 @@ public class RobotContainer {
 			);
 
 		/** -------------------------------------
-		 * Test-mode specific climber bindings
+		 * Climber bindings
 		 * ---
 		 * climb and descend
 		 * ---
 		 */
 
-		m_JoystickL
-			.button(8)
-			.and(DriverStation::isTest)
-			.whileTrue(climberSubsystem.climbCommand().alongWith(Commands.print("climber up")));
-		m_JoystickL
-			.button(9)
-			.and(DriverStation::isTest)
-			.whileTrue(climberSubsystem.descendCommand().alongWith(Commands.print("climber down")));
+		m_JoystickL.button(9).whileTrue(climberSubsystem.descendCommand().alongWith(Commands.print("climber down")));
+		m_JoystickL.button(10).whileTrue(climberSubsystem.climbCommand().alongWith(Commands.print("climber up")));
 
 		/** -------------------------------------
 		 * Test-mode specific tilt bindings
@@ -337,16 +353,14 @@ public class RobotContainer {
 		 * ---
 		 */
 
-		m_JoystickL.button(10).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltCommand(0));
+		m_JoystickL.button(7).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltCommand(0));
 
-		// stow command
-		m_JoystickL
-			.button(9)
-			.and(DriverStation::isTest)
-			.onTrue(elevatorSubsystem.setPos(() -> 0).alongWith(scoringSubsystem.tiltCommand(0)));
+		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(false));
+		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(true));
 
-		m_JoystickL.button(11).whileTrue(scoringSubsystem.tiltNudge(false));
-		m_JoystickL.button(12).whileTrue(scoringSubsystem.tiltNudge(true));
+		Command tiltJoyCommand = scoringSubsystem.tiltJoy(() -> m_JoystickL.getY());
+		tiltJoyCommand.addRequirements(scoringSubsystem);
+		scoringSubsystem.setDefaultCommand(tiltJoyCommand);
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings
@@ -400,6 +414,74 @@ public class RobotContainer {
 				Commands.none(),
 				DriverStation::isTeleop));
 	}
+
+	/** ----------
+	 * Auto named commands
+	 * ---
+	 * named commands for reef align and auto scoring on different levels
+	 * ---
+	 */
+
+	public Command autoTargetLeftBranchCommand = targetingSubsystem
+		.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
+		.andThen(
+			Commands.either(
+				targetingSubsystem.driveToCoralTarget(drivebase),
+				Commands.runEnd(
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+				).withTimeout(.2),
+				() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+			)
+		)
+		.withName("autoTargetLeftBranch");
+
+	public Command autoTargetRightBranchCommand = targetingSubsystem
+		.autoTargetPairCommand(drivebase::getPose, Side.RIGHT)
+		.andThen(
+			Commands.either(
+				targetingSubsystem.driveToCoralTarget(drivebase),
+				Commands.runEnd(
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
+					() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
+				).withTimeout(.2),
+				() -> targetingSubsystem.areWeAllowedToDrive(drivebase::getPose)
+			)
+		)
+		.withName("autoTargetRightBranch");
+
+	public Command autoLvl4Command = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L4.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runIntakeCommand())
+		.withName("autoLvl4");
+
+	public Command autoLvl3Command = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L3.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runIntakeCommand())
+		.withName("autoLvl3");
+
+	public Command autoLvl2Command = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L2.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runEjectCommand())
+		.withName("autoLvl2");
+
+	public Command autoIntakeCommand = elevatorSubsystem
+		.setPos(() -> FieldConstants.CoralStation.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
+		.until(elevatorSubsystem::atDesiredPosistion)
+		.andThen(scoringSubsystem.runIntakeCommand())
+		.withName("autoIntake");
+
+	public Command autoAlignSourceCommand = targetingSubsystem
+		.driveToSourceCommand(drivebase)
+		.alongWith(autoIntakeCommand)
+		.withName("autoAlignSource");
 
 	/** ----------
 	 * Use this to pass the autonomous command to the main {@link Robot} class.
