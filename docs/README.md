@@ -17,6 +17,7 @@
 | Y Button | kill auto drive | restores manual control to the drive system |
 | Left Bumper | Lock drive | Locks drivebase |
 | Right Bumper | play music | Kraken sings the duck song |
+| Right Numper | toggles robot relative | <----
 
 #### Left Joystick (Operator) [`Port 1`]
 | Binding | Action | Description |
