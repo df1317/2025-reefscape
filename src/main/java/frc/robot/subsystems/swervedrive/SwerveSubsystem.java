@@ -162,11 +162,13 @@ public class SwerveSubsystem extends SubsystemBase {
 			private Translation2d lastPos; 
 			private Translation2d newPos;
 			private Optional<Double> targetYaw;
+			private Translation2d startPos;
 
 			@Override
 			public void initialize(){
 				lastPos = swerveDrive.getPose().getTranslation();
 				newPos = lastPos;
+				startPos = lastPos;
 			}
 
 			@Override
@@ -196,7 +198,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 			@Override
 			public boolean isFinished(){
-				return targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false;
+				final double maxDistTravel = 1.0;
+				return (targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false) || Math.abs(newPos.minus(startPos).getY()) > maxDistTravel;
 			}
 		};
 	}
