@@ -39,6 +39,8 @@ public class RobotContainer {
 
 	private final SendableChooser<Command> autoChooser;
 
+	public boolean robotRelative = false;
+
 	/** ----------
 	 * HID Initialization
 	 * ------------ */
@@ -134,7 +136,7 @@ public class RobotContainer {
 	 * ---
 	 */
 	private void configureBindings() {
-		Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+		Command driveFieldOrientedAnglularVelocity = drivebase.robotDriveCommand(driveAngularVelocity, () -> robotRelative);
 
 		drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
@@ -196,6 +198,8 @@ public class RobotContainer {
 		driverXbox
 			.back()
 			.whileTrue(Commands.either(drivebase.centerModulesCommand(), Commands.none(), DriverStation::isTest));
+
+		driverXbox.rightBumper().onTrue(Commands.runOnce(() -> {robotRelative = robotRelative ? false : true;})).and(DriverStation::isTeleop);
 
 		/** -------------------------------------
 		 * Xbox Scoring and Intake bindings

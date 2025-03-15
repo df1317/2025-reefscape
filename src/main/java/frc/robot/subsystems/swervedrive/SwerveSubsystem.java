@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
@@ -151,8 +152,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		visionDriveTest = SmartDashboard.getBoolean("Swerve Drive/vision enabled", visionDriveTest);
 
 		// When vision is enabled we must manually update odometry in SwerveDrive
+		swerveDrive.updateOdometry();
 		if (visionDriveTest) {
-			swerveDrive.updateOdometry();
 			vision.updatePoseEstimation(swerveDrive);
 		}
 	}
@@ -562,6 +563,15 @@ public class SwerveSubsystem extends SubsystemBase {
 	public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
 		return run(() -> {
 			swerveDrive.driveFieldOriented(velocity.get());
+		});
+	}
+	public Command robotDriveCommand(Supplier<ChassisSpeeds> velocity, BooleanSupplier robotRelative){
+		return run(() ->{
+			if(robotRelative.getAsBoolean()){
+				swerveDrive.driveFieldOrientedAndRobotOriented(new ChassisSpeeds(0, 0, 0), velocity.get());
+			} else{
+				swerveDrive.driveFieldOriented(velocity.get());
+			}
 		});
 	}
 
