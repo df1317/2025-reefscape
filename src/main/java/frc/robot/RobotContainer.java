@@ -249,8 +249,8 @@ public class RobotContainer {
 				)
 			);
 
-		m_JoystickL.trigger().and(m_JoystickL.button(7)).onTrue(scoringSubsystem.runEjectCommand());
-		m_JoystickL.trigger().and(m_JoystickL.button(8)).onTrue(scoringSubsystem.runIntakeCommand());
+		m_JoystickL.trigger().and(m_JoystickL.button(7)).whileTrue(scoringSubsystem.runEjectCommand());
+		m_JoystickL.trigger().and(m_JoystickL.button(8)).whileTrue(scoringSubsystem.runIntakeCommand());
 
 		/** -------------------------------------
 		 * Elevator position bindings
