@@ -172,9 +172,9 @@ public class SwerveSubsystem extends SubsystemBase {
 			@Override
 			public void execute(){
 
-				newPos = new Translation2d(lastPos.getX() + (left ? speed : -speed), lastPos.getY());//find the new pos to be at
+				newPos = new Translation2d(lastPos.getX(), lastPos.getY() + (left ? speed : -speed));//find the new pos to be at
 				if(!test){
-					drive(newPos, 0.0, false);//goes to the new pos
+					drive(newPos.minus(lastPos), 0.0, false);//goes to the new pos
 
 					lastPos = swerveDrive.getPose().getTranslation();//update the last posstion we were at
 				} else{
@@ -185,7 +185,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 				targetYaw = vision.getBarrelTargetYaw();
 
-				SmartDashboard.putNumber("reefFineTune/targetYaw", targetYaw.get());
+				SmartDashboard.putNumber("reefFineTune/targetYaw", targetYaw.isPresent() ? targetYaw.get() : Float.NaN);
 				SmartDashboard.putNumber("reefFineTune/newPos X", newPos.getX());
 				SmartDashboard.putNumber("reefFineTune/newPos Y", newPos.getY());
 				SmartDashboard.putNumber("reefFineTune/lastPos X", lastPos.getX());

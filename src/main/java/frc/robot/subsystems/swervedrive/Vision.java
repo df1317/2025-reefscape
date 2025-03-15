@@ -117,17 +117,22 @@ public class Vision {
 
 	public Optional<Double> getBarrelTargetYaw(){
 		PhotonTrackedTarget target;
-		Double distToCenter = null;
+		Double distToCenter;
 		List<PhotonPipelineResult> results = barrelCamera.getAllUnreadResults();
+		
+		if(results.size() > 0){
+			
+			barrelCamResult = results.get(results.size() - 1);
 
-		barrelCamResult = results.get(results.size() - 1);
+			if( barrelCamResult.hasTargets()){
 
-		if(barrelCamResult.hasTargets()){
-			target = barrelCamResult.getBestTarget();
-			distToCenter = target.getYaw() / 90;
+				target = barrelCamResult.getBestTarget();
+				distToCenter = target.getYaw() / 90;
+
+				return Optional.of(distToCenter);
+			}
 		}
-
-		return Optional.of(distToCenter);
+			return Optional.empty();
 	}
 
 	/**
