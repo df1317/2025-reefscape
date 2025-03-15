@@ -23,6 +23,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -307,8 +308,8 @@ public class Vision {
 		 */
 		CENTER_CAM(
 			"PEBBLE",
-			new Rotation3d(0, 0, 0),
-			new Translation3d(Units.inchesToMeters(13.5), Units.inchesToMeters(14.25), Units.inchesToMeters(10)),
+			new Rotation3d(0, Units.degreesToRadians(45.0), 0),
+			new Translation3d(0.32, 0.32, 0.30),
 			VecBuilder.fill(4, 4, 8),
 			VecBuilder.fill(0.5, 0.5, 1)
 		);
