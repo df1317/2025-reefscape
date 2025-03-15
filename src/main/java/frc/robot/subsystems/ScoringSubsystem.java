@@ -130,7 +130,11 @@ public class ScoringSubsystem extends SubsystemBase {
 						spinnyController2.setReference(0, ControlType.kCurrent);
 					})
 					.withTimeout(0.2)
-			);
+			).finallyDo(() -> {
+				System.out.println("intake command finished");
+				spinnyController.setReference(0, ControlType.kCurrent);
+				spinnyController2.setReference(0, ControlType.kCurrent);
+			});
 	}
 
 	public Command runEjectCommand() {
