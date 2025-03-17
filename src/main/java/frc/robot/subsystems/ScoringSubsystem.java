@@ -44,7 +44,6 @@ public class ScoringSubsystem extends SubsystemBase {
 	private SparkMaxConfig motorConfig = new SparkMaxConfig();
 	private SparkMaxConfig motorConfig2 = new SparkMaxConfig();
 	private SparkClosedLoopController canTiltController;
-	private DigitalInput homingTiltClickySwitch;
 	public DigitalInput coralSensor;
 	private double setpoint = 0;
 
@@ -89,7 +88,6 @@ public class ScoringSubsystem extends SubsystemBase {
 		canTiltMax.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		canTiltController = canTiltMax.getClosedLoopController();
 		canTiltEncoder = canTiltMax.getEncoder();
-		homingTiltClickySwitch = new DigitalInput(DIOConstants.homingTiltClickySwitch);
 	}
 
 	@Override
@@ -130,7 +128,8 @@ public class ScoringSubsystem extends SubsystemBase {
 						spinnyController2.setReference(0, ControlType.kCurrent);
 					})
 					.withTimeout(0.2)
-			).finallyDo(() -> {
+			)
+			.finallyDo(() -> {
 				System.out.println("intake command finished");
 				spinnyController.setReference(0, ControlType.kCurrent);
 				spinnyController2.setReference(0, ControlType.kCurrent);
@@ -179,16 +178,11 @@ public class ScoringSubsystem extends SubsystemBase {
 		});
 	}
 
-	public Command homeCommand() {
-		return this.runEnd(
-				() -> {
-					canTiltController.setReference(0.45, ControlType.kDutyCycle);
-				},
-				() -> {
-					canTiltMax.getEncoder().setPosition(0);
-					canTiltController.setReference(0, ControlType.kPosition);
-				}
-			).until(() -> homingTiltClickySwitch.get());
+	public Command zeroEncoder() {
+		return this.runOnce(() -> {
+				canTiltEncoder.setPosition(0);
+				setpoint = 0;
+			});
 	}
 
 	public Command tiltSysIDCommand(double quasiTimeout, double timeout, double dynamicTimeout) {
