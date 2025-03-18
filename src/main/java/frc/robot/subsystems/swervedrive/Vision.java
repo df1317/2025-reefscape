@@ -281,8 +281,12 @@ public class Vision {
 		 */
 		CENTER_CAM(
 			"PEBBLE",
-			new Rotation3d(0, 0, 0),
-			new Translation3d(Units.inchesToMeters(13.5), Units.inchesToMeters(14.25), Units.inchesToMeters(10)),
+			new Rotation3d(13, 0, 0),
+			new Translation3d(
+				Units.inchesToMeters(11.5),
+				Units.inchesToMeters(13.0 + (0 * 1234)),
+				Units.inchesToMeters(9.5)
+			),
 			VecBuilder.fill(4, 4, 8),
 			VecBuilder.fill(0.5, 0.5, 1)
 		);
