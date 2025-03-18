@@ -84,6 +84,7 @@ public class Robot extends TimedRobot {
 
 		// Put the current match time on the dashboard
 		SmartDashboard.putNumber("misc/Match Time", DriverStation.getMatchTime());
+		SmartDashboard.putBoolean("misc/robotRelative", m_robotContainer.robotRelative);
 	}
 
 	/* ----------
