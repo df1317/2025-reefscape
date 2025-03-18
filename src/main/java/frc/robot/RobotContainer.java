@@ -229,15 +229,9 @@ public class RobotContainer {
 				)
 			);
 
-		driverXbox
-			.rightBumper()
-			.onTrue(
-				Commands.either(
-					scoringSubsystem.runIntakeCommand(),
-					climberSubsystem.playMusicCommand(),
-					DriverStation::isTest
-				)
-			);
+		driverXbox.rightBumper().and(DriverStation::isTest).onTrue(scoringSubsystem.runIntakeCommand());
+
+		driverXbox.rightTrigger().and(DriverStation::isTeleop).onTrue(climberSubsystem.playMusicCommand());
 
 		/** -------------------------------------
 		 * Scoring Bindings
