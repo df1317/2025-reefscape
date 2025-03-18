@@ -136,7 +136,9 @@ public class RobotContainer {
 	 * ---
 	 */
 	private void configureBindings() {
-		Command driveFieldOrientedAnglularVelocity = drivebase.robotDriveCommand(driveAngularVelocity, () -> robotRelative);
+		Command driveFieldOrientedAnglularVelocity = drivebase.robotDriveCommand(driveAngularVelocity, () ->
+			robotRelative
+		);
 
 		drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
@@ -199,7 +201,14 @@ public class RobotContainer {
 			.back()
 			.whileTrue(Commands.either(drivebase.centerModulesCommand(), Commands.none(), DriverStation::isTest));
 
-		driverXbox.rightBumper().onTrue(Commands.runOnce(() -> {robotRelative = robotRelative ? false : true;})).and(DriverStation::isTeleop);
+		driverXbox
+			.rightBumper()
+			.onTrue(
+				Commands.runOnce(() -> {
+					robotRelative = robotRelative ? false : true;
+				})
+			)
+			.and(DriverStation::isTeleop);
 
 		/** -------------------------------------
 		 * Xbox Scoring and Intake bindings
@@ -354,6 +363,8 @@ public class RobotContainer {
 		Command tiltJoyCommand = scoringSubsystem.tiltJoy(() -> m_JoystickL.getY());
 		tiltJoyCommand.addRequirements(scoringSubsystem);
 		scoringSubsystem.setDefaultCommand(tiltJoyCommand);
+
+		m_JoystickL.button(12).and(() -> !DriverStation.isTest()).onTrue(scoringSubsystem.zeroEncoder());
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings

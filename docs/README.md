@@ -33,6 +33,7 @@
 | Button 9 | Climber descend | Controls climber down |
 | Button 10 | Climber climb | Controls climber up |
 | Button 11 | manual tilt | control the tilt with the joystick |
+| Button 12 | zero tilt encoder | sets the encoder to zero |
 
 ### Test Mode
 
