@@ -12,6 +12,9 @@
 	<img src="https://raw.githubusercontent.com/taciturnaxolotl/carriage/main/.github/images/line-break-thin.svg" />
 </p>
 
+> [!NOTE]
+> the bindings and can ids are documented in [`docs`](/docs)
+
 ## What's this?
 
 This is the code for 1317's 2025 robot for this years Reefscape FRC game!
