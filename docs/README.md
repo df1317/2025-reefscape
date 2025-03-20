@@ -91,3 +91,12 @@ All the fancy quick reference stuff goes here.
 | Elevator Motor | Right | `27` |
 | | |
 | Climber Motor | Beefy | `29` |
+
+## DIO Constants
+
+| Sensor | Port |
+|--------|------|
+| Coral Sensor | `1` |
+| Elevator Encoder Left | `2` |
+| Elevator Encoder Right | `3` |
+| Homing Tilt Clicky Switch | `4` |

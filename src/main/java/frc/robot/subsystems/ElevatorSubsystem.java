@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.CanConstants;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -22,14 +21,13 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants.DIOConstants;
+import frc.robot.Constants.CanConstants;
 import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -40,10 +38,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private RelativeEncoder encoderL;
 	private RelativeEncoder encoderR;
 
-	public DigitalInput limitSwitchTop = new DigitalInput(DIOConstants.elevatorTopLimitSwitch);
-	public DigitalInput limitSwitchBottom = new DigitalInput(DIOConstants.elevatorBottomLimitSwitch);
-
-	private enum LimitSwitchTrigger {
+	private enum Limits {
 		TOP,
 		NONE,
 		BOTTOM,
@@ -103,13 +98,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 		ffState.velocity = 0.0;
 	}
 
-	private LimitSwitchTrigger checkLimits() {
-		if (limitSwitchTop.get()) {
-			return LimitSwitchTrigger.TOP;
-		} else if (limitSwitchBottom.get()) {
-			return LimitSwitchTrigger.BOTTOM;
+	private Limits checkLimits() {
+		double height = encoderL.getPosition() / krot;
+		if (height >= maxHeight) {
+			return Limits.TOP;
+		} else if (height <= minHeight) {
+			return Limits.BOTTOM;
 		} else {
-			return LimitSwitchTrigger.NONE;
+			return Limits.NONE;
 		}
 	}
 
@@ -164,6 +160,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 				running = false;
 				break;
 		}
+
 		if (running) {
 			controllerL.setReference(
 				preRenfernce.position * krot,
@@ -183,8 +180,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("elevator/current-velocity", preRenfernce.velocity);
 		SmartDashboard.putNumber("elevator/end-position", ffState.position);
 		SmartDashboard.putNumber("elevator/currentMaxVal", currentMaxVel);
-		SmartDashboard.putBoolean("elevator/topLimitSwitch", limitSwitchTop.get());
-		SmartDashboard.putBoolean("elevator/bottomLimitSwitch", limitSwitchBottom.get());
 		SmartDashboard.putNumber("elevator/encoderL", encoderL.getPosition());
 		SmartDashboard.putNumber("elevator/encoderR", encoderR.getPosition());
 		SmartDashboard.putNumber("elevator/motorL current", motorL.getOutputCurrent());
