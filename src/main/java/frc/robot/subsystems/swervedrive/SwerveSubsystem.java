@@ -565,11 +565,12 @@ public class SwerveSubsystem extends SubsystemBase {
 			swerveDrive.driveFieldOriented(velocity.get());
 		});
 	}
-	public Command robotDriveCommand(Supplier<ChassisSpeeds> velocity, BooleanSupplier robotRelative){
-		return run(() ->{
-			if(robotRelative.getAsBoolean()){
+
+	public Command robotDriveCommand(Supplier<ChassisSpeeds> velocity, BooleanSupplier robotRelative) {
+		return run(() -> {
+			if (robotRelative.getAsBoolean()) {
 				swerveDrive.driveFieldOrientedAndRobotOriented(new ChassisSpeeds(0, 0, 0), velocity.get());
-			} else{
+			} else {
 				swerveDrive.driveFieldOriented(velocity.get());
 			}
 		});

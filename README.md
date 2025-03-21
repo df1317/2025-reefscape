@@ -41,11 +41,13 @@ bun format
 If you don't have `bun` installed then install it by running one of the following commands:
 
 > linux / macos
+
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
 > windows
+
 ```powershell
 powershell -c "irm bun.sh/install.ps1 | iex"
 ```
@@ -87,27 +89,31 @@ Here is a quick example of a subsystem with a command and then a command binding
 
 ```java
 public class ExampleSubsystem extends SubsystemBase {
-    private final SparkMotor motor;
-    
-    public ExampleSubsystem() {
-        motor = new SparkMotor(0);
-    }
-    
-    public Command getExampleCommand(BooleanSupplier speed) {
-        return new RunCommand(() -> motor.set(speed.getAsDouble()), this);
-    }
+
+	private final SparkMotor motor;
+
+	public ExampleSubsystem() {
+		motor = new SparkMotor(0);
+	}
+
+	public Command getExampleCommand(BooleanSupplier speed) {
+		return new RunCommand(() -> motor.set(speed.getAsDouble()), this);
+	}
 }
+
 ```
 
 ```java
 public class RobotContainer {
-    private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
-    private final Joystick joystick = new Joystick(0);
-    
-    public RobotContainer() {
-        joystick.trigger().onTrue(elevatorSubsystem.setPos(() -> 0.3));
-    }
+
+	private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
+	private final Joystick joystick = new Joystick(0);
+
+	public RobotContainer() {
+		joystick.trigger().onTrue(elevatorSubsystem.setPos(() -> 0.3));
+	}
 }
+
 ```
 
 ## Why AGPL 3.0 as a license?
