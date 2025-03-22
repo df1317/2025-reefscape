@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -74,6 +75,8 @@ public final class Constants {
 	}
 
 	public static class AutoScoring {
+
+		public static final Pose2d SCORING_AUTO_POSE = new Pose2d(5.562,5.577,new Rotation2d(0.0));
 
 		public static class Processor {
 

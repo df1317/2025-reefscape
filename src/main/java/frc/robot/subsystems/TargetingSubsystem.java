@@ -2,24 +2,35 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoScoring;
 import frc.robot.libs.AllianceFlipUtil;
 import frc.robot.libs.FieldConstants;
 import frc.robot.libs.FieldConstants.Reef;
 import frc.robot.libs.FieldConstants.ReefHeight;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilderException;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 
 /* -----------
  * TargetingSubsystem
@@ -193,12 +204,54 @@ public class TargetingSubsystem extends SubsystemBase {
 		});
 	}
 
+	public PathPlannerPath goTo(Pose2d currentPose, Pose2d endPose){
+		double deltaDeg = currentPose.getRotation().getDegrees();
+		double finalDeg = endPose.getRotation().getDegrees() - deltaDeg;
+		
+		endPose = new Pose2d(endPose.getX(),endPose.getY(),
+			new Rotation2d(endPose.getRotation().getDegrees() - deltaDeg));
+		endPose = new Pose2d(currentPose.getX(),currentPose.getY(),
+			new Rotation2d(currentPose.getRotation().getDegrees() - deltaDeg));
+
+		List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+			currentPose,
+			endPose
+			);
+			
+
+			
+		PathConstraints constraints = new PathConstraints(Constants.MAX_SPEED/2, Constants.MAX_ACCELERATION/2, Constants.MAX_ANGULAR_SPEED/2, Constants.MAX_ANGULAR_ACCELERATION);
+		finalDeg = 0.0;
+		PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null,
+			new GoalEndState(0.0, Rotation2d.fromDegrees(finalDeg)));
+
+		path.preventFlipping = true;
+
+		return path;
+	}
+	public Command driveToArb(SwerveSubsystem swerve){
+		return Commands.runOnce(() ->{
+			
+			PathPlannerPath path = goTo(swerve.getPose(), Constants.AutoScoring.SCORING_AUTO_POSE);
+
+			try{
+				AutoBuilder.followPath(path);
+			} catch(AutoBuilderException e){
+				System.out.println("Whoops looks like you got a little error: ");
+				e.printStackTrace();
+			}
+			
+		});
+	}
+
+
 	public enum Side {
 		LEFT,
 		RIGHT
 	}
 
-	public enum ReefBranch {
+	public enum 
+	ReefBranch {
 		A,
 		B,
 		K,
