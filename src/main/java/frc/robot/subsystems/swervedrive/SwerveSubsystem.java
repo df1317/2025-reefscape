@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Newton;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.MAX_SPEED;
 import static frc.robot.Constants.MAX_ACCELERATION;
@@ -147,6 +148,70 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)), Rotation2d.fromDegrees(0))
 		);
 		// Epilogue.bind(this);
+	}
+	/**
+	 *
+	 * @param left
+	 * <pre> goes left or right 
+	 * if true goes left else right
+	 * @param speed
+	 * the double to which to add to the left or right prob in meters
+	 * @param tol
+	 * cool, this is the tolerance for the fine positionng and camera stuff so i guess we make it 0.5
+	 * also this could be an error in vision so...
+	 * @param test
+	 * WOW! thats a lot of temp requirements hope someone checks the docs and doens just put this as false.
+	 * oh and by the this var changes if the robot moves or doesn't slash is in test/debug mode or not
+	 * @return
+	 * a command to fine tune the reef might work who knows 🤷
+	 * @throws
+	 * head off wall debuging this
+	 */
+	public Command reefFineTune(double speed, boolean left, double tol, boolean test){
+		return new Command() {
+			private Translation2d lastPos; 
+			private Translation2d newPos;
+			private Optional<Double> targetYaw;
+			private Translation2d startPos;
+
+			@Override
+			public void initialize(){
+				lastPos = swerveDrive.getPose().getTranslation();
+				newPos = lastPos;
+				startPos = lastPos;
+			}
+
+			@Override
+			public void execute(){
+
+				newPos = new Translation2d(lastPos.getX(), lastPos.getY() + (left ? speed : -speed));//find the new pos to be at
+				if(!test){
+					drive(newPos.minus(lastPos), 0.0, false);//goes to the new pos
+
+					lastPos = swerveDrive.getPose().getTranslation();//update the last posstion we were at
+				} else{
+					lastPos = newPos;
+
+				}
+				
+
+				targetYaw = vision.getBarrelTargetYaw();
+
+				SmartDashboard.putNumber("reefFineTune/targetYaw", targetYaw.isPresent() ? targetYaw.get() : Float.NaN);
+				SmartDashboard.putNumber("reefFineTune/newPos X", newPos.getX());
+				SmartDashboard.putNumber("reefFineTune/newPos Y", newPos.getY());
+				SmartDashboard.putNumber("reefFineTune/lastPos X", lastPos.getX());
+				SmartDashboard.putNumber("reefFineTune/lastPos Y", lastPos.getY());
+				SmartDashboard.putBoolean("reefFineTUne/has targets", targetYaw.isPresent());
+
+			}
+
+			@Override
+			public boolean isFinished(){
+				final double maxDistTravel = 1.0;
+				return (targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false) || Math.abs(newPos.minus(startPos).getY()) > maxDistTravel;
+			}
+		};
 	}
 
 	/**

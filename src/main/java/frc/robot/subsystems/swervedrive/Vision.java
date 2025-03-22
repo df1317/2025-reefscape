@@ -23,6 +23,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -42,6 +43,7 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
 import swervelib.SwerveDrive;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
@@ -76,6 +78,9 @@ public class Vision {
 	 */
 	private final Alert noPhotonVisionAlert = new Alert("No PhotonVision clients found", AlertType.kWarning);
 
+	private final PhotonCamera barrelCamera;
+	private PhotonPipelineResult barrelCamResult;
+
 	/**
 	 * Constructor for the Vision class.
 	 *
@@ -86,6 +91,8 @@ public class Vision {
 	public Vision(Supplier<Pose2d> currentPose, Field2d field) {
 		this.currentPose = currentPose;
 		this.field2d = field;
+
+		barrelCamera = new PhotonCamera("ROCKY");
 
 		if (Robot.isSimulation()) {
 			visionSim = new VisionSystemSim("Vision");
@@ -107,6 +114,26 @@ public class Vision {
 			}
 		}
 		noPhotonVisionAlert.set(!hasCamera);
+	}
+
+	public Optional<Double> getBarrelTargetYaw(){
+		PhotonTrackedTarget target;
+		Double distToCenter;
+		List<PhotonPipelineResult> results = barrelCamera.getAllUnreadResults();
+		
+		if(results.size() > 0){
+			
+			barrelCamResult = results.get(results.size() - 1);
+
+			if( barrelCamResult.hasTargets()){
+
+				target = barrelCamResult.getBestTarget();
+				distToCenter = target.getYaw() / 90;
+
+				return Optional.of(distToCenter);
+			}
+		}
+			return Optional.empty();
 	}
 
 	/**
@@ -281,12 +308,8 @@ public class Vision {
 		 */
 		CENTER_CAM(
 			"PEBBLE",
-			new Rotation3d(13, 0, 0),
-			new Translation3d(
-				Units.inchesToMeters(11.5),
-				Units.inchesToMeters(13.0 + (0 * 1234)),
-				Units.inchesToMeters(9.5)
-			),
+			new Rotation3d(0, Units.degreesToRadians(45.0), 0),
+			new Translation3d(0.32, 0.32, 0.30),
 			VecBuilder.fill(4, 4, 8),
 			VecBuilder.fill(0.5, 0.5, 1)
 		);
