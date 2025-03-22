@@ -205,25 +205,22 @@ public class TargetingSubsystem extends SubsystemBase {
 	}
 
 	public PathPlannerPath goTo(Pose2d currentPose, Pose2d endPose){
-		double deltaDeg = currentPose.getRotation().getDegrees();
-		double finalDeg = endPose.getRotation().getDegrees() - deltaDeg;
+		// double initDeg = currentPose.getRotation().getDegrees();
+		// double finalDeg = endPose.getRotation().getDegrees() - initDeg;
 		
-		endPose = new Pose2d(endPose.getX(),endPose.getY(),
-			new Rotation2d(endPose.getRotation().getDegrees() - deltaDeg));
-		endPose = new Pose2d(currentPose.getX(),currentPose.getY(),
-			new Rotation2d(currentPose.getRotation().getDegrees() - deltaDeg));
+		// endPose = new Pose2d(endPose.getX(),endPose.getY(),
+		// 	new Rotation2d(endPose.getRotation().getDegrees() - initDeg));
+		// currentPose = new Pose2d(currentPose.getX(),currentPose.getY(),
+		// 	new Rotation2d(currentPose.getRotation().getDegrees() - initDeg));
 
 		List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
 			currentPose,
 			endPose
 			);
 			
-
-			
 		PathConstraints constraints = new PathConstraints(Constants.MAX_SPEED/2, Constants.MAX_ACCELERATION/2, Constants.MAX_ANGULAR_SPEED/2, Constants.MAX_ANGULAR_ACCELERATION);
-		finalDeg = 0.0;
 		PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null,
-			new GoalEndState(0.0, Rotation2d.fromDegrees(finalDeg)));
+			new GoalEndState(0.0, endPose.getRotation()));
 
 		path.preventFlipping = true;
 

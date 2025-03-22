@@ -399,6 +399,8 @@ public class RobotContainer {
 	 * ---
 	 */
 
+	 public Command driveArb = targetingSubsystem.driveToArb(drivebase).andThen(targetingSubsystem.autoTargetPairCommand(drivebase::getPose, Side.LEFT)).withName("driveArb");
+
 	public Command autoTargetLeftBranchCommand = targetingSubsystem
 		.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
 		.andThen(
