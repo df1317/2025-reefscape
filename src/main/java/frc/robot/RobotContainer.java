@@ -20,6 +20,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.TargetingSubsystem;
+import frc.robot.subsystems.TiltSubsystem;
 import frc.robot.subsystems.TargetingSubsystem.Side;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -58,6 +59,7 @@ public class RobotContainer {
 	private final ScoringSubsystem scoringSubsystem = new ScoringSubsystem();
 	private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 	private final TargetingSubsystem targetingSubsystem = new TargetingSubsystem();
+	private final TiltSubsystem tiltSubsystem = new TiltSubsystem();
 
 	/** ----------
 	 * Swerve Drive Input Streams
@@ -279,28 +281,28 @@ public class RobotContainer {
 			.onTrue(
 				elevatorSubsystem
 					.setPos(() -> FieldConstants.CoralStation.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
+					.alongWith(tiltSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
 			);
 		m_JoystickL
 			.button(3)
 			.onTrue(
 				elevatorSubsystem
 					.setPos(() -> FieldConstants.ReefHeight.L2.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
+					.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
 			);
 		m_JoystickL
 			.button(4)
 			.onTrue(
 				elevatorSubsystem
 					.setPos(() -> FieldConstants.ReefHeight.L3.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
+					.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
 			);
 		m_JoystickL
 			.button(6)
 			.onTrue(
 				elevatorSubsystem
 					.setPos(() -> FieldConstants.ReefHeight.L4.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
+					.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
 			);
 
 		m_JoystickL
@@ -310,20 +312,20 @@ public class RobotContainer {
 					Commands.repeatingSequence(
 						elevatorSubsystem
 							.setPos(() -> FieldConstants.CoralStation.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch)),
+							.alongWith(tiltSubsystem.tiltCommand(FieldConstants.CoralStation.pitch)),
 						Commands.waitSeconds(2),
 						elevatorSubsystem
 							.setPos(() -> FieldConstants.ReefHeight.L2.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch)),
+							.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch)),
 						Commands.waitSeconds(2),
 						elevatorSubsystem
 							.setPos(() -> FieldConstants.ReefHeight.L3.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch)),
+							.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch)),
 						Commands.waitSeconds(2),
 						elevatorSubsystem
 							.setPos(() -> FieldConstants.ReefHeight.L4.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
-							.andThen(scoringSubsystem.tiltCommand(144)),
+							.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
+							.andThen(tiltSubsystem.tiltCommand(144)),
 						Commands.waitSeconds(2)
 					),
 					Commands.none(),
@@ -349,16 +351,16 @@ public class RobotContainer {
 		 * ---
 		 */
 
-		m_JoystickL.button(7).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltCommand(0));
+		m_JoystickL.button(7).and(DriverStation::isTest).whileTrue(tiltSubsystem.tiltCommand(0));
 
-		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(false));
-		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(true));
+		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(tiltSubsystem.tiltNudge(false));
+		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(tiltSubsystem.tiltNudge(true));
 
-		Command tiltJoyCommand = scoringSubsystem.tiltJoy(() -> m_JoystickL.getY());
+		Command tiltJoyCommand = tiltSubsystem.tiltJoy(() -> m_JoystickL.getY());
 		tiltJoyCommand.addRequirements(scoringSubsystem);
 		scoringSubsystem.setDefaultCommand(tiltJoyCommand);
 
-		m_JoystickL.button(12).and(() -> !DriverStation.isTest()).onTrue(scoringSubsystem.zeroEncoder());
+		m_JoystickL.button(12).and(() -> !DriverStation.isTest()).onTrue(tiltSubsystem.zeroEncoder());
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings
@@ -370,19 +372,19 @@ public class RobotContainer {
 		m_JoystickL
 			.button(2)
 			.onTrue(
-				Commands.either(scoringSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
+				Commands.either(tiltSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
 			);
 
 		m_JoystickR
 			.button(9)
 			.whileTrue(
-				Commands.either(elevatorSubsystem.sysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
+				Commands.either(tiltSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
 			);
 
 		m_JoystickR
 			.button(10)
 			.whileTrue(
-				Commands.either(scoringSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
+				Commands.either(tiltSubsystem.tiltSysIDCommand(4, 2, 2), Commands.none(), DriverStation::isTest)
 			);
 		m_JoystickR
 			.button(11)
@@ -429,28 +431,28 @@ public class RobotContainer {
 
 	public Command autoLvl4Command = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L4.height)
-		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
+		.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
 		.until(elevatorSubsystem::atDesiredPosistion)
 		.andThen(scoringSubsystem.runIntakeCommand())
 		.withName("autoLvl4");
 
 	public Command autoLvl3Command = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L3.height)
-		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
+		.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
 		.until(elevatorSubsystem::atDesiredPosistion)
 		.andThen(scoringSubsystem.runIntakeCommand())
 		.withName("autoLvl3");
 
 	public Command autoLvl2Command = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L2.height)
-		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
+		.alongWith(tiltSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
 		.until(elevatorSubsystem::atDesiredPosistion)
 		.andThen(scoringSubsystem.runEjectCommand())
 		.withName("autoLvl2");
 
 	public Command autoIntakeCommand = elevatorSubsystem
 		.setPos(() -> FieldConstants.CoralStation.height)
-		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
+		.alongWith(tiltSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
 		.until(elevatorSubsystem::atDesiredPosistion)
 		.andThen(scoringSubsystem.runIntakeCommand())
 		.withName("autoIntake");
