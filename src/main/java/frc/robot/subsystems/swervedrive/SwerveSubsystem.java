@@ -153,12 +153,16 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @param test
 	 * WOW! thats a lot of temp requirements hope someone checks the docs and doens just put this as false.
 	 * oh and by the this var changes if the robot moves or doesn't slash is in test/debug mode or not
+	 * @param throwSomthing
+	 * just some useful security error hadeling becues who knows when you code on a private lan is going to get hacked
+	 * to prevent this by enableing this boolean you can ever get hacked cause this will instantly throw a useful error with pointers and much much more... 
+	 * jk or not.
 	 * @return
 	 * a command to fine tune the reef might work who knows 🤷
 	 * @throws
 	 * head off wall debuging this
 	 */
-	public Command reefFineTune(double speed, boolean left, double tol, boolean test){
+	public Command reefFineTune(double speed, boolean left, double tol, boolean test, boolean throwSomthing){
 		return new Command() {
 			private Translation2d lastPos; 
 			private Translation2d newPos;
@@ -170,6 +174,10 @@ public class SwerveSubsystem extends SubsystemBase {
 				lastPos = swerveDrive.getPose().getTranslation();
 				newPos = lastPos;
 				startPos = lastPos;
+
+				if(throwSomthing){
+					throw new VerifyError(" 💀💀💀 you have been hacked with buffers and such 💀💀💀");
+				}
 			}
 
 			@Override

@@ -395,22 +395,22 @@ public class RobotContainer {
 
 		driverXbox.povLeft().onTrue(
 			Commands.either(
-				drivebase.reefFineTune(0.1, true, 0.5, true),
+				drivebase.reefFineTune(0.1, true, 0.5, true, false),
 				Commands.none(),
 				DriverStation::isTest));
 		driverXbox.povRight().onTrue(
 			Commands.either(
-				drivebase.reefFineTune(0.1, false, 0.5, true),
+				drivebase.reefFineTune(0.1, false, 0.5, true, false),
 				Commands.none(),
 				DriverStation::isTest));
 		driverXbox.povLeft().onTrue(
 			Commands.either(
-				drivebase.reefFineTune(0.1, true, 0.5, false),
+				drivebase.reefFineTune(0.1, true, 0.5, false,false),
 				Commands.none(),
 				DriverStation::isTeleop));
 		driverXbox.povRight().onTrue(
 			Commands.either(
-				drivebase.reefFineTune(0.1, false, 0.5, false),
+				drivebase.reefFineTune(0.1, false, 0.5, false, false),
 				Commands.none(),
 				DriverStation::isTeleop));
 	}
