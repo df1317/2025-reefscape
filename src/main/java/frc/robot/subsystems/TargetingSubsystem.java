@@ -204,25 +204,14 @@ public class TargetingSubsystem extends SubsystemBase {
 		});
 	}
 
-	public PathPlannerPath goTo(Pose2d currentPose, Pose2d endPose){
-		// double initDeg = currentPose.getRotation().getDegrees();
-		// double finalDeg = endPose.getRotation().getDegrees() - initDeg;
-		
-		// endPose = new Pose2d(endPose.getX(),endPose.getY(),
-		// 	new Rotation2d(endPose.getRotation().getDegrees() - initDeg));
-		// currentPose = new Pose2d(currentPose.getX(),currentPose.getY(),
-		// 	new Rotation2d(currentPose.getRotation().getDegrees() - initDeg));
-
-		List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-			endPose,
-			endPose
-			);
+	public Command goTo(Pose2d targetPose){
 			
 		PathConstraints constraints = new PathConstraints(Constants.MAX_SPEED/2, Constants.MAX_ACCELERATION/2, Constants.MAX_ANGULAR_SPEED/2, Constants.MAX_ANGULAR_ACCELERATION);
-		PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null,
-			new GoalEndState(0.0, endPose.getRotation()));
+		// PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null,
+		// 	new GoalEndState(0.0, endPose.getRotation()));
+		Command path = AutoBuilder.pathfindToPose(targetPose, constraints,0.0);
 
-		path.preventFlipping = true;
+		// path.preventFlipping = true;
 
 		return path;
 	}
@@ -231,11 +220,10 @@ public class TargetingSubsystem extends SubsystemBase {
 
 			System.out.println("started drivetoarb");
 			
-			PathPlannerPath path = goTo(swerve.getPose(), Constants.AutoScoring.SCORING_AUTO_POSE);
+			Command path = goTo(Constants.AutoScoring.SCORING_AUTO_POSE);
 
 			try{
-				PathConstraints constraints = new PathConstraints(Constants.MAX_SPEED/2, Constants.MAX_ACCELERATION/2, Constants.MAX_ANGULAR_SPEED/2, Constants.MAX_ANGULAR_ACCELERATION);
-				AutoBuilder.pathfindThenFollowPath(path, constraints).schedule();
+				path.schedule();
 			} catch(AutoBuilderException e){
 				System.out.println("Whoops looks like you got a little error: ");
 				e.printStackTrace();

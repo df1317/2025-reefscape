@@ -308,7 +308,7 @@ public class Vision {
 		 */
 		CENTER_CAM(
 			"PEBBLE",
-			new Rotation3d(0, Units.degreesToRadians(45.0), 0),
+			new Rotation3d(0, Units.degreesToRadians(15.0), 0),
 			new Translation3d(0.32, 0.32, 0.30),
 			VecBuilder.fill(4, 4, 8),
 			VecBuilder.fill(0.5, 0.5, 1)
