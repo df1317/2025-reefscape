@@ -38,7 +38,7 @@ public class TiltSubsystem extends SubsystemBase {
 	private final MutAngle m_rotation = Rotations.mutable(0);
 	private final MutAngularVelocity m_velocity = RotationsPerSecond.mutable(0);
 
-    private final double kp = 0.01, ki = 0, kd = 0, kv = 1 / 917;
+    private final double kp = 4.5, ki = 0, kd = 0.4;
 	private SparkMax canTiltMax;
 	private SparkMaxConfig tiltConfig = new SparkMaxConfig();
 	private EncoderConfig tiltEncoderConfig = new EncoderConfig();
@@ -49,7 +49,7 @@ public class TiltSubsystem extends SubsystemBase {
     public TiltSubsystem(){
 
         tiltConfig.inverted(false).smartCurrentLimit(15).apply(tiltEncoderConfig);
-		tiltConfig.closedLoop.p(4.5, ClosedLoopSlot.kSlot0).i(0, ClosedLoopSlot.kSlot0).d(0.4, ClosedLoopSlot.kSlot0);
+		tiltConfig.closedLoop.p(kp, ClosedLoopSlot.kSlot0).i(ki, ClosedLoopSlot.kSlot0).d(kd, ClosedLoopSlot.kSlot0);
 		canTiltMax = new SparkMax(CanConstants.scoreTiltMotor, MotorType.kBrushed);
 		canTiltMax.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		canTiltController = canTiltMax.getClosedLoopController();
