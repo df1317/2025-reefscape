@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -127,6 +128,7 @@ public class RobotContainer {
 	 * ---
 	 */
 	public RobotContainer() {
+		NamedCommands.registerCommand("driveArb", driveArb);
 		configureBindings();
 		DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -427,9 +429,10 @@ public class RobotContainer {
 	 * ---
 	 */
 
-	 public Command driveArb = targetingSubsystem.driveToArb(drivebase).andThen(targetingSubsystem.autoTargetPairCommand(drivebase::getPose, Side.LEFT)).withName("driveArb");
+	public Command driveArb = targetingSubsystem.driveToArb(drivebase);//.andThen(targetingSubsystem.autoTargetPairCommand(drivebase::getPose, Side.LEFT)).andThen(drivebase.reefFineTune(0.1, true, 0.5, false)).andThen(drivebase.reefFineTune(0.1, false, 0.5, false)).withName("driveArb");
 
-	public Command autoTargetLeftBranchCommand = targetingSubsystem
+
+	 public Command autoTargetLeftBranchCommand = targetingSubsystem
 		.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
 		.andThen(
 			Commands.either(

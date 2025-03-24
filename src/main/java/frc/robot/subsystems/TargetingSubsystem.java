@@ -214,7 +214,7 @@ public class TargetingSubsystem extends SubsystemBase {
 		// 	new Rotation2d(currentPose.getRotation().getDegrees() - initDeg));
 
 		List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-			currentPose,
+			endPose,
 			endPose
 			);
 			
@@ -228,11 +228,14 @@ public class TargetingSubsystem extends SubsystemBase {
 	}
 	public Command driveToArb(SwerveSubsystem swerve){
 		return Commands.runOnce(() ->{
+
+			System.out.println("started drivetoarb");
 			
 			PathPlannerPath path = goTo(swerve.getPose(), Constants.AutoScoring.SCORING_AUTO_POSE);
 
 			try{
-				AutoBuilder.followPath(path);
+				PathConstraints constraints = new PathConstraints(Constants.MAX_SPEED/2, Constants.MAX_ACCELERATION/2, Constants.MAX_ANGULAR_SPEED/2, Constants.MAX_ANGULAR_ACCELERATION);
+				AutoBuilder.pathfindThenFollowPath(path, constraints).schedule();
 			} catch(AutoBuilderException e){
 				System.out.println("Whoops looks like you got a little error: ");
 				e.printStackTrace();
