@@ -116,10 +116,10 @@ public class FieldConstants {
 				for (var level : ReefHeight.values()) {
 					Pose2d poseDirection = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
 					double adjustXLeft = Units.inchesToMeters(17.738);//offsets for the left reef coral thing scoring
-					double adjustYLeft = Units.inchesToMeters(9.469);
+					double adjustYLeft = Units.inchesToMeters(7.9);
 
 					double adjustXRight = Units.inchesToMeters(17.738);//offsets for the right reel coral thing scoring
-					double adjustYRight = Units.inchesToMeters(9.469);
+					double adjustYRight = Units.inchesToMeters(7.9);
 
 					fillRight.put(
 						level,

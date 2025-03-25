@@ -129,6 +129,7 @@ public class RobotContainer {
 	 * ---
 	 */
 	public RobotContainer() {
+		NamedCommands.registerCommand("score", score);
 		NamedCommands.registerCommand("driveArb", driveArb);
 		NamedCommands.registerCommand("L1", L1);
 		NamedCommands.registerCommand("L2", L2);
@@ -298,11 +299,7 @@ public class RobotContainer {
 			.onTrue(L3);
 		m_JoystickL
 			.button(6)
-			.onTrue(
-				elevatorSubsystem
-					.setPos(() -> FieldConstants.ReefHeight.L4.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
-			);
+			.onTrue(L4);
 
 		m_JoystickL
 			.button(7)
@@ -420,14 +417,16 @@ public class RobotContainer {
 	 * named commands for reef align and auto scoring on different levels
 	 * ---
 	 */
-
+	public Command score = scoringSubsystem.runEjectCommand();
 	public Command driveArb = targetingSubsystem.driveToArb(drivebase);//.andThen(drivebase.reefFineTune(0.1, true, 0.5, false)).andThen(drivebase.reefFineTune(0.1, false, 0.5, false)).withName("driveArb");
-	public Command L1 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L1.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L1.pitch));
+	public Command L1 = elevatorSubsystem.setPos(() ->FieldConstants.CoralStation.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch));
 	public Command L2 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L2.height)
 							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch));
 	public Command L3 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L3.height)
 							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch));
+	public Command L4 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L4.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch));
 
 
 	 public Command autoTargetLeftBranchCommand = targetingSubsystem
