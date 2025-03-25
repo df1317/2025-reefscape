@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
@@ -129,6 +130,9 @@ public class RobotContainer {
 	 */
 	public RobotContainer() {
 		NamedCommands.registerCommand("driveArb", driveArb);
+		NamedCommands.registerCommand("L1", L1);
+		NamedCommands.registerCommand("L2", L2);
+		NamedCommands.registerCommand("L3", L3);
 		configureBindings();
 		DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -285,25 +289,13 @@ public class RobotContainer {
 
 		m_JoystickL
 			.button(5)
-			.onTrue(
-				elevatorSubsystem
-					.setPos(() -> FieldConstants.CoralStation.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
-			);
+			.onTrue(L1);
 		m_JoystickL
 			.button(3)
-			.onTrue(
-				elevatorSubsystem
-					.setPos(() -> FieldConstants.ReefHeight.L2.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
-			);
+			.onTrue(L2);
 		m_JoystickL
 			.button(4)
-			.onTrue(
-				elevatorSubsystem
-					.setPos(() -> FieldConstants.ReefHeight.L3.height)
-					.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
-			);
+			.onTrue(L3);
 		m_JoystickL
 			.button(6)
 			.onTrue(
@@ -429,7 +421,13 @@ public class RobotContainer {
 	 * ---
 	 */
 
-	public Command driveArb = targetingSubsystem.driveToArb(drivebase);//.andThen(targetingSubsystem.autoTargetPairCommand(drivebase::getPose, Side.LEFT)).andThen(drivebase.reefFineTune(0.1, true, 0.5, false)).andThen(drivebase.reefFineTune(0.1, false, 0.5, false)).withName("driveArb");
+	public Command driveArb = targetingSubsystem.driveToArb(drivebase);//.andThen(drivebase.reefFineTune(0.1, true, 0.5, false)).andThen(drivebase.reefFineTune(0.1, false, 0.5, false)).withName("driveArb");
+	public Command L1 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L1.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L1.pitch));
+	public Command L2 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L2.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch));
+	public Command L3 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L3.height)
+							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch));
 
 
 	 public Command autoTargetLeftBranchCommand = targetingSubsystem

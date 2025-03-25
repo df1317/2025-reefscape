@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
@@ -222,14 +223,17 @@ public class TargetingSubsystem extends SubsystemBase {
 			
 			Command path = goTo(Constants.AutoScoring.SCORING_AUTO_POSE);
 
-			try{
-				path.schedule();
-			} catch(AutoBuilderException e){
-				System.out.println("Whoops looks like you got a little error: ");
-				e.printStackTrace();
-			}
+			// try{
+			// 	path.schedule();
+			// } catch(AutoBuilderException e){
+			// 	System.out.println("Whoops looks like you got a little error: ");
+			// 	e.printStackTrace();
+			// }
 			
-		});
+		}).andThen(new PrintCommand("ended drive to arb normaly"))
+		.andThen(autoTargetPairCommand(swerve::getPose, Side.LEFT))
+		.andThen(driveToCoralTarget(swerve))
+		.andThen(new PrintCommand("ened the auto routine thing"));
 	}
 
 
