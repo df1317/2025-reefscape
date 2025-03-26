@@ -5,7 +5,6 @@
 package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Newton;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.MAX_ACCELERATION;
 import static frc.robot.Constants.MAX_ANGULAR_ACCELERATION;
