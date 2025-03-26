@@ -91,7 +91,7 @@ public final class Constants {
 
 			public static final Transform2d coralOffset = new Transform2d(
 				Inches.of(23).in(Meters),
-				Inches.of(4).in(Meters),
+				Inches.of(3.5).in(Meters),
 				Rotation2d.fromDegrees(180)
 			);
 
