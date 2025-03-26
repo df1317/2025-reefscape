@@ -140,10 +140,11 @@ public class SwerveSubsystem extends SubsystemBase {
 		);
 		// Epilogue.bind(this);
 	}
+
 	/**
 	 *
 	 * @param left
-	 * <pre> goes left or right 
+	 * <pre> goes left or right
 	 * if true goes left else right
 	 * @param speed
 	 * the double to which to add to the left or right prob in meters
@@ -153,46 +154,35 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @param test
 	 * WOW! thats a lot of temp requirements hope someone checks the docs and doens just put this as false.
 	 * oh and by the this var changes if the robot moves or doesn't slash is in test/debug mode or not
-	 * @param throwSomthing
-	 * just some useful security error hadeling becues who knows when you code on a private lan is going to get hacked
-	 * to prevent this by enableing this boolean you can ever get hacked cause this will instantly throw a useful error with pointers and much much more... 
-	 * jk or not.
 	 * @return
 	 * a command to fine tune the reef might work who knows 🤷
 	 * @throws
 	 * head off wall debuging this
 	 */
-	public Command reefFineTune(double speed, boolean left, double tol, boolean test, boolean throwSomthing){
+	public Command reefFineTune(double speed, boolean left, double tol, boolean test) {
 		return new Command() {
-			private Translation2d lastPos; 
+			private Translation2d lastPos;
 			private Translation2d newPos;
 			private Optional<Double> targetYaw;
 			private Translation2d startPos;
 
 			@Override
-			public void initialize(){
+			public void initialize() {
 				lastPos = swerveDrive.getPose().getTranslation();
 				newPos = lastPos;
 				startPos = lastPos;
-
-				if(throwSomthing){
-					throw new VerifyError(" 💀💀💀 you have been hacked with buffers and such 💀💀💀");
-				}
 			}
 
 			@Override
-			public void execute(){
+			public void execute() {
+				newPos = new Translation2d(lastPos.getX(), lastPos.getY() + (left ? speed : -speed)); //find the new pos to be at
+				if (!test) {
+					drive(newPos.minus(lastPos), 0.0, false); //goes to the new pos
 
-				newPos = new Translation2d(lastPos.getX(), lastPos.getY() + (left ? speed : -speed));//find the new pos to be at
-				if(!test){
-					drive(newPos.minus(lastPos), 0.0, false);//goes to the new pos
-
-					lastPos = swerveDrive.getPose().getTranslation();//update the last posstion we were at
-				} else{
+					lastPos = swerveDrive.getPose().getTranslation(); //update the last posstion we were at
+				} else {
 					lastPos = newPos;
-
 				}
-				
 
 				targetYaw = vision.getBarrelTargetYaw();
 
@@ -202,13 +192,15 @@ public class SwerveSubsystem extends SubsystemBase {
 				SmartDashboard.putNumber("reefFineTune/lastPos X", lastPos.getX());
 				SmartDashboard.putNumber("reefFineTune/lastPos Y", lastPos.getY());
 				SmartDashboard.putBoolean("reefFineTUne/has targets", targetYaw.isPresent());
-
 			}
 
 			@Override
-			public boolean isFinished(){
+			public boolean isFinished() {
 				final double maxDistTravel = 1.0;
-				return (targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false) || Math.abs(newPos.minus(startPos).getY()) > maxDistTravel;
+				return (
+					(targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false) ||
+					Math.abs(newPos.minus(startPos).getY()) > maxDistTravel
+				);
 			}
 		};
 	}
@@ -638,11 +630,12 @@ public class SwerveSubsystem extends SubsystemBase {
 			swerveDrive.driveFieldOriented(velocity.get());
 		});
 	}
-	public Command robotDriveCommand(Supplier<ChassisSpeeds> velocity, BooleanSupplier robotRelative){
-		return run(() ->{
-			if(robotRelative.getAsBoolean()){
+
+	public Command robotDriveCommand(Supplier<ChassisSpeeds> velocity, BooleanSupplier robotRelative) {
+		return run(() -> {
+			if (robotRelative.getAsBoolean()) {
 				swerveDrive.driveFieldOrientedAndRobotOriented(new ChassisSpeeds(0, 0, 0), velocity.get());
-			} else{
+			} else {
 				swerveDrive.driveFieldOriented(velocity.get());
 			}
 		});

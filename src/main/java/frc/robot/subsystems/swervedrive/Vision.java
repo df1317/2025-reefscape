@@ -43,7 +43,6 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-
 import swervelib.SwerveDrive;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
@@ -116,24 +115,22 @@ public class Vision {
 		noPhotonVisionAlert.set(!hasCamera);
 	}
 
-	public Optional<Double> getBarrelTargetYaw(){
+	public Optional<Double> getBarrelTargetYaw() {
 		PhotonTrackedTarget target;
 		Double distToCenter;
 		List<PhotonPipelineResult> results = barrelCamera.getAllUnreadResults();
-		
-		if(results.size() > 0){
-			
+
+		if (results.size() > 0) {
 			barrelCamResult = results.get(results.size() - 1);
 
-			if( barrelCamResult.hasTargets()){
-
+			if (barrelCamResult.hasTargets()) {
 				target = barrelCamResult.getBestTarget();
 				distToCenter = target.getYaw() / 90;
 
 				return Optional.of(distToCenter);
 			}
 		}
-			return Optional.empty();
+		return Optional.empty();
 	}
 
 	/**
