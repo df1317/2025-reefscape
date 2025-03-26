@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 public class TargetingSubsystem extends SubsystemBase {
 
 	private ReefBranch targetBranch;
+	private Side targetSide;
 
 	private List<Pose2d> reefBranches = null;
 	private List<Pose2d> allianceRelativeReefBranches = null;
@@ -88,7 +89,9 @@ public class TargetingSubsystem extends SubsystemBase {
 		if (targetBranch != null) {
 			Pose2d startingPose = Reef.branchPositions.get(targetBranch.ordinal()).get(ReefHeight.L2).toPose2d();
 			SmartDashboard.putString("Targetted Coral Pose without Offset (Meters)", startingPose.toString());
-			scoringPose = startingPose.plus(AutoScoring.Reef.coralOffset);
+			scoringPose = startingPose.plus(
+				targetSide == Side.LEFT ? AutoScoring.Reef.coralOffsetL : AutoScoring.Reef.coralOffsetR
+			);
 			SmartDashboard.putString("Targetted Coral Pose with Offset (Meters)", scoringPose.toString());
 		}
 		return AllianceFlipUtil.apply(scoringPose);
@@ -101,6 +104,7 @@ public class TargetingSubsystem extends SubsystemBase {
 
 		Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
 		targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
+		targetSide = (targetBranch.ordinal() % 2 == 0) ? Side.LEFT : Side.RIGHT;
 		return selectedTargetPose;
 	}
 
@@ -143,6 +147,7 @@ public class TargetingSubsystem extends SubsystemBase {
 
 		// Set the target branch based on the preferred side
 		targetBranch = getReefFromPairAndSide(pairBase, preferredSide);
+		targetSide = preferredSide;
 
 		// Return the pose for the selected branch
 		return allianceRelativeReefBranches.get(targetBranch.ordinal());
