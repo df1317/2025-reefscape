@@ -76,8 +76,6 @@ public final class Constants {
 
 	public static class AutoScoring {
 
-		public static final Pose2d SCORING_AUTO_POSE = new Pose2d(6.162,4.558,new Rotation2d(Math.toRadians(180)));
-
 		public static class Processor {
 
 			public static final Transform2d offset = new Transform2d(
