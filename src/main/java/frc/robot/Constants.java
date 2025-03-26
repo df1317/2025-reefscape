@@ -86,7 +86,13 @@ public final class Constants {
 
 		public static class Reef {
 
-			public static final Transform2d coralOffset = new Transform2d(
+			public static final Transform2d coralOffsetL = new Transform2d(
+				Inches.of(21.5).in(Meters),
+				Inches.of(2.5).in(Meters),
+				Rotation2d.fromDegrees(180)
+			);
+
+			public static final Transform2d coralOffsetR = new Transform2d(
 				Inches.of(21.5).in(Meters),
 				Inches.of(2.5).in(Meters),
 				Rotation2d.fromDegrees(180)
