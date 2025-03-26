@@ -212,7 +212,7 @@ public class TargetingSubsystem extends SubsystemBase {
 		return path;
 	}
 
-	public Command driveToArb(SwerveSubsystem swerve) {
+	public Command driveToLeftBranch(SwerveSubsystem swerve) {
 		return autoTargetPairCommand(swerve::getPose, Side.LEFT)
 			.andThen(driveToCoralTarget(swerve))
 			.andThen(Commands.print("ened the auto routine thing"));

@@ -130,7 +130,7 @@ public class RobotContainer {
 	 */
 	public RobotContainer() {
 		NamedCommands.registerCommand("score", score);
-		NamedCommands.registerCommand("driveArb", driveArb);
+		NamedCommands.registerCommand("driveArb", driveToLeftBranch);
 		NamedCommands.registerCommand("L1", L1);
 		NamedCommands.registerCommand("L2", L2);
 		NamedCommands.registerCommand("L3", L3);
@@ -418,7 +418,7 @@ public class RobotContainer {
 	 * ---
 	 */
 	public Command score = Commands.waitUntil(() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion()).withTimeout(1.5).andThen(scoringSubsystem.runEjectCommand());
-	public Command driveArb = targetingSubsystem.driveToArb(drivebase);
+	public Command driveToLeftBranch = targetingSubsystem.driveToLeftBranch(drivebase);
 	public Command L1 = elevatorSubsystem.setPos(() ->FieldConstants.CoralStation.height)
 							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch));
 	public Command L2 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L2.height)

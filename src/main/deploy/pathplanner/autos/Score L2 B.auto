@@ -11,34 +11,22 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "score_path_firstpart"
+                  "pathName": "score_path_auto_b"
                 }
               }
             ]
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.5
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "driveArb"
+            "name": "driveToLeftBranch"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "L2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
           }
         },
         {

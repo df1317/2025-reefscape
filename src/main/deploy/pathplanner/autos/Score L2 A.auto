@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score_Path_auto_2"
+            "pathName": "score_path_auto_a"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "driveArb"
+            "name": "driveToLeftBranch"
           }
         },
         {
