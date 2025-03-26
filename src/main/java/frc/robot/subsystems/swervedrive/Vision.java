@@ -76,9 +76,6 @@ public class Vision {
 	 */
 	private final Alert noPhotonVisionAlert = new Alert("No PhotonVision clients found", AlertType.kWarning);
 
-	private final PhotonCamera barrelCamera;
-	private PhotonPipelineResult barrelCamResult;
-
 	/**
 	 * Constructor for the Vision class.
 	 *
@@ -89,8 +86,6 @@ public class Vision {
 	public Vision(Supplier<Pose2d> currentPose, Field2d field) {
 		this.currentPose = currentPose;
 		this.field2d = field;
-
-		barrelCamera = new PhotonCamera("ROCKY");
 
 		if (Robot.isSimulation()) {
 			visionSim = new VisionSystemSim("Vision");
@@ -112,24 +107,6 @@ public class Vision {
 			}
 		}
 		noPhotonVisionAlert.set(!hasCamera);
-	}
-
-	public Optional<Double> getBarrelTargetYaw() {
-		PhotonTrackedTarget target;
-		Double distToCenter;
-		List<PhotonPipelineResult> results = barrelCamera.getAllUnreadResults();
-
-		if (results.size() > 0) {
-			barrelCamResult = results.get(results.size() - 1);
-
-			if (barrelCamResult.hasTargets()) {
-				target = barrelCamResult.getBestTarget();
-				distToCenter = target.getYaw() / 90;
-
-				return Optional.of(distToCenter);
-			}
-		}
-		return Optional.empty();
 	}
 
 	/**
