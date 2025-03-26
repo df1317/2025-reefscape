@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -10,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants;
 import frc.robot.Constants.AutoScoring;
 import frc.robot.libs.AllianceFlipUtil;
 import frc.robot.libs.FieldConstants;
@@ -194,22 +191,6 @@ public class TargetingSubsystem extends SubsystemBase {
 				.andThen(swerveDrive.driveToPose(() -> sourcePose))
 				.andThen(Commands.print("DONE GOING TO SOURCE"));
 		});
-	}
-
-	public Command goTo(Pose2d targetPose) {
-		PathConstraints constraints = new PathConstraints(
-			Constants.MAX_SPEED / 2,
-			Constants.MAX_ACCELERATION / 2,
-			Constants.MAX_ANGULAR_SPEED / 2,
-			Constants.MAX_ANGULAR_ACCELERATION
-		);
-		// PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null,
-		// 	new GoalEndState(0.0, endPose.getRotation()));
-		Command path = AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
-
-		// path.preventFlipping = true;
-
-		return path;
 	}
 
 	public Command driveToLeftBranch(SwerveSubsystem swerve) {
