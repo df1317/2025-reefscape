@@ -217,23 +217,9 @@ public class TargetingSubsystem extends SubsystemBase {
 		return path;
 	}
 	public Command driveToArb(SwerveSubsystem swerve){
-		return Commands.runOnce(() ->{
-
-			System.out.println("started drivetoarb");
-			
-			Command path = goTo(Constants.AutoScoring.SCORING_AUTO_POSE);
-
-			// try{
-			// 	path.schedule();
-			// } catch(AutoBuilderException e){
-			// 	System.out.println("Whoops looks like you got a little error: ");
-			// 	e.printStackTrace();
-			// }
-			
-		}).andThen(new PrintCommand("ended drive to arb normaly"))
-		.andThen(autoTargetPairCommand(swerve::getPose, Side.LEFT))
+		return autoTargetPairCommand(swerve::getPose, Side.LEFT)
 		.andThen(driveToCoralTarget(swerve))
-		.andThen(new PrintCommand("ened the auto routine thing"));
+		.andThen(Commands.print("ened the auto routine thing"));
 	}
 
 
