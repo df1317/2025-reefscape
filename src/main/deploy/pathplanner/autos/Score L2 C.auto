@@ -5,22 +5,34 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "path",
+          "data": {
+            "pathName": "score_path_auto_c"
+          }
+        },
+        {
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "New Path"
+                  "name": "driveToLeftBranch"
                 }
               },
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 5.0
+                  "name": "L2"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "score"
           }
         }
       ]

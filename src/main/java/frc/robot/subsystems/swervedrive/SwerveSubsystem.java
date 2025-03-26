@@ -6,6 +6,10 @@ package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.MAX_ACCELERATION;
+import static frc.robot.Constants.MAX_ANGULAR_ACCELERATION;
+import static frc.robot.Constants.MAX_ANGULAR_SPEED;
+import static frc.robot.Constants.MAX_SPEED;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -20,6 +24,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -86,7 +91,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 		try {
 			swerveDrive = new SwerveParser(directory).createSwerveDrive(
-				Constants.MAX_SPEED,
+				MAX_SPEED,
 				new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)), Rotation2d.fromDegrees(0))
 			);
 			// Alternative method if you don't want to supply the conversion factor via JSON
@@ -97,6 +102,14 @@ public class SwerveSubsystem extends SubsystemBase {
 			throw new RuntimeException(e);
 		}
 		this.replaceSwerveModuleFeedforward(0.024309, 2.7435, 2.0788);
+
+		swerveDrive.setMaximumAllowableSpeeds(MAX_SPEED, MAX_ANGULAR_SPEED);
+
+		swerveDrive.swerveController.addSlewRateLimiters(
+			new SlewRateLimiter(MAX_ACCELERATION),
+			new SlewRateLimiter(MAX_ACCELERATION),
+			new SlewRateLimiter(MAX_ANGULAR_ACCELERATION)
+		);
 
 		swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
 		// angle.

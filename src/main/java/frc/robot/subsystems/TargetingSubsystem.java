@@ -193,6 +193,12 @@ public class TargetingSubsystem extends SubsystemBase {
 		});
 	}
 
+	public Command driveToLeftBranch(SwerveSubsystem swerve) {
+		return autoTargetPairCommand(swerve::getPose, Side.LEFT)
+			.andThen(driveToCoralTarget(swerve))
+			.andThen(Commands.print("ened the auto routine thing"));
+	}
+
 	public enum Side {
 		LEFT,
 		RIGHT

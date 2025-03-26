@@ -2,6 +2,28 @@
 
 All the fancy quick reference stuff goes here.
 
+## Autonomous
+
+### Auto Routines
+
+1. Short Leave
+
+![Short Leave](autos/leave-short.gif)
+
+2. Score L2 position A
+
+![Score L2 position A](autos/score-l2-a.gif)
+
+3. Score L2 position B
+
+![Score L2 position B](autos/score-l2-b.gif)
+
+4. Score L2 position C
+
+![Score L2 position C](autos/score-l2-c.gif)
+
+## Controls
+
 ### Teleop
 
 #### Xbox Controller (Driver) [`Port 0`]
