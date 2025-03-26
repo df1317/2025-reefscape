@@ -6,12 +6,11 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,10 +27,8 @@ import frc.robot.subsystems.TargetingSubsystem;
 import frc.robot.subsystems.TargetingSubsystem.Side;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
-
 import java.io.File;
 import java.util.function.BooleanSupplier;
-
 import swervelib.SwerveInputStream;
 
 /** ----------
@@ -288,18 +285,10 @@ public class RobotContainer {
 			.and(() -> !DriverStation.isTest())
 			.whileTrue(elevatorSubsystem.setSpeed(() -> m_JoystickL.getY() * -1));
 
-		m_JoystickL
-			.button(5)
-			.onTrue(L1);
-		m_JoystickL
-			.button(3)
-			.onTrue(L2);
-		m_JoystickL
-			.button(4)
-			.onTrue(L3);
-		m_JoystickL
-			.button(6)
-			.onTrue(L4);
+		m_JoystickL.button(5).onTrue(L1);
+		m_JoystickL.button(3).onTrue(L2);
+		m_JoystickL.button(4).onTrue(L3);
+		m_JoystickL.button(6).onTrue(L4);
 
 		m_JoystickL
 			.button(7)
@@ -388,7 +377,6 @@ public class RobotContainer {
 		m_JoystickR
 			.button(12)
 			.whileTrue(Commands.either(drivebase.sysIdDriveMotorCommand(), Commands.none(), DriverStation::isTest));
-
 		// driverXbox.povLeft().onTrue(
 		// 	Commands.either(
 		// 		drivebase.reefFineTune(0.1, true, 0.5, true),
@@ -417,19 +405,26 @@ public class RobotContainer {
 	 * named commands for reef align and auto scoring on different levels
 	 * ---
 	 */
-	public Command score = Commands.waitUntil(() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion()).withTimeout(1.5).andThen(scoringSubsystem.runEjectCommand());
+	public Command score = Commands.waitUntil(
+		() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion()
+	)
+		.withTimeout(1.5)
+		.andThen(scoringSubsystem.runEjectCommand());
 	public Command driveToLeftBranch = targetingSubsystem.driveToLeftBranch(drivebase);
-	public Command L1 = elevatorSubsystem.setPos(() ->FieldConstants.CoralStation.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch));
-	public Command L2 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L2.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch));
-	public Command L3 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L3.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch));
-	public Command L4 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L4.height)
-							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch));
+	public Command L1 = elevatorSubsystem
+		.setPos(() -> FieldConstants.CoralStation.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch));
+	public Command L2 = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L2.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch));
+	public Command L3 = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L3.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch));
+	public Command L4 = elevatorSubsystem
+		.setPos(() -> FieldConstants.ReefHeight.L4.height)
+		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch));
 
-
-	 public Command autoTargetLeftBranchCommand = targetingSubsystem
+	public Command autoTargetLeftBranchCommand = targetingSubsystem
 		.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
 		.andThen(
 			Commands.either(

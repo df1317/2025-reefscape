@@ -7,10 +7,10 @@ package frc.robot.subsystems.swervedrive;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Newton;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.MAX_SPEED;
 import static frc.robot.Constants.MAX_ACCELERATION;
 import static frc.robot.Constants.MAX_ANGULAR_ACCELERATION;
 import static frc.robot.Constants.MAX_ANGULAR_SPEED;
+import static frc.robot.Constants.MAX_SPEED;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -104,9 +104,13 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 		this.replaceSwerveModuleFeedforward(0.024309, 2.7435, 2.0788);
 
-		swerveDrive.setMaximumAllowableSpeeds(MAX_SPEED,  MAX_ANGULAR_SPEED);
+		swerveDrive.setMaximumAllowableSpeeds(MAX_SPEED, MAX_ANGULAR_SPEED);
 
-		swerveDrive.swerveController.addSlewRateLimiters(new SlewRateLimiter(MAX_ACCELERATION), new SlewRateLimiter(MAX_ACCELERATION), new SlewRateLimiter(MAX_ANGULAR_ACCELERATION));
+		swerveDrive.swerveController.addSlewRateLimiters(
+			new SlewRateLimiter(MAX_ACCELERATION),
+			new SlewRateLimiter(MAX_ACCELERATION),
+			new SlewRateLimiter(MAX_ANGULAR_ACCELERATION)
+		);
 
 		swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
 		// angle.
@@ -149,10 +153,11 @@ public class SwerveSubsystem extends SubsystemBase {
 		);
 		// Epilogue.bind(this);
 	}
+
 	/**
 	 *
 	 * @param left
-	 * <pre> goes left or right 
+	 * <pre> goes left or right
 	 * if true goes left else right
 	 * @param speed
 	 * the double to which to add to the left or right prob in meters
@@ -167,33 +172,30 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @throws
 	 * head off wall debuging this
 	 */
-	public Command reefFineTune(double speed, boolean left, double tol, boolean test){
+	public Command reefFineTune(double speed, boolean left, double tol, boolean test) {
 		return new Command() {
-			private Translation2d lastPos; 
+			private Translation2d lastPos;
 			private Translation2d newPos;
 			private Optional<Double> targetYaw;
 			private Translation2d startPos;
 
 			@Override
-			public void initialize(){
+			public void initialize() {
 				lastPos = swerveDrive.getPose().getTranslation();
 				newPos = lastPos;
 				startPos = lastPos;
 			}
 
 			@Override
-			public void execute(){
+			public void execute() {
+				newPos = new Translation2d(lastPos.getX(), lastPos.getY() + (left ? speed : -speed)); //find the new pos to be at
+				if (!test) {
+					drive(newPos.minus(lastPos), 0.0, false); //goes to the new pos
 
-				newPos = new Translation2d(lastPos.getX(), lastPos.getY() + (left ? speed : -speed));//find the new pos to be at
-				if(!test){
-					drive(newPos.minus(lastPos), 0.0, false);//goes to the new pos
-
-					lastPos = swerveDrive.getPose().getTranslation();//update the last posstion we were at
-				} else{
+					lastPos = swerveDrive.getPose().getTranslation(); //update the last posstion we were at
+				} else {
 					lastPos = newPos;
-
 				}
-				
 
 				targetYaw = vision.getBarrelTargetYaw();
 
@@ -203,13 +205,15 @@ public class SwerveSubsystem extends SubsystemBase {
 				SmartDashboard.putNumber("reefFineTune/lastPos X", lastPos.getX());
 				SmartDashboard.putNumber("reefFineTune/lastPos Y", lastPos.getY());
 				SmartDashboard.putBoolean("reefFineTUne/has targets", targetYaw.isPresent());
-
 			}
 
 			@Override
-			public boolean isFinished(){
+			public boolean isFinished() {
 				final double maxDistTravel = 1.0;
-				return (targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false) || Math.abs(newPos.minus(startPos).getY()) > maxDistTravel;
+				return (
+					(targetYaw.isPresent() ? Math.abs(targetYaw.get()) < tol : false) ||
+					Math.abs(newPos.minus(startPos).getY()) > maxDistTravel
+				);
 			}
 		};
 	}
