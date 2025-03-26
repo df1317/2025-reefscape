@@ -150,6 +150,10 @@ public class ScoringSubsystem extends SubsystemBase {
 			.withTimeout(1.7);
 	}
 
+	public boolean atDesiredPosistion() {
+		return MathUtil.isNear(setpoint, canTiltEncoder.getPosition(), 0.1);
+	}
+
 	public boolean getCoralSensor() {
 		return coralSensor.get();
 	}

@@ -115,18 +115,15 @@ public class FieldConstants {
 				Map<ReefHeight, Pose3d> fillLeft = new HashMap<>();
 				for (var level : ReefHeight.values()) {
 					Pose2d poseDirection = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
-					double adjustXRight = Units.inchesToMeters(17.738);//offsets for the left reef coral thing scoring
-					double adjustYRight = Units.inchesToMeters(7.9);
-
-					double adjustXLeft = Units.inchesToMeters(17.738);//offsets for the right reel coral thing scoring
-					double adjustYLeft = Units.inchesToMeters(7.9);
+					double adjustX = Units.inchesToMeters(30.738);
+					double adjustY = Units.inchesToMeters(6.469);
 
 					fillRight.put(
 						level,
 						new Pose3d(
 							new Translation3d(
-								poseDirection.transformBy(new Transform2d(adjustXRight, adjustYRight, new Rotation2d())).getX(),
-								poseDirection.transformBy(new Transform2d(adjustXRight, adjustYRight, new Rotation2d())).getY(),
+								poseDirection.transformBy(new Transform2d(adjustX, adjustY, new Rotation2d())).getX(),
+								poseDirection.transformBy(new Transform2d(adjustX, adjustY, new Rotation2d())).getY(),
 								level.height
 							),
 							new Rotation3d(
@@ -140,8 +137,8 @@ public class FieldConstants {
 						level,
 						new Pose3d(
 							new Translation3d(
-								poseDirection.transformBy(new Transform2d(adjustXLeft, -adjustYLeft, new Rotation2d())).getX(),
-								poseDirection.transformBy(new Transform2d(adjustXLeft, -adjustYLeft, new Rotation2d())).getY(),
+								poseDirection.transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d())).getX(),
+								poseDirection.transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d())).getY(),
 								level.height
 							),
 							new Rotation3d(

@@ -417,8 +417,8 @@ public class RobotContainer {
 	 * named commands for reef align and auto scoring on different levels
 	 * ---
 	 */
-	public Command score = scoringSubsystem.runEjectCommand();
-	public Command driveArb = targetingSubsystem.driveToArb(drivebase);//.andThen(drivebase.reefFineTune(0.1, true, 0.5, false)).andThen(drivebase.reefFineTune(0.1, false, 0.5, false)).withName("driveArb");
+	public Command score = Commands.waitUntil(() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion()).withTimeout(1.5).andThen(scoringSubsystem.runEjectCommand());
+	public Command driveArb = targetingSubsystem.driveToArb(drivebase);
 	public Command L1 = elevatorSubsystem.setPos(() ->FieldConstants.CoralStation.height)
 							.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch));
 	public Command L2 = elevatorSubsystem.setPos(() -> FieldConstants.ReefHeight.L2.height)
