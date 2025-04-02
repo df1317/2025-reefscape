@@ -64,6 +64,7 @@ public class ScoringSubsystem extends SubsystemBase {
 			.d(kd, ClosedLoopSlot.kSlot0)
 			.velocityFF(kv, ClosedLoopSlot.kSlot0);
 		motor1 = new SparkMax(CanConstants.scoreMotor1, MotorType.kBrushless);
+		motorConfig.signals.absoluteEncoderPositionPeriodMs(10);
 		motor1.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
 		motorConfig2
@@ -111,7 +112,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	public Command runIntakeCommand() {
 		return this.run(() -> {
-				System.out.println("intake command started");
+				// System.out.println("intake command started");
 				spinnyController.setReference(scoringCurrent, ControlType.kCurrent);
 				spinnyController2.setReference(scoringCurrent, ControlType.kCurrent);
 			})
@@ -123,14 +124,14 @@ public class ScoringSubsystem extends SubsystemBase {
 						spinnyController2.setReference(scoringCurrent, ControlType.kCurrent);
 					})
 					.finallyDo(() -> {
-						System.out.println("intake command finished");
+						// System.out.println("intake command finished");
 						spinnyController.setReference(0, ControlType.kCurrent);
 						spinnyController2.setReference(0, ControlType.kCurrent);
 					})
 					.withTimeout(0.2)
 			)
 			.finallyDo(() -> {
-				System.out.println("intake command finished");
+				// System.out.println("intake command finished");
 				spinnyController.setReference(0, ControlType.kCurrent);
 				spinnyController2.setReference(0, ControlType.kCurrent);
 			});
@@ -138,12 +139,12 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	public Command runEjectCommand() {
 		return this.run(() -> {
-				System.out.println("eject command started");
+				// System.out.println("eject command started");
 				spinnyController.setReference(-scoringCurrent, ControlType.kCurrent);
 				spinnyController2.setReference(-scoringCurrent, ControlType.kCurrent);
 			})
 			.finallyDo(() -> {
-				System.out.println("eject command ended");
+				// System.out.println("eject command ended");
 				spinnyController.setReference(0, ControlType.kCurrent);
 				spinnyController2.setReference(0, ControlType.kCurrent);
 			})

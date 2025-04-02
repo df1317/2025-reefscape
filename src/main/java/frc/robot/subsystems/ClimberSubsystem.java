@@ -8,10 +8,12 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +27,7 @@ public class ClimberSubsystem extends SubsystemBase {
 	private final Orchestra marioUnderwater;
 	private final Orchestra duckOrchestra;
 	private final VoltageOut m_voltage = new VoltageOut(0).withEnableFOC(false);
+	private final double runVotlts = 25;
 
 	public ClimberSubsystem() {
 		beefyMotor = new TalonFX(CanConstants.beefyMotor);
@@ -36,12 +39,14 @@ public class ClimberSubsystem extends SubsystemBase {
 			.withReverseLimitSource(ReverseLimitSourceValue.Disabled);
 		CurrentLimitsConfigs currentConfigs = new CurrentLimitsConfigs()
 			.withStatorCurrentLimit(60)
-			.withStatorCurrentLimitEnable(true);
+			.withStatorCurrentLimitEnable(false);
 		AudioConfigs audioConfigs = new AudioConfigs().withAllowMusicDurDisable(true);
+		MotorOutputConfigs outputConfigs = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
 		TalonFXConfiguration config = new TalonFXConfiguration()
 			.withHardwareLimitSwitch(newHardwareLimitSwitch)
 			.withAudio(audioConfigs)
-			.withCurrentLimits(currentConfigs);
+			.withCurrentLimits(currentConfigs)
+			.withMotorOutput(outputConfigs);
 
 		config.Slot0.kP = 2;
 		config.Slot0.kI = 0;
@@ -72,13 +77,13 @@ public class ClimberSubsystem extends SubsystemBase {
 			duckOrchestra.stop();
 			marioUnderwater.stop();
 			// beefyMotor.setControl(m_voltage.withOutput(-10).withEnableFOC(false));
-			beefyMotor.setVoltage(-10);
+			beefyMotor.setVoltage(-runVotlts);
 
-			System.out.println("climbCommand set to -10");
+			// System.out.println("climbCommand set to -10");
 		}).finallyDo(() -> {
 			beefyMotor.setVoltage(0);
 			// beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
-			System.out.println("turn off climb command set to 0");
+			// System.out.println("turn off climb command set to 0");
 		});
 	}
 
@@ -86,13 +91,13 @@ public class ClimberSubsystem extends SubsystemBase {
 		return run(() -> {
 			duckOrchestra.stop();
 			marioUnderwater.stop();
-			beefyMotor.setVoltage(10);
+			beefyMotor.setVoltage(runVotlts);
 			// beefyMotor.setControl(m_voltage.withOutput(10).withEnableFOC(false));
-			System.out.println("descendCommand set to 10");
+			// System.out.println("descendCommand set to 10");
 		}).finallyDo(() -> {
 			beefyMotor.setVoltage(0);
 			// beefyMotor.setControl(m_voltage.withOutput(0).withEnableFOC(false));
-			System.out.println("turn off descend command set to 0");
+			// System.out.println("turn off descend command set to 0");
 		});
 	}
 

@@ -74,6 +74,7 @@ public class TargetingSubsystem extends SubsystemBase {
 		return Commands.print("GOING TO POSE")
 			.andThen(
 				Commands.runOnce(() -> {
+					System.out.println("drivetoCoralTarget");
 					swerveDrive.getSwerveDrive().field.getObject("target").setPose(getCoralTargetPose());
 				})
 			)
@@ -82,14 +83,18 @@ public class TargetingSubsystem extends SubsystemBase {
 	}
 
 	public Pose2d getCoralTargetPose() {
+		System.out.println("getCoarlTargetPose");
 		Pose2d scoringPose = Pose2d.kZero;
 		if (targetBranch != null) {
 			Pose2d startingPose = Reef.branchPositions.get(targetBranch.ordinal()).get(ReefHeight.L2).toPose2d();
 			SmartDashboard.putString("Targetted Coral Pose without Offset (Meters)", startingPose.toString());
+			// scoringPose = startingPose.plus(AutoScoring.Reef.coralOffsetL);
 			scoringPose = startingPose.plus(
 				targetSide == Side.LEFT ? AutoScoring.Reef.coralOffsetL : AutoScoring.Reef.coralOffsetR
 			);
 			SmartDashboard.putString("Targetted Coral Pose with Offset (Meters)", scoringPose.toString());
+		}else{
+			System.out.println("targetBranch = null");
 		}
 		return AllianceFlipUtil.apply(scoringPose);
 	}
@@ -98,6 +103,7 @@ public class TargetingSubsystem extends SubsystemBase {
 		if (reefBranches == null) {
 			initializeBranchPoses();
 		}
+		System.out.println("autoTarget");
 
 		Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
 		targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
@@ -134,6 +140,7 @@ public class TargetingSubsystem extends SubsystemBase {
 		if (reefBranches == null) {
 			initializeBranchPoses();
 		}
+		System.out.println("autoTaregtPair");
 
 		// Find the closest reef position
 		Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
@@ -144,7 +151,7 @@ public class TargetingSubsystem extends SubsystemBase {
 
 		// Set the target branch based on the preferred side
 		targetBranch = getReefFromPairAndSide(pairBase, preferredSide);
-		targetSide = preferredSide;
+		// targetSide = preferredSide;
 
 		// Return the pose for the selected branch
 		return allianceRelativeReefBranches.get(targetBranch.ordinal());
