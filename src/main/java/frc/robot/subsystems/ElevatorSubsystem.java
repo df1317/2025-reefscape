@@ -11,11 +11,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SignalsConfig;
-import com.revrobotics.spark.config.SignalsConfigAccessor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -80,7 +77,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		config.closedLoop.p(kp, ClosedLoopSlot.kSlot0).i(ki, ClosedLoopSlot.kSlot0).d(kd, ClosedLoopSlot.kSlot0);
 		config.smartCurrentLimit(elevatorCurrentLimit).idleMode(IdleMode.kBrake);
 		config.signals.primaryEncoderPositionPeriodMs(10);
-		
+
 		motorL.configure(config.inverted(false), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		motorR.configure(config.inverted(true), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
@@ -89,7 +86,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		encoderL = motorL.getEncoder();
 		encoderR = motorR.getEncoder();
-
 		// System.out.println("TODO: please put reset encodes pos in");
 	}
 

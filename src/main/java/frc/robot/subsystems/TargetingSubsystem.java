@@ -78,7 +78,7 @@ public class TargetingSubsystem extends SubsystemBase {
 					swerveDrive.getSwerveDrive().field.getObject("target").setPose(getCoralTargetPose());
 				})
 			)
-			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose))
+			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose, 0.6, 0.5))
 			.andThen(Commands.print("DONE GOING TO POSE"));
 	}
 

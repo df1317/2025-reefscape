@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "score_path_auto_b"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
