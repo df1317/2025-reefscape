@@ -7,19 +7,32 @@
         {
           "type": "path",
           "data": {
-            "pathName": "score_path_auto_a"
+            "pathName": "score_path_auto_c"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "driveToLeftBranch"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "driveToLeftBranch"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L2"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "L2"
+            "waitTime": 0
           }
         },
         {

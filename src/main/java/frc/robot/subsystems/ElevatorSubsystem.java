@@ -76,6 +76,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		// the defualt is lsot zero
 		config.closedLoop.p(kp, ClosedLoopSlot.kSlot0).i(ki, ClosedLoopSlot.kSlot0).d(kd, ClosedLoopSlot.kSlot0);
 		config.smartCurrentLimit(elevatorCurrentLimit).idleMode(IdleMode.kBrake);
+		config.signals.primaryEncoderPositionPeriodMs(10);
 
 		motorL.configure(config.inverted(false), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 		motorR.configure(config.inverted(true), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
@@ -85,8 +86,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		encoderL = motorL.getEncoder();
 		encoderR = motorR.getEncoder();
-
-		System.out.println("TODO: please put reset encodes pos in");
+		// System.out.println("TODO: please put reset encodes pos in");
 	}
 
 	public boolean atDesiredPosistion() {

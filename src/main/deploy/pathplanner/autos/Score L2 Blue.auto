@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "score_path_auto_c"
+            "pathName": "score_path_auto_a"
           }
         },
         {
@@ -27,6 +27,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {

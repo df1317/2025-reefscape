@@ -28,8 +28,8 @@ public class FieldConstants {
 	public static final double startingLineX = Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
 	public enum ReefHeight {
-		L4(1.23, 72),
-		L3(0.59, 54),
+		L4(1.23, 64),
+		L3(0.62, 54),
 		L2(0.19, 61),
 		L1(0.3, 65);
 

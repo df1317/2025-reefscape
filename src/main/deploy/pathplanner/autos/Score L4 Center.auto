@@ -5,13 +5,19 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "score_path_auto_b"
+                  "name": "driveToLeftBranch"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L1"
                 }
               }
             ]
@@ -20,19 +26,31 @@
         {
           "type": "named",
           "data": {
-            "name": "driveToLeftBranch"
+            "name": "L4"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "L2"
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
             "name": "score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BackUp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
           }
         }
       ]

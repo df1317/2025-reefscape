@@ -74,14 +74,16 @@ public class TargetingSubsystem extends SubsystemBase {
 		return Commands.print("GOING TO POSE")
 			.andThen(
 				Commands.runOnce(() -> {
+					System.out.println("drivetoCoralTarget");
 					swerveDrive.getSwerveDrive().field.getObject("target").setPose(getCoralTargetPose());
 				})
 			)
-			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose))
+			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose, 0.6, 0.5))
 			.andThen(Commands.print("DONE GOING TO POSE"));
 	}
 
 	public Pose2d getCoralTargetPose() {
+		System.out.println("getCoarlTargetPose");
 		Pose2d scoringPose = Pose2d.kZero;
 		if (targetBranch != null) {
 			Pose2d startingPose = Reef.branchPositions.get(targetBranch.ordinal()).get(ReefHeight.L2).toPose2d();
@@ -90,6 +92,8 @@ public class TargetingSubsystem extends SubsystemBase {
 				targetSide == Side.LEFT ? AutoScoring.Reef.coralOffsetL : AutoScoring.Reef.coralOffsetR
 			);
 			SmartDashboard.putString("Targetted Coral Pose with Offset (Meters)", scoringPose.toString());
+		} else {
+			System.out.println("targetBranch = null");
 		}
 		return AllianceFlipUtil.apply(scoringPose);
 	}
@@ -98,6 +102,7 @@ public class TargetingSubsystem extends SubsystemBase {
 		if (reefBranches == null) {
 			initializeBranchPoses();
 		}
+		System.out.println("autoTarget");
 
 		Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);
 		targetBranch = reefPoseToBranchMap.get(selectedTargetPose);
@@ -134,6 +139,7 @@ public class TargetingSubsystem extends SubsystemBase {
 		if (reefBranches == null) {
 			initializeBranchPoses();
 		}
+		System.out.println("autoTaregtPair");
 
 		// Find the closest reef position
 		Pose2d selectedTargetPose = currentPose.get().nearest(allianceRelativeReefBranches);

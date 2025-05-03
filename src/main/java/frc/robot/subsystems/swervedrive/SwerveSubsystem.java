@@ -296,6 +296,31 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 
 	/**
+	 * Use PathPlanner Path finding to go to a point on the field.
+	 *
+	 * @param pose Target {@link Pose2d} to go to.
+	 * @return PathFinding command
+	 */
+	public Command driveToPose(Supplier<Pose2d> pose, double velocity, double acceleration) {
+		return defer(() -> {
+			// Create the constraints to use while pathfinding
+			PathConstraints constraints = new PathConstraints(
+				velocity,
+				acceleration,
+				swerveDrive.getMaximumChassisAngularVelocity(),
+				Units.degreesToRadians(720)
+			);
+
+			// Since AutoBuilder is configured, we can use it to build pathfinding commands
+			return AutoBuilder.pathfindToPose(
+				pose.get(),
+				constraints,
+				edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
+			);
+		});
+	}
+
+	/**
 	 * Drive with {@link SwerveSetpointGenerator} from 254, implemented by
 	 * PathPlanner.
 	 *
