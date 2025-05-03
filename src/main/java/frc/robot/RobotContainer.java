@@ -127,7 +127,6 @@ public class RobotContainer {
 	public RobotContainer() {
 		NamedCommands.registerCommand("score", score);
 		NamedCommands.registerCommand("driveToLeftBranch", driveToLeftBranch);
-		NamedCommands.registerCommand("inchBack", inchBack);
 		NamedCommands.registerCommand("L1", L1);
 		NamedCommands.registerCommand("L2", L2);
 		NamedCommands.registerCommand("L3", L3);
@@ -390,8 +389,7 @@ public class RobotContainer {
 		() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion()
 	)
 		.withTimeout(1.5)
-		.andThen(scoringSubsystem.runEjectCommand())
-		.until(scoringSubsystem::atDesiredPosistion);
+		.andThen(scoringSubsystem.runEjectCommand());
 	public Command driveToLeftBranch = targetingSubsystem.driveToLeftBranch(drivebase);
 	public Command L1 = elevatorSubsystem
 		.setPos(() -> FieldConstants.CoralStation.height)
@@ -416,10 +414,6 @@ public class RobotContainer {
 		.until(elevatorSubsystem::atDesiredPosistion)
 		.andThen(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
 		.until(scoringSubsystem::atDesiredPosistion);
-
-	public Command inchBack = drivebase.driveToPose(() ->
-		drivebase.getPose().transformBy(new Transform2d(Inches.of(0), Inches.of(-4), Rotation2d.fromDegrees(0)))
-	);
 
 	public Command autoTargetLeftBranchCommand = targetingSubsystem
 		.autoTargetPairCommand(drivebase::getPose, Side.LEFT)

@@ -5,16 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "score_path_auto_b"
-                }
-              }
-            ]
+            "pathName": "score_path_auto_b"
           }
         },
         {
@@ -30,10 +23,16 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L4"
+                  "name": "L1"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4"
           }
         },
         {
@@ -46,6 +45,18 @@
           "type": "named",
           "data": {
             "name": "score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BackUp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
           }
         }
       ]
