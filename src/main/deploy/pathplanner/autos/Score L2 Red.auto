@@ -32,19 +32,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0
           }
         },
         {
           "type": "named",
           "data": {
             "name": "score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "inchBack"
           }
         }
       ]
