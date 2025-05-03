@@ -122,7 +122,7 @@ public class RobotContainer {
 	 */
 	public RobotContainer() {
 		NamedCommands.registerCommand("score", score);
-		NamedCommands.registerCommand("driveArb", driveToLeftBranch);
+		NamedCommands.registerCommand("driveToLeftBranch", driveToLeftBranch);
 		NamedCommands.registerCommand("L1", L1);
 		NamedCommands.registerCommand("L2", L2);
 		NamedCommands.registerCommand("L3", L3);
