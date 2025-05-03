@@ -11,27 +11,40 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "driveToLeftBranch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L2"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "driveToLeftBranch"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L2"
+                }
+              }
+            ]
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
             "name": "score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "inchBack"
           }
         }
       ]
