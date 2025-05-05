@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -91,6 +94,7 @@ public class TargetingSubsystem extends SubsystemBase {
 			scoringPose = startingPose.plus(
 				targetSide == Side.LEFT ? AutoScoring.Reef.coralOffsetL : AutoScoring.Reef.coralOffsetR
 			);
+			scoringPose = scoringPose.plus(getBranchSpecificOffset(targetBranch));
 			SmartDashboard.putString("Targetted Coral Pose with Offset (Meters)", scoringPose.toString());
 		} else {
 			System.out.println("targetBranch = null");
@@ -208,6 +212,22 @@ public class TargetingSubsystem extends SubsystemBase {
 		return autoTargetPairCommand(swerve::getPose, Side.LEFT)
 			.andThen(driveToCoralTarget(swerve))
 			.andThen(Commands.print("ened the auto routine thing"));
+	}
+
+	public Transform2d getBranchSpecificOffset(ReefBranch branch) {
+		double x;
+		double y;
+		double rot;
+
+		switch (branch) {
+			default:
+				x = 0.0;
+				y = 0.0;
+				rot = 0.0;
+				break;
+		}
+
+		return new Transform2d(new Translation2d(x, y), new Rotation2d(rot));
 	}
 
 	public enum Side {
