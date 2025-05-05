@@ -1,10 +1,13 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -74,6 +77,10 @@ public class TargetingSubsystem extends SubsystemBase {
 	}
 
 	public Command driveToCoralTarget(SwerveSubsystem swerveDrive) {
+		return driveToCoralTarget(swerveDrive, 0.6, 1);
+	}
+
+	public Command driveToCoralTarget(SwerveSubsystem swerveDrive, double speed, double acceleration) {
 		return Commands.print("GOING TO POSE")
 			.andThen(
 				Commands.runOnce(() -> {
@@ -81,7 +88,7 @@ public class TargetingSubsystem extends SubsystemBase {
 					swerveDrive.getSwerveDrive().field.getObject("target").setPose(getCoralTargetPose());
 				})
 			)
-			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose, 0.6, 0.5))
+			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose, speed, acceleration))
 			.andThen(Commands.print("DONE GOING TO POSE"));
 	}
 
@@ -203,7 +210,7 @@ public class TargetingSubsystem extends SubsystemBase {
 						swerveDrive.getSwerveDrive().field.getObject("target").setPose(sourcePose);
 					})
 				)
-				.andThen(swerveDrive.driveToPose(() -> sourcePose))
+				.andThen(swerveDrive.driveToPose(() -> sourcePose, 0.6, 1))
 				.andThen(Commands.print("DONE GOING TO SOURCE"));
 		});
 	}
@@ -215,19 +222,27 @@ public class TargetingSubsystem extends SubsystemBase {
 	}
 
 	public Transform2d getBranchSpecificOffset(ReefBranch branch) {
-		double x;
-		double y;
-		double rot;
+		double x = 0; // in inches; positive is robot forward
+		double y = 0; // in inches; positive is left
+		double rot = 0; // in degrees; positive is counter clockwise
 
 		switch (branch) {
+			case I:
+				y = -2;
+				x = -4;
+				rot = -5;
+				break;
 			default:
-				x = 0.0;
-				y = 0.0;
-				rot = 0.0;
+				x = 0;
+				y = 0;
+				rot = 0;
 				break;
 		}
 
-		return new Transform2d(new Translation2d(x, y), new Rotation2d(rot));
+		return new Transform2d(
+			new Translation2d(Units.inchesToMeters(x), Units.inchesToMeters(y)),
+			new Rotation2d(Units.degreesToRadians(rot))
+		);
 	}
 
 	public enum Side {

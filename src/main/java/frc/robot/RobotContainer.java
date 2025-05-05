@@ -171,7 +171,7 @@ public class RobotContainer {
 					.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
 					.andThen(
 						Commands.either(
-							targetingSubsystem.driveToCoralTarget(drivebase),
+							targetingSubsystem.driveToCoralTarget(drivebase, 0.6, 1),
 							Commands.runEnd(
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
@@ -188,7 +188,7 @@ public class RobotContainer {
 					.autoTargetPairCommand(drivebase::getPose, Side.RIGHT)
 					.andThen(
 						Commands.either(
-							targetingSubsystem.driveToCoralTarget(drivebase),
+							targetingSubsystem.driveToCoralTarget(drivebase, 0.6, 1),
 							Commands.runEnd(
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 1),
 								() -> driverXbox.getHID().setRumble(RumbleType.kBothRumble, 0)
