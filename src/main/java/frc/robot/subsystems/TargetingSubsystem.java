@@ -203,7 +203,15 @@ public class TargetingSubsystem extends SubsystemBase {
 	public Command driveToSourceCommand(SwerveSubsystem swerveDrive) {
 		return defer(() -> {
 			Pose2d currentPose = swerveDrive.getPose();
-			Pose2d sourcePose = currentPose.nearest(FieldConstants.CoralStation.bothPoses);
+			Pose2d sourcePose = currentPose
+				.nearest(FieldConstants.CoralStation.bothPoses)
+				.plus(
+					new Transform2d(
+						new Translation2d(Units.inchesToMeters(-4), Units.inchesToMeters(-4)),
+						new Rotation2d(Units.degreesToRadians(180))
+					)
+				);
+
 			return Commands.print("GOING TO SOURCE")
 				.andThen(
 					Commands.runOnce(() -> {
@@ -217,6 +225,12 @@ public class TargetingSubsystem extends SubsystemBase {
 
 	public Command driveToLeftBranch(SwerveSubsystem swerve) {
 		return autoTargetPairCommand(swerve::getPose, Side.LEFT)
+			.andThen(driveToCoralTarget(swerve))
+			.andThen(Commands.print("ened the auto routine thing"));
+	}
+
+	public Command driveToRightBranch(SwerveSubsystem swerve) {
+		return autoTargetPairCommand(swerve::getPose, Side.RIGHT)
 			.andThen(driveToCoralTarget(swerve))
 			.andThen(Commands.print("ened the auto routine thing"));
 	}
