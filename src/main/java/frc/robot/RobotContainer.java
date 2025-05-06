@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
@@ -394,7 +395,7 @@ public class RobotContainer {
 		.andThen(
 			Commands.waitUntil(() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion())
 				.withTimeout(1.5)
-				.andThen(scoringSubsystem.runIntakeCommand())
+				.andThen(scoringSubsystem.runIntakeCommand()).andThen(new PrintCommand("nothing").until(()->!scoringSubsystem.getCoralSensor()))
 		);
 	public Command driveToLeftBranch = targetingSubsystem.driveToLeftBranch(drivebase);
 	public Command driveToRightBranch = targetingSubsystem.driveToRightBranch(drivebase);

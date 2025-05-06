@@ -207,7 +207,7 @@ public class TargetingSubsystem extends SubsystemBase {
 				.nearest(FieldConstants.CoralStation.bothPoses)
 				.plus(
 					new Transform2d(
-						new Translation2d(Units.inchesToMeters(-4), Units.inchesToMeters(-4)),
+						new Translation2d(Units.inchesToMeters(4), Units.inchesToMeters(8)),
 						new Rotation2d(Units.degreesToRadians(180))
 					)
 				);
