@@ -198,6 +198,7 @@ public class RobotContainer {
 					)
 			);
 
+		// this effectively cancel's the auto align
 		driverXbox.y().onTrue(drivebase.driveToPose(drivebase::getPose));
 
 		driverXbox
