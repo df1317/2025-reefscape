@@ -6,22 +6,21 @@ All the fancy quick reference stuff goes here.
 
 ### Auto Routines
 
-1. Short Leave
+1. Short Leave (works anywhere on the field)
 
-![Short Leave](autos/leave-short.gif)
+![Short Leave](autos/leave-short.png)
 
-2. Score L2 position A
+2. Score L2 Blue (align with center cage on blue side)
 
-![Score L2 position A](autos/score-l2-a.gif)
+![Score L2 Blue](autos/l2-blue.png)
 
-3. Score L2 position B
+3. Score L4 Center (align on center left coral)
 
-![Score L2 position B](autos/score-l2-b.gif)
+![Score L4 Center](autos/l4-center.png)
 
-4. Score L2 position C
+4. Score L2 Red (align center red cage)
 
-![Score L2 position C](autos/score-l2-c.gif)
-
+![Score L2 Red](autos/l2-red.png)
 ## Controls
 
 ### Teleop
