@@ -207,7 +207,8 @@ public class TargetingSubsystem extends SubsystemBase {
 				.nearest(FieldConstants.CoralStation.bothPoses)
 				.plus(
 					new Transform2d(
-						new Translation2d(Units.inchesToMeters(4), Units.inchesToMeters(8)),
+						// positive is backwards; positive is right
+						new Translation2d(Units.inchesToMeters(12), Units.inchesToMeters(4)),
 						new Rotation2d(Units.degreesToRadians(180))
 					)
 				);
