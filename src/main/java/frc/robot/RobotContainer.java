@@ -387,7 +387,7 @@ public class RobotContainer {
 	 * ---
 	 */
 	public Command score = Commands.waitUntil(
-		() -> scoringSubsystem.atDesiredPosition() & elevatorSubsystem.atDesiredPosition()
+		() -> scoringSubsystem.atDesiredPosition() && elevatorSubsystem.atDesiredPosition()
 	)
 		.withTimeout(1.5)
 		.andThen(scoringSubsystem.runEjectCommand());
