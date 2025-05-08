@@ -89,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		// System.out.println("TODO: please put reset encodes pos in");
 	}
 
-	public boolean atDesiredPosistion() {
+	public boolean atDesiredPosition() {
 		return MathUtil.isNear(preRenfernce.position, ffState.position, 0.1);
 	}
 

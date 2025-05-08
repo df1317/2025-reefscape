@@ -151,7 +151,7 @@ public class ScoringSubsystem extends SubsystemBase {
 			.withTimeout(1.7);
 	}
 
-	public boolean atDesiredPosistion() {
+	public boolean atDesiredPosition() {
 		return MathUtil.isNear(setpoint, canTiltEncoder.getPosition(), 0.1);
 	}
 

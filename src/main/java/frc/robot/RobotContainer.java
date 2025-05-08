@@ -387,16 +387,21 @@ public class RobotContainer {
 	 * ---
 	 */
 	public Command score = Commands.waitUntil(
-		() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion()
+		() -> scoringSubsystem.atDesiredPosition() & elevatorSubsystem.atDesiredPosition()
 	)
 		.withTimeout(1.5)
 		.andThen(scoringSubsystem.runEjectCommand());
 	public Command intake = scoringSubsystem
 		.tiltCommand(FieldConstants.CoralStation.pitch)
 		.andThen(
-			Commands.waitUntil(() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion())
+			Commands.waitUntil(() -> scoringSubsystem.atDesiredPosition() & elevatorSubsystem.atDesiredPosition())
 				.withTimeout(1.5)
-				.andThen(scoringSubsystem.runIntakeCommand()).andThen(new PrintCommand("Coral sensor active, running intake").until(()->!scoringSubsystem.getCoralSensor()))
+				.andThen(scoringSubsystem.runIntakeCommand())
+				.andThen(
+					new PrintCommand("Coral sensor active, running intake").until(() ->
+						!scoringSubsystem.getCoralSensor()
+					)
+				)
 		);
 	public Command driveToLeftBranch = targetingSubsystem.driveToLeftBranch(drivebase);
 	public Command driveToRightBranch = targetingSubsystem.driveToRightBranch(drivebase);
@@ -404,25 +409,25 @@ public class RobotContainer {
 	public Command L1 = elevatorSubsystem
 		.setPos(() -> FieldConstants.CoralStation.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion);
+		.until(elevatorSubsystem::atDesiredPosition);
 	public Command L2 = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L2.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion)
+		.until(elevatorSubsystem::atDesiredPosition)
 		.andThen(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
-		.until(scoringSubsystem::atDesiredPosistion);
+		.until(scoringSubsystem::atDesiredPosition);
 	public Command L3 = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L3.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion)
+		.until(elevatorSubsystem::atDesiredPosition)
 		.andThen(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
-		.until(scoringSubsystem::atDesiredPosistion);
+		.until(scoringSubsystem::atDesiredPosition);
 	public Command L4 = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L4.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion)
+		.until(elevatorSubsystem::atDesiredPosition)
 		.andThen(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
-		.until(scoringSubsystem::atDesiredPosistion);
+		.until(scoringSubsystem::atDesiredPosition);
 
 	public Command autoTargetLeftBranchCommand = targetingSubsystem
 		.autoTargetPairCommand(drivebase::getPose, Side.LEFT)
@@ -455,28 +460,28 @@ public class RobotContainer {
 	public Command autoLvl4Command = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L4.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L4.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion)
+		.until(elevatorSubsystem::atDesiredPosition)
 		.andThen(scoringSubsystem.runIntakeCommand())
 		.withName("autoLvl4");
 
 	public Command autoLvl3Command = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L3.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L3.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion)
+		.until(elevatorSubsystem::atDesiredPosition)
 		.andThen(scoringSubsystem.runIntakeCommand())
 		.withName("autoLvl3");
 
 	public Command autoLvl2Command = elevatorSubsystem
 		.setPos(() -> FieldConstants.ReefHeight.L2.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.ReefHeight.L2.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion)
+		.until(elevatorSubsystem::atDesiredPosition)
 		.andThen(scoringSubsystem.runEjectCommand())
 		.withName("autoLvl2");
 
 	public Command autoIntakeCommand = elevatorSubsystem
 		.setPos(() -> FieldConstants.CoralStation.height)
 		.alongWith(scoringSubsystem.tiltCommand(FieldConstants.CoralStation.pitch))
-		.until(elevatorSubsystem::atDesiredPosistion)
+		.until(elevatorSubsystem::atDesiredPosition)
 		.andThen(scoringSubsystem.runIntakeCommand())
 		.withName("autoIntake");
 
