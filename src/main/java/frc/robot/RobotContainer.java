@@ -147,6 +147,10 @@ public class RobotContainer {
 	 * ---
 	 */
 	private void configureBindings() {
+		// NOTE: Avoid duplicating button bindings in the same mode (teleop, test, etc.)
+		// Always check for existing bindings before assigning new ones
+		// Use comments to document button assignments for better clarity
+		
 		Command driveFieldOrientedAnglularVelocity = drivebase.robotDriveCommand(driveAngularVelocity, () ->
 			robotRelative
 		);
@@ -291,6 +295,7 @@ public class RobotContainer {
 		m_JoystickL.button(4).onTrue(L3);
 		m_JoystickL.button(6).onTrue(L4);
 
+		// Button 7 used for elevator demo sequence in test mode
 		m_JoystickL
 			.button(7)
 			.toggleOnTrue(
@@ -332,24 +337,19 @@ public class RobotContainer {
 		/** -------------------------------------
 		 * Test-mode specific tilt bindings
 		 * ---
-		 * tilt command and tilt nudge
+		 * tilt command (button 8) and tilt nudge
 		 * tilt sysid command
+		 * Note: Button 7 is already used for elevator sequence in test mode
 		 * ---
 		 */
 
-		m_JoystickL.button(7).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltCommand(0));
-
-		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(false));
-		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(true));
-		
-		// Zero encoder for test mode on button 3
-		m_JoystickL.button(3).and(DriverStation::isTest).onTrue(scoringSubsystem.zeroEncoder());
+		m_JoystickL.button(8).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltCommand(0));
 
 		Command tiltJoyCommand = scoringSubsystem.tiltJoy(() -> m_JoystickL.getY());
 		tiltJoyCommand.addRequirements(scoringSubsystem);
 		scoringSubsystem.setDefaultCommand(tiltJoyCommand);
 
-		m_JoystickL.button(12).and(() -> !DriverStation.isTest()).onTrue(scoringSubsystem.zeroEncoder());
+		m_JoystickL.button(12).onTrue(scoringSubsystem.zeroEncoder());
 
 		/** -------------------------------------
 		 * Test-mode specific sysid bindings

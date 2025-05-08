@@ -57,6 +57,8 @@ All the fancy quick reference stuff goes here.
 ### Test Mode
 
 > **Note:** In test mode, all tilt position limits are ignored to allow for full range of motion during testing and calibration.
+>
+> **Warning:** Avoid creating duplicate bindings for the same button in test mode. Any changes to these bindings should be documented here and in the code comments.
 
 #### Xbox Controller (Driver)
 
@@ -72,16 +74,16 @@ All the fancy quick reference stuff goes here.
 
 #### Left Joystick (Operator) - Test Mode
 
-| Binding     | Action          | Description                       |
-| ----------- | --------------- | --------------------------------- |
-| `Trigger`   | Manual elevator | Controls elevator speed manually  |
-| `Button 3`  | Zero tilt encoder | Sets tilt encoder to zero position |
-| `Button 7`  | Demo mode       | Cycles through elevator positions |
-| `Button 8`  | Climb           | Controls climber up               |
-| `Button 9`  | Descend         | Controls climber down             |
-| `Button 11` | Tilt down       | Nudges tilt down (no limits in test mode) |
-| `Button 12` | Tilt up         | Nudges tilt up (no limits in test mode)   |
-| `Button 2`  | Tilt SysID      | Runs tilt system identification   |
+| Binding     | Action             | Description                       |
+| ----------- | ------------------ | --------------------------------- |
+| `Trigger`   | Manual elevator    | Controls elevator speed manually  |
+| `Button 3`  | lvl 4              | Sets elevator to level 4          |
+| `Button 7`  | Demo mode          | Cycles through elevator positions |
+| `Button 8`  | Tilt to position 0 | Resets tilt to zero position      |
+| `Button 9`  | Descend            | Controls climber down             |
+| `Joystick`  | Tilt               | Nudges tilt up/down (no limits in test mode) |
+| `Button 12` | zero tilt encoder  | zeros tilt encoder                |
+| `Button 2`  | Tilt SysID         | Runs tilt system identification   |
 
 #### Right Joystick (Operator) [`Port 2`]
 
