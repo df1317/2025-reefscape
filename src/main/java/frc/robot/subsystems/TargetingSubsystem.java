@@ -242,7 +242,7 @@ public class TargetingSubsystem extends SubsystemBase {
 
 		switch (branch) {
 			case I:
-				y = -2;
+				y = -4;
 				x = -4;
 				rot = -5;
 				break;
