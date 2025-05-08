@@ -396,7 +396,7 @@ public class RobotContainer {
 		.andThen(
 			Commands.waitUntil(() -> scoringSubsystem.atDesiredPosistion() & elevatorSubsystem.atDesiredPosistion())
 				.withTimeout(1.5)
-				.andThen(scoringSubsystem.runIntakeCommand()).andThen(new PrintCommand("nothing").until(()->!scoringSubsystem.getCoralSensor()))
+				.andThen(scoringSubsystem.runIntakeCommand()).andThen(new PrintCommand("Coral sensor active, running intake").until(()->!scoringSubsystem.getCoralSensor()))
 		);
 	public Command driveToLeftBranch = targetingSubsystem.driveToLeftBranch(drivebase);
 	public Command driveToRightBranch = targetingSubsystem.driveToRightBranch(drivebase);
