@@ -56,6 +56,8 @@ All the fancy quick reference stuff goes here.
 
 ### Test Mode
 
+> **Note:** In test mode, all tilt position limits are ignored to allow for full range of motion during testing and calibration.
+
 #### Xbox Controller (Driver)
 
 | Binding         | Action          | Description                            |
@@ -73,12 +75,12 @@ All the fancy quick reference stuff goes here.
 | Binding     | Action          | Description                       |
 | ----------- | --------------- | --------------------------------- |
 | `Trigger`   | Manual elevator | Controls elevator speed manually  |
+| `Button 3`  | Zero tilt encoder | Sets tilt encoder to zero position |
 | `Button 7`  | Demo mode       | Cycles through elevator positions |
-| `Button 7`  | Tilt zero       | Sets tilt to position 0           |
 | `Button 8`  | Climb           | Controls climber up               |
 | `Button 9`  | Descend         | Controls climber down             |
-| `Button 11` | Tilt down       | Nudges tilt down                  |
-| `Button 12` | Tilt up         | Nudges tilt up                    |
+| `Button 11` | Tilt down       | Nudges tilt down (no limits in test mode) |
+| `Button 12` | Tilt up         | Nudges tilt up (no limits in test mode)   |
 | `Button 2`  | Tilt SysID      | Runs tilt system identification   |
 
 #### Right Joystick (Operator) [`Port 2`]

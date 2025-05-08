@@ -341,6 +341,9 @@ public class RobotContainer {
 
 		m_JoystickL.button(11).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(false));
 		m_JoystickL.button(12).and(DriverStation::isTest).whileTrue(scoringSubsystem.tiltNudge(true));
+		
+		// Zero encoder for test mode on button 3
+		m_JoystickL.button(3).and(DriverStation::isTest).onTrue(scoringSubsystem.zeroEncoder());
 
 		Command tiltJoyCommand = scoringSubsystem.tiltJoy(() -> m_JoystickL.getY());
 		tiltJoyCommand.addRequirements(scoringSubsystem);
