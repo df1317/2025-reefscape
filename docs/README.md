@@ -10,7 +10,7 @@ All the fancy quick reference stuff goes here.
 
 ![Short Leave](autos/leave-short.png)
 
-2. Score L2 Blue (align with center cage on blue side)
+2. Score L2 Blue (align half way between far and center cage on blue side)
 
 ![Score L2 Blue](autos/l2-blue.png)
 
