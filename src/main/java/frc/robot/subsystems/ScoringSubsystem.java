@@ -194,7 +194,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	public Command tiltJoy(DoubleSupplier joy) {
 		return Commands.run(() -> {
-			double joyVal = MathUtil.applyDeadband(joy.getAsDouble(), 0.05);
+			double joyVal = MathUtil.applyDeadband(joy.getAsDouble(), 0.1);
 			double adjustment = Units.degreesToRotations(joyVal);
 
 			if (DriverStation.isTest()) {

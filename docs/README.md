@@ -67,7 +67,7 @@ All the fancy quick reference stuff goes here.
 | `A Button`      | Zero gyro       | Resets gyro heading                    |
 | `X Button`      | Auto Target     | Auto-targets the left reef             |
 | `B Button`      | Auto Target     | Auto-targets the right reef            |
-| `Y Button`      | Drive to pose   | Uses targeting system to drive to pose |
+| `Y Button`      | cancel align    | Escape auto drive to pose              |
 | `Back Button`   | Center modules  | Centers swerve modules                 |
 | `Left Bumper`   | Play music      | Plays duck song                        |
 | `Right Bumper`  | Run intake      | Runs the intake mechanism              |
