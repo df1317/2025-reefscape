@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -93,7 +94,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		setpoint = MathUtil.clamp(setpoint, 0, 0.4);
+		// Only apply limits when not in test mode
+		if (!DriverStation.isTest()) {
+			setpoint = MathUtil.clamp(setpoint, 0, 0.4);
+		}
 		canTiltController.setReference(setpoint, ControlType.kPosition);
 
 		SmartDashboard.putNumber("scoring/setpoint", setpoint);
@@ -151,7 +155,7 @@ public class ScoringSubsystem extends SubsystemBase {
 			.withTimeout(1.7);
 	}
 
-	public boolean atDesiredPosistion() {
+	public boolean atDesiredPosition() {
 		return MathUtil.isNear(setpoint, canTiltEncoder.getPosition(), 0.1);
 	}
 
@@ -161,7 +165,11 @@ public class ScoringSubsystem extends SubsystemBase {
 
 	public Command tiltCommand(double degrees) {
 		return this.runOnce(() -> {
-				setpoint = MathUtil.clamp(Units.degreesToRotations(degrees), 0, 0.4);
+				double rotations = Units.degreesToRotations(degrees);
+				if (!DriverStation.isTest()) {
+					rotations = MathUtil.clamp(rotations, 0, 0.4);
+				}
+				setpoint = rotations;
 			});
 	}
 
@@ -169,17 +177,31 @@ public class ScoringSubsystem extends SubsystemBase {
 		double amount = Units.degreesToRotations(0.4);
 		return Commands.run(() -> {
 			if (direction) {
-				setpoint = MathUtil.clamp(setpoint + amount, 0, 0.4);
+				if (DriverStation.isTest()) {
+					setpoint = setpoint + amount;
+				} else {
+					setpoint = MathUtil.clamp(setpoint + amount, 0, 0.4);
+				}
 			} else {
-				setpoint = MathUtil.clamp(setpoint - amount, 0, 0.4);
+				if (DriverStation.isTest()) {
+					setpoint = setpoint - amount;
+				} else {
+					setpoint = MathUtil.clamp(setpoint - amount, 0, 0.4);
+				}
 			}
 		});
 	}
 
 	public Command tiltJoy(DoubleSupplier joy) {
 		return Commands.run(() -> {
-			double joyVal = MathUtil.applyDeadband(joy.getAsDouble(), 0.05);
-			setpoint = MathUtil.clamp(setpoint + Units.degreesToRotations(joyVal), 0, 0.4);
+			double joyVal = MathUtil.applyDeadband(joy.getAsDouble(), 0.1);
+			double adjustment = Units.degreesToRotations(joyVal);
+
+			if (DriverStation.isTest()) {
+				setpoint = setpoint + adjustment;
+			} else {
+				setpoint = MathUtil.clamp(setpoint + adjustment, 0, 0.4);
+			}
 		});
 	}
 

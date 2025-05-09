@@ -1,7 +1,13 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -71,6 +77,10 @@ public class TargetingSubsystem extends SubsystemBase {
 	}
 
 	public Command driveToCoralTarget(SwerveSubsystem swerveDrive) {
+		return driveToCoralTarget(swerveDrive, 0.6, 1);
+	}
+
+	public Command driveToCoralTarget(SwerveSubsystem swerveDrive, double speed, double acceleration) {
 		return Commands.print("GOING TO POSE")
 			.andThen(
 				Commands.runOnce(() -> {
@@ -78,7 +88,7 @@ public class TargetingSubsystem extends SubsystemBase {
 					swerveDrive.getSwerveDrive().field.getObject("target").setPose(getCoralTargetPose());
 				})
 			)
-			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose, 0.6, 0.5))
+			.andThen(swerveDrive.driveToPose(this::getCoralTargetPose, speed, acceleration))
 			.andThen(Commands.print("DONE GOING TO POSE"));
 	}
 
@@ -91,6 +101,7 @@ public class TargetingSubsystem extends SubsystemBase {
 			scoringPose = startingPose.plus(
 				targetSide == Side.LEFT ? AutoScoring.Reef.coralOffsetL : AutoScoring.Reef.coralOffsetR
 			);
+			scoringPose = scoringPose.plus(getBranchSpecificOffset(targetBranch));
 			SmartDashboard.putString("Targetted Coral Pose with Offset (Meters)", scoringPose.toString());
 		} else {
 			System.out.println("targetBranch = null");
@@ -192,14 +203,23 @@ public class TargetingSubsystem extends SubsystemBase {
 	public Command driveToSourceCommand(SwerveSubsystem swerveDrive) {
 		return defer(() -> {
 			Pose2d currentPose = swerveDrive.getPose();
-			Pose2d sourcePose = currentPose.nearest(FieldConstants.CoralStation.bothPoses);
+			Pose2d sourcePose = currentPose
+				.nearest(FieldConstants.CoralStation.bothPoses)
+				.plus(
+					new Transform2d(
+						// positive is backwards; positive is right
+						new Translation2d(Units.inchesToMeters(12), Units.inchesToMeters(4)),
+						new Rotation2d(Units.degreesToRadians(180))
+					)
+				);
+
 			return Commands.print("GOING TO SOURCE")
 				.andThen(
 					Commands.runOnce(() -> {
 						swerveDrive.getSwerveDrive().field.getObject("target").setPose(sourcePose);
 					})
 				)
-				.andThen(swerveDrive.driveToPose(() -> sourcePose))
+				.andThen(swerveDrive.driveToPose(() -> sourcePose, 0.6, 1))
 				.andThen(Commands.print("DONE GOING TO SOURCE"));
 		});
 	}
@@ -208,6 +228,36 @@ public class TargetingSubsystem extends SubsystemBase {
 		return autoTargetPairCommand(swerve::getPose, Side.LEFT)
 			.andThen(driveToCoralTarget(swerve))
 			.andThen(Commands.print("ened the auto routine thing"));
+	}
+
+	public Command driveToRightBranch(SwerveSubsystem swerve) {
+		return autoTargetPairCommand(swerve::getPose, Side.RIGHT)
+			.andThen(driveToCoralTarget(swerve))
+			.andThen(Commands.print("ened the auto routine thing"));
+	}
+
+	public Transform2d getBranchSpecificOffset(ReefBranch branch) {
+		double x = 0; // in inches; positive is robot forward
+		double y = 0; // in inches; positive is left
+		double rot = 0; // in degrees; positive is counter clockwise
+
+		switch (branch) {
+			case I:
+				y = -4;
+				x = -4;
+				rot = -5;
+				break;
+			default:
+				x = 0;
+				y = 0;
+				rot = 0;
+				break;
+		}
+
+		return new Transform2d(
+			new Translation2d(Units.inchesToMeters(x), Units.inchesToMeters(y)),
+			new Rotation2d(Units.degreesToRadians(rot))
+		);
 	}
 
 	public enum Side {
