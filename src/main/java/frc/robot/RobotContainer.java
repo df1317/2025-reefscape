@@ -104,7 +104,7 @@ public class RobotContainer {
 	)
 		.withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
 		.deadband(OperatorConstants.DEADBAND)
-		.scaleTranslation(0.8)
+		.scaleTranslation(0.9)
 		.allianceRelativeControl(true);
 	// Derive the heading axis with math!
 	SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard
@@ -150,7 +150,7 @@ public class RobotContainer {
 		// NOTE: Avoid duplicating button bindings in the same mode (teleop, test, etc.)
 		// Always check for existing bindings before assigning new ones
 		// Use comments to document button assignments for better clarity
-		
+
 		Command driveFieldOrientedAnglularVelocity = drivebase.robotDriveCommand(driveAngularVelocity, () ->
 			robotRelative
 		);
@@ -295,7 +295,6 @@ public class RobotContainer {
 		m_JoystickL.button(4).onTrue(L3);
 		m_JoystickL.button(6).onTrue(L4);
 
-		// Button 7 used for elevator demo sequence in test mode
 		m_JoystickL
 			.button(7)
 			.toggleOnTrue(
@@ -339,7 +338,6 @@ public class RobotContainer {
 		 * ---
 		 * tilt command (button 8) and tilt nudge
 		 * tilt sysid command
-		 * Note: Button 7 is already used for elevator sequence in test mode
 		 * ---
 		 */
 

@@ -242,6 +242,8 @@ public class TargetingSubsystem extends SubsystemBase {
 		double rot = 0; // in degrees; positive is counter clockwise
 
 		switch (branch) {
+			case G:
+				y = 0;
 			case I:
 				y = -4;
 				x = -4;
