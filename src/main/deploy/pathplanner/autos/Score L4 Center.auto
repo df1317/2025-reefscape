@@ -40,18 +40,6 @@
           "data": {
             "name": "score"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "BackUp"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L1"
-          }
         }
       ]
     }
