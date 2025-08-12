@@ -188,3 +188,6 @@ compile_commands.json
 
 # bun
 node_modules/
+
+# crush
+.crush
