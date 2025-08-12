@@ -46,517 +46,472 @@ import swervelib.SwerveDrive;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
 /**
- * Example PhotonVision class to aid in the pursuit of accurate odometry. Taken
- * from
+ * Example PhotonVision class to aid in the pursuit of accurate odometry. Taken from
  * https://gitlab.com/ironclad_code/ironclad-2024/-/blob/master/src/main/java/frc/robot/vision/Vision.java?ref_type=heads
  */
 public class Vision {
 
-	/**
-	 * April Tag Field Layout of the year.
-	 */
-	public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
-		AprilTagFields.k2025ReefscapeWelded
-	);
-	/**
-	 * Photon Vision Simulation
-	 */
-	public VisionSystemSim visionSim;
-	/**
-	 * Current pose from the pose estimator using wheel odometry.
-	 */
-	private Supplier<Pose2d> currentPose;
-	/**
-	 * Field from {@link swervelib.SwerveDrive#field}
-	 */
-	private Field2d field2d;
+  /** April Tag Field Layout of the year. */
+  public static final AprilTagFieldLayout fieldLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-	/**
-	 * Alert to show when no PhotonVision clients are found
-	 */
-	private final Alert noPhotonVisionAlert = new Alert("No PhotonVision clients found", AlertType.kWarning);
+  /** Photon Vision Simulation */
+  public VisionSystemSim visionSim;
 
-	/**
-	 * Constructor for the Vision class.
-	 *
-	 * @param currentPose Current pose supplier, should reference
-	 *                    {@link SwerveDrive#getPose()}
-	 * @param field       Current field, should be {@link SwerveDrive#field}
-	 */
-	public Vision(Supplier<Pose2d> currentPose, Field2d field) {
-		this.currentPose = currentPose;
-		this.field2d = field;
+  /** Current pose from the pose estimator using wheel odometry. */
+  private Supplier<Pose2d> currentPose;
 
-		if (Robot.isSimulation()) {
-			visionSim = new VisionSystemSim("Vision");
-			visionSim.addAprilTags(fieldLayout);
+  /** Field from {@link swervelib.SwerveDrive#field} */
+  private Field2d field2d;
 
-			for (Cameras c : Cameras.values()) {
-				c.addToVisionSim(visionSim);
-			}
+  /** Alert to show when no PhotonVision clients are found */
+  private final Alert noPhotonVisionAlert =
+      new Alert("No PhotonVision clients found", AlertType.kWarning);
 
-			openSimCameraViews();
-		}
+  /**
+   * Constructor for the Vision class.
+   *
+   * @param currentPose Current pose supplier, should reference {@link SwerveDrive#getPose()}
+   * @param field Current field, should be {@link SwerveDrive#field}
+   */
+  public Vision(Supplier<Pose2d> currentPose, Field2d field) {
+    this.currentPose = currentPose;
+    this.field2d = field;
 
-		// Check if any cameras are connected
-		boolean hasCamera = false;
-		for (Cameras c : Cameras.values()) {
-			if (c.camera.isConnected()) {
-				hasCamera = true;
-				break;
-			}
-		}
-		noPhotonVisionAlert.set(!hasCamera);
-	}
+    if (Robot.isSimulation()) {
+      visionSim = new VisionSystemSim("Vision");
+      visionSim.addAprilTags(fieldLayout);
 
-	/**
-	 * Calculates a target pose relative to an AprilTag on the field.
-	 *
-	 * @param aprilTag    The ID of the AprilTag.
-	 * @param robotOffset The offset {@link Transform2d} of the robot to apply to
-	 *                    the pose for the robot to position
-	 *                    itself correctly.
-	 * @return The target pose of the AprilTag.
-	 */
-	public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
-		Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
-		if (aprilTagPose3d.isPresent()) {
-			return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
-		} else {
-			throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
-		}
-	}
+      for (Cameras c : Cameras.values()) {
+        c.addToVisionSim(visionSim);
+      }
 
-	/**
-	 * Update the pose estimation inside of {@link SwerveDrive} with all of the
-	 * given poses.
-	 *
-	 * @param swerveDrive {@link SwerveDrive} instance.
-	 */
-	public void updatePoseEstimation(SwerveDrive swerveDrive) {
-		if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent()) {
-			/*
-			 * In the maple-sim, odometry is simulated using encoder values, accounting for
-			 * factors like skidding and drifting.
-			 * As a result, the odometry may not always be 100% accurate.
-			 * However, the vision system should be able to provide a reasonably accurate
-			 * pose estimation, even when odometry is incorrect.
-			 * (This is why teams implement vision system to correct odometry.)
-			 * Therefore, we must ensure that the actual robot pose is provided in the
-			 * simulator when updating the vision simulation during the simulation.
-			 */
-			visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
-		}
-		for (Cameras camera : Cameras.values()) {
-			if (!camera.camera.isConnected()) {
-				continue;
-			}
-			Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
-			if (poseEst.isPresent()) {
-				var pose = poseEst.get();
-				swerveDrive.addVisionMeasurement(
-					pose.estimatedPose.toPose2d(),
-					pose.timestampSeconds,
-					camera.curStdDevs
-				);
-			}
-		}
-	}
+      openSimCameraViews();
+    }
 
-	/**
-	 * Generates the estimated robot pose. Returns empty if:
-	 * <ul>
-	 * <li>No Pose Estimates could be generated</li>
-	 * <li>The generated pose estimate was considered not accurate</li>
-	 * </ul>
-	 *
-	 * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and
-	 *         targets used to create the estimate
-	 */
-	public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
-		Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
-		if (Robot.isSimulation()) {
-			Field2d debugField = visionSim.getDebugField();
-			// Uncomment to enable outputting of vision targets in sim.
-			poseEst.ifPresentOrElse(
-				est -> debugField.getObject("VisionEstimation").setPose(est.estimatedPose.toPose2d()),
-				() -> {
-					debugField.getObject("VisionEstimation").setPoses();
-				}
-			);
-		}
-		return poseEst;
-	}
+    // Check if any cameras are connected
+    boolean hasCamera = false;
+    for (Cameras c : Cameras.values()) {
+      if (c.camera.isConnected()) {
+        hasCamera = true;
+        break;
+      }
+    }
+    noPhotonVisionAlert.set(!hasCamera);
+  }
 
-	/**
-	 * Get distance of the robot from the AprilTag pose.
-	 *
-	 * @param id AprilTag ID
-	 * @return Distance
-	 */
-	public double getDistanceFromAprilTag(int id) {
-		Optional<Pose3d> tag = fieldLayout.getTagPose(id);
-		return tag.map(pose3d -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d())).orElse(-1.0);
-	}
+  /**
+   * Calculates a target pose relative to an AprilTag on the field.
+   *
+   * @param aprilTag The ID of the AprilTag.
+   * @param robotOffset The offset {@link Transform2d} of the robot to apply to the pose for the
+   *     robot to position itself correctly.
+   * @return The target pose of the AprilTag.
+   */
+  public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset) {
+    Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
+    if (aprilTagPose3d.isPresent()) {
+      return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
+    } else {
+      throw new RuntimeException(
+          "Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
+    }
+  }
 
-	/**
-	 * Get tracked target from a camera of AprilTagID
-	 *
-	 * @param id     AprilTag ID
-	 * @param camera Camera to check.
-	 * @return Tracked target.
-	 */
-	public PhotonTrackedTarget getTargetFromId(int id, Cameras camera) {
-		PhotonTrackedTarget target = null;
-		for (PhotonPipelineResult result : camera.resultsList) {
-			if (result.hasTargets()) {
-				for (PhotonTrackedTarget i : result.getTargets()) {
-					if (i.getFiducialId() == id) {
-						return i;
-					}
-				}
-			}
-		}
-		return target;
-	}
+  /**
+   * Update the pose estimation inside of {@link SwerveDrive} with all of the given poses.
+   *
+   * @param swerveDrive {@link SwerveDrive} instance.
+   */
+  public void updatePoseEstimation(SwerveDrive swerveDrive) {
+    if (SwerveDriveTelemetry.isSimulation
+        && swerveDrive.getSimulationDriveTrainPose().isPresent()) {
+      /*
+       * In the maple-sim, odometry is simulated using encoder values, accounting for
+       * factors like skidding and drifting.
+       * As a result, the odometry may not always be 100% accurate.
+       * However, the vision system should be able to provide a reasonably accurate
+       * pose estimation, even when odometry is incorrect.
+       * (This is why teams implement vision system to correct odometry.)
+       * Therefore, we must ensure that the actual robot pose is provided in the
+       * simulator when updating the vision simulation during the simulation.
+       */
+      visionSim.update(swerveDrive.getSimulationDriveTrainPose().get());
+    }
+    for (Cameras camera : Cameras.values()) {
+      if (!camera.camera.isConnected()) {
+        continue;
+      }
+      Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+      if (poseEst.isPresent()) {
+        var pose = poseEst.get();
+        swerveDrive.addVisionMeasurement(
+            pose.estimatedPose.toPose2d(), pose.timestampSeconds, camera.curStdDevs);
+      }
+    }
+  }
 
-	/**
-	 * Vision simulation.
-	 *
-	 * @return Vision Simulation
-	 */
-	public VisionSystemSim getVisionSim() {
-		return visionSim;
-	}
+  /**
+   * Generates the estimated robot pose. Returns empty if:
+   *
+   * <ul>
+   *   <li>No Pose Estimates could be generated
+   *   <li>The generated pose estimate was considered not accurate
+   * </ul>
+   *
+   * @return an {@link EstimatedRobotPose} with an estimated pose, timestamp, and targets used to
+   *     create the estimate
+   */
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
+    Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
+    if (Robot.isSimulation()) {
+      Field2d debugField = visionSim.getDebugField();
+      // Uncomment to enable outputting of vision targets in sim.
+      poseEst.ifPresentOrElse(
+          (est) -> debugField.getObject("VisionEstimation").setPose(est.estimatedPose.toPose2d()),
+          () -> {
+            debugField.getObject("VisionEstimation").setPoses();
+          });
+    }
+    return poseEst;
+  }
 
-	/**
-	 * Open up the photon vision camera streams on the localhost, assumes running
-	 * photon vision on localhost.
-	 */
-	private void openSimCameraViews() {
-		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-			// try
-			// {
-			// Desktop.getDesktop().browse(new URI("http://localhost:1182/"));
-			// Desktop.getDesktop().browse(new URI("http://localhost:1184/"));
-			// Desktop.getDesktop().browse(new URI("http://localhost:1186/"));
-			// } catch (IOException | URISyntaxException e)
-			// {
-			// e.printStackTrace();
-			// }
-		}
-	}
+  /**
+   * Get distance of the robot from the AprilTag pose.
+   *
+   * @param id AprilTag ID
+   * @return Distance
+   */
+  public double getDistanceFromAprilTag(int id) {
+    Optional<Pose3d> tag = fieldLayout.getTagPose(id);
+    return tag.map((pose3d) -> PhotonUtils.getDistanceToPose(currentPose.get(), pose3d.toPose2d()))
+        .orElse(-1.0);
+  }
 
-	/**
-	 * Update the {@link Field2d} to include tracked targets/
-	 */
-	public void updateVisionField() {
-		List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
-		for (Cameras c : Cameras.values()) {
-			if (!c.resultsList.isEmpty()) {
-				PhotonPipelineResult latest = c.resultsList.get(0);
-				if (latest.hasTargets()) {
-					targets.addAll(latest.targets);
-				}
-			}
-		}
+  /**
+   * Get tracked target from a camera of AprilTagID
+   *
+   * @param id AprilTag ID
+   * @param camera Camera to check.
+   * @return Tracked target.
+   */
+  public PhotonTrackedTarget getTargetFromId(int id, Cameras camera) {
+    PhotonTrackedTarget target = null;
+    for (PhotonPipelineResult result : camera.resultsList) {
+      if (result.hasTargets()) {
+        for (PhotonTrackedTarget i : result.getTargets()) {
+          if (i.getFiducialId() == id) {
+            return i;
+          }
+        }
+      }
+    }
+    return target;
+  }
 
-		List<Pose2d> poses = new ArrayList<>();
-		for (PhotonTrackedTarget target : targets) {
-			if (fieldLayout.getTagPose(target.getFiducialId()).isPresent()) {
-				Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
-				poses.add(targetPose);
-			}
-		}
+  /**
+   * Vision simulation.
+   *
+   * @return Vision Simulation
+   */
+  public VisionSystemSim getVisionSim() {
+    return visionSim;
+  }
 
-		field2d.getObject("tracked targets").setPoses(poses);
-	}
+  /**
+   * Open up the photon vision camera streams on the localhost, assumes running photon vision on
+   * localhost.
+   */
+  private void openSimCameraViews() {
+    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+      // try
+      // {
+      // Desktop.getDesktop().browse(new URI("http://localhost:1182/"));
+      // Desktop.getDesktop().browse(new URI("http://localhost:1184/"));
+      // Desktop.getDesktop().browse(new URI("http://localhost:1186/"));
+      // } catch (IOException | URISyntaxException e)
+      // {
+      // e.printStackTrace();
+      // }
+    }
+  }
 
-	/**
-	 * Camera Enum to select each camera
-	 */
-	enum Cameras {
-		/**
-		 * Center Camera
-		 */
-		CENTER_CAM(
-			"PEBBLE",
-			new Rotation3d(0, Units.degreesToRadians(15.0), 0),
-			new Translation3d(0.32, 0.32, 0.30),
-			VecBuilder.fill(4, 4, 8),
-			VecBuilder.fill(0.5, 0.5, 1)
-		);
+  /** Update the {@link Field2d} to include tracked targets/ */
+  public void updateVisionField() {
+    List<PhotonTrackedTarget> targets = new ArrayList<PhotonTrackedTarget>();
+    for (Cameras c : Cameras.values()) {
+      if (!c.resultsList.isEmpty()) {
+        PhotonPipelineResult latest = c.resultsList.get(0);
+        if (latest.hasTargets()) {
+          targets.addAll(latest.targets);
+        }
+      }
+    }
 
-		/**
-		 * Latency alert to use when high latency is detected.
-		 */
-		public final Alert latencyAlert;
-		/**
-		 * Camera instance for comms.
-		 */
-		public final PhotonCamera camera;
-		/**
-		 * Pose estimator for camera.
-		 */
-		public final PhotonPoseEstimator poseEstimator;
-		/**
-		 * Standard Deviation for single tag readings for pose estimation.
-		 */
-		private final Matrix<N3, N1> singleTagStdDevs;
-		/**
-		 * Standard deviation for multi-tag readings for pose estimation.
-		 */
-		private final Matrix<N3, N1> multiTagStdDevs;
-		/**
-		 * Transform of the camera rotation and translation relative to the center of
-		 * the robot
-		 */
-		private final Transform3d robotToCamTransform;
-		/**
-		 * Current standard deviations used.
-		 */
-		public Matrix<N3, N1> curStdDevs;
-		/**
-		 * Estimated robot pose.
-		 */
-		public Optional<EstimatedRobotPose> estimatedRobotPose;
-		/**
-		 * Simulated camera instance which only exists during simulations.
-		 */
-		public PhotonCameraSim cameraSim;
-		/**
-		 * Results list to be updated periodically and cached to avoid unnecessary
-		 * queries.
-		 */
-		public List<PhotonPipelineResult> resultsList = new ArrayList<>();
-		/**
-		 * Last read from the camera timestamp to prevent lag due to slow data fetches.
-		 */
-		private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+    List<Pose2d> poses = new ArrayList<>();
+    for (PhotonTrackedTarget target : targets) {
+      if (fieldLayout.getTagPose(target.getFiducialId()).isPresent()) {
+        Pose2d targetPose = fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d();
+        poses.add(targetPose);
+      }
+    }
 
-		/**
-		 * Construct a Photon Camera class with help. Standard deviations are fake
-		 * values, experiment and determine
-		 * estimation noise on an actual robot.
-		 *
-		 * @param name                  Name of the PhotonVision camera found in the PV
-		 *                              UI.
-		 * @param robotToCamRotation    {@link Rotation3d} of the camera.
-		 * @param robotToCamTranslation {@link Translation3d} relative to the center of
-		 *                              the robot.
-		 * @param singleTagStdDevs      Single AprilTag standard deviations of estimated
-		 *                              poses from the camera.
-		 * @param multiTagStdDevsMatrix Multi AprilTag standard deviations of estimated
-		 *                              poses from the camera.
-		 */
-		Cameras(
-			String name,
-			Rotation3d robotToCamRotation,
-			Translation3d robotToCamTranslation,
-			Matrix<N3, N1> singleTagStdDevs,
-			Matrix<N3, N1> multiTagStdDevsMatrix
-		) {
-			latencyAlert = new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
+    field2d.getObject("tracked targets").setPoses(poses);
+  }
 
-			camera = new PhotonCamera(name);
+  /** Camera Enum to select each camera */
+  enum Cameras {
+    /** Center Camera */
+    CENTER_CAM(
+        "PEBBLE",
+        new Rotation3d(0, Units.degreesToRadians(15.0), 0),
+        new Translation3d(0.32, 0.32, 0.30),
+        VecBuilder.fill(4, 4, 8),
+        VecBuilder.fill(0.5, 0.5, 1));
 
-			// https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
-			robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
+    /** Latency alert to use when high latency is detected. */
+    public final Alert latencyAlert;
 
-			poseEstimator = new PhotonPoseEstimator(
-				Vision.fieldLayout,
-				PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-				robotToCamTransform
-			);
-			poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    /** Camera instance for comms. */
+    public final PhotonCamera camera;
 
-			this.singleTagStdDevs = singleTagStdDevs;
-			this.multiTagStdDevs = multiTagStdDevsMatrix;
+    /** Pose estimator for camera. */
+    public final PhotonPoseEstimator poseEstimator;
 
-			if (Robot.isSimulation()) {
-				SimCameraProperties cameraProp = new SimCameraProperties();
-				// A 640 x 480 camera with a 100 degree diagonal FOV.
-				cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(100));
-				// Approximate detection noise with average and standard deviation error in
-				// pixels.
-				cameraProp.setCalibError(0.25, 0.08);
-				// Set the camera image capture framerate (Note: this is limited by robot loop
-				// rate).
-				cameraProp.setFPS(30);
-				// The average and standard deviation in milliseconds of image data latency.
-				cameraProp.setAvgLatencyMs(35);
-				cameraProp.setLatencyStdDevMs(5);
+    /** Standard Deviation for single tag readings for pose estimation. */
+    private final Matrix<N3, N1> singleTagStdDevs;
 
-				cameraSim = new PhotonCameraSim(camera, cameraProp);
-				cameraSim.enableDrawWireframe(true);
-			}
-		}
+    /** Standard deviation for multi-tag readings for pose estimation. */
+    private final Matrix<N3, N1> multiTagStdDevs;
 
-		/**
-		 * Add camera to {@link VisionSystemSim} for simulated photon vision.
-		 *
-		 * @param systemSim {@link VisionSystemSim} to use.
-		 */
-		public void addToVisionSim(VisionSystemSim systemSim) {
-			if (Robot.isSimulation()) {
-				systemSim.addCamera(cameraSim, robotToCamTransform);
-			}
-		}
+    /** Transform of the camera rotation and translation relative to the center of the robot */
+    private final Transform3d robotToCamTransform;
 
-		/**
-		 * Get the result with the least ambiguity from the best tracked target within
-		 * the Cache. This may not be the most
-		 * recent result!
-		 *
-		 * @return The result in the cache with the least ambiguous best tracked target.
-		 *         This is not the most recent result!
-		 */
-		public Optional<PhotonPipelineResult> getBestResult() {
-			if (resultsList.isEmpty()) {
-				return Optional.empty();
-			}
+    /** Current standard deviations used. */
+    public Matrix<N3, N1> curStdDevs;
 
-			PhotonPipelineResult bestResult = resultsList.get(0);
-			double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
-			double currentAmbiguity = 0;
-			for (PhotonPipelineResult result : resultsList) {
-				currentAmbiguity = result.getBestTarget().getPoseAmbiguity();
-				if (currentAmbiguity < amiguity && currentAmbiguity > 0) {
-					bestResult = result;
-					amiguity = currentAmbiguity;
-				}
-			}
-			return Optional.of(bestResult);
-		}
+    /** Estimated robot pose. */
+    public Optional<EstimatedRobotPose> estimatedRobotPose;
 
-		/**
-		 * Get the latest result from the current cache.
-		 *
-		 * @return Empty optional if nothing is found. Latest result if something is
-		 *         there.
-		 */
-		public Optional<PhotonPipelineResult> getLatestResult() {
-			return resultsList.isEmpty() ? Optional.empty() : Optional.of(resultsList.get(0));
-		}
+    /** Simulated camera instance which only exists during simulations. */
+    public PhotonCameraSim cameraSim;
 
-		/**
-		 * Get the estimated robot pose. Updates the current robot pose estimation,
-		 * standard deviations, and flushes the
-		 * cache of results.
-		 *
-		 * @return Estimated pose.
-		 */
-		public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-			updateUnreadResults();
-			return estimatedRobotPose;
-		}
+    /** Results list to be updated periodically and cached to avoid unnecessary queries. */
+    public List<PhotonPipelineResult> resultsList = new ArrayList<>();
 
-		/**
-		 * Update the latest results, cached with a maximum refresh rate of 1req/15ms.
-		 * Sorts the list by timestamp.
-		 */
-		private void updateUnreadResults() {
-			double mostRecentTimestamp = resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
-			double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
-			double debounceTime = Milliseconds.of(15).in(Seconds);
-			for (PhotonPipelineResult result : resultsList) {
-				mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
-			}
-			if (
-				(resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime)) &&
-				(currentTimestamp - lastReadTimestamp) >= debounceTime
-			) {
-				resultsList = Robot.isReal()
-					? camera.getAllUnreadResults()
-					: cameraSim.getCamera().getAllUnreadResults();
-				lastReadTimestamp = currentTimestamp;
-				resultsList.sort((PhotonPipelineResult a, PhotonPipelineResult b) -> {
-					return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
-				});
-				if (!resultsList.isEmpty()) {
-					updateEstimatedGlobalPose();
-				}
-			}
-		}
+    /** Last read from the camera timestamp to prevent lag due to slow data fetches. */
+    private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
-		/**
-		 * The latest estimated robot pose on the field from vision data. This may be
-		 * empty. This should only be called once
-		 * per loop.
-		 *
-		 * <p>
-		 * Also includes updates for the standard deviations, which can (optionally) be
-		 * retrieved with
-		 * {@link Cameras#updateEstimationStdDevs}
-		 *
-		 * @return An {@link EstimatedRobotPose} with an estimated pose, estimate
-		 *         timestamp, and targets used for
-		 *         estimation.
-		 */
-		private void updateEstimatedGlobalPose() {
-			Optional<EstimatedRobotPose> visionEst = Optional.empty();
-			for (var change : resultsList) {
-				visionEst = poseEstimator.update(change);
-				updateEstimationStdDevs(visionEst, change.getTargets());
-			}
-			estimatedRobotPose = visionEst;
-		}
+    /**
+     * Construct a Photon Camera class with help. Standard deviations are fake values, experiment
+     * and determine estimation noise on an actual robot.
+     *
+     * @param name Name of the PhotonVision camera found in the PV UI.
+     * @param robotToCamRotation {@link Rotation3d} of the camera.
+     * @param robotToCamTranslation {@link Translation3d} relative to the center of the robot.
+     * @param singleTagStdDevs Single AprilTag standard deviations of estimated poses from the
+     *     camera.
+     * @param multiTagStdDevsMatrix Multi AprilTag standard deviations of estimated poses from the
+     *     camera.
+     */
+    Cameras(
+        String name,
+        Rotation3d robotToCamRotation,
+        Translation3d robotToCamTranslation,
+        Matrix<N3, N1> singleTagStdDevs,
+        Matrix<N3, N1> multiTagStdDevsMatrix) {
+      latencyAlert =
+          new Alert("'" + name + "' Camera is experiencing high latency.", AlertType.kWarning);
 
-		/**
-		 * Calculates new standard deviations This algorithm is a heuristic that creates
-		 * dynamic standard deviations based
-		 * on number of tags, estimation strategy, and distance from the tags.
-		 *
-		 * @param estimatedPose The estimated pose to guess standard deviations for.
-		 * @param targets       All targets in this camera frame
-		 */
-		private void updateEstimationStdDevs(
-			Optional<EstimatedRobotPose> estimatedPose,
-			List<PhotonTrackedTarget> targets
-		) {
-			if (estimatedPose.isEmpty()) {
-				// No pose input. Default to single-tag std devs
-				curStdDevs = singleTagStdDevs;
-			} else {
-				// Pose present. Start running Heuristic
-				var estStdDevs = singleTagStdDevs;
-				int numTags = 0;
-				double avgDist = 0;
+      camera = new PhotonCamera(name);
 
-				// Precalculation - see how many tags we found, and calculate an
-				// average-distance metric
-				for (var tgt : targets) {
-					var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-					if (tagPose.isEmpty()) {
-						continue;
-					}
-					numTags++;
-					avgDist += tagPose
-						.get()
-						.toPose2d()
-						.getTranslation()
-						.getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-				}
+      // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
+      robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
-				if (numTags == 0) {
-					// No tags visible. Default to single-tag std devs
-					curStdDevs = singleTagStdDevs;
-				} else {
-					// One or more tags visible, run the full heuristic.
-					avgDist /= numTags;
-					// Decrease std devs if multiple targets are visible
-					if (numTags > 1) {
-						estStdDevs = multiTagStdDevs;
-					}
-					// Increase std devs based on (average) distance
-					if (numTags == 1 && avgDist > 4) {
-						estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-					} else {
-						estStdDevs = estStdDevs.times(1 + ((avgDist * avgDist) / 30));
-					}
-					curStdDevs = estStdDevs;
-				}
-			}
-		}
-	}
+      poseEstimator =
+          new PhotonPoseEstimator(
+              Vision.fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamTransform);
+      poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
+      this.singleTagStdDevs = singleTagStdDevs;
+      this.multiTagStdDevs = multiTagStdDevsMatrix;
+
+      if (Robot.isSimulation()) {
+        SimCameraProperties cameraProp = new SimCameraProperties();
+        // A 640 x 480 camera with a 100 degree diagonal FOV.
+        cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(100));
+        // Approximate detection noise with average and standard deviation error in
+        // pixels.
+        cameraProp.setCalibError(0.25, 0.08);
+        // Set the camera image capture framerate (Note: this is limited by robot loop
+        // rate).
+        cameraProp.setFPS(30);
+        // The average and standard deviation in milliseconds of image data latency.
+        cameraProp.setAvgLatencyMs(35);
+        cameraProp.setLatencyStdDevMs(5);
+
+        cameraSim = new PhotonCameraSim(camera, cameraProp);
+        cameraSim.enableDrawWireframe(true);
+      }
+    }
+
+    /**
+     * Add camera to {@link VisionSystemSim} for simulated photon vision.
+     *
+     * @param systemSim {@link VisionSystemSim} to use.
+     */
+    public void addToVisionSim(VisionSystemSim systemSim) {
+      if (Robot.isSimulation()) {
+        systemSim.addCamera(cameraSim, robotToCamTransform);
+      }
+    }
+
+    /**
+     * Get the result with the least ambiguity from the best tracked target within the Cache. This
+     * may not be the most recent result!
+     *
+     * @return The result in the cache with the least ambiguous best tracked target. This is not the
+     *     most recent result!
+     */
+    public Optional<PhotonPipelineResult> getBestResult() {
+      if (resultsList.isEmpty()) {
+        return Optional.empty();
+      }
+
+      PhotonPipelineResult bestResult = resultsList.get(0);
+      double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
+      double currentAmbiguity = 0;
+      for (PhotonPipelineResult result : resultsList) {
+        currentAmbiguity = result.getBestTarget().getPoseAmbiguity();
+        if (currentAmbiguity < amiguity && currentAmbiguity > 0) {
+          bestResult = result;
+          amiguity = currentAmbiguity;
+        }
+      }
+      return Optional.of(bestResult);
+    }
+
+    /**
+     * Get the latest result from the current cache.
+     *
+     * @return Empty optional if nothing is found. Latest result if something is there.
+     */
+    public Optional<PhotonPipelineResult> getLatestResult() {
+      return resultsList.isEmpty() ? Optional.empty() : Optional.of(resultsList.get(0));
+    }
+
+    /**
+     * Get the estimated robot pose. Updates the current robot pose estimation, standard deviations,
+     * and flushes the cache of results.
+     *
+     * @return Estimated pose.
+     */
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+      updateUnreadResults();
+      return estimatedRobotPose;
+    }
+
+    /**
+     * Update the latest results, cached with a maximum refresh rate of 1req/15ms. Sorts the list by
+     * timestamp.
+     */
+    private void updateUnreadResults() {
+      double mostRecentTimestamp =
+          resultsList.isEmpty() ? 0.0 : resultsList.get(0).getTimestampSeconds();
+      double currentTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+      double debounceTime = Milliseconds.of(15).in(Seconds);
+      for (PhotonPipelineResult result : resultsList) {
+        mostRecentTimestamp = Math.max(mostRecentTimestamp, result.getTimestampSeconds());
+      }
+      if ((resultsList.isEmpty() || (currentTimestamp - mostRecentTimestamp >= debounceTime))
+          && (currentTimestamp - lastReadTimestamp) >= debounceTime) {
+        resultsList =
+            Robot.isReal()
+                ? camera.getAllUnreadResults()
+                : cameraSim.getCamera().getAllUnreadResults();
+        lastReadTimestamp = currentTimestamp;
+        resultsList.sort(
+            (PhotonPipelineResult a, PhotonPipelineResult b) -> {
+              return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
+            });
+        if (!resultsList.isEmpty()) {
+          updateEstimatedGlobalPose();
+        }
+      }
+    }
+
+    /**
+     * The latest estimated robot pose on the field from vision data. This may be empty. This should
+     * only be called once per loop.
+     *
+     * <p>Also includes updates for the standard deviations, which can (optionally) be retrieved
+     * with {@link Cameras#updateEstimationStdDevs}
+     *
+     * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
+     *     used for estimation.
+     */
+    private void updateEstimatedGlobalPose() {
+      Optional<EstimatedRobotPose> visionEst = Optional.empty();
+      for (var change : resultsList) {
+        visionEst = poseEstimator.update(change);
+        updateEstimationStdDevs(visionEst, change.getTargets());
+      }
+      estimatedRobotPose = visionEst;
+    }
+
+    /**
+     * Calculates new standard deviations This algorithm is a heuristic that creates dynamic
+     * standard deviations based on number of tags, estimation strategy, and distance from the tags.
+     *
+     * @param estimatedPose The estimated pose to guess standard deviations for.
+     * @param targets All targets in this camera frame
+     */
+    private void updateEstimationStdDevs(
+        Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+      if (estimatedPose.isEmpty()) {
+        // No pose input. Default to single-tag std devs
+        curStdDevs = singleTagStdDevs;
+      } else {
+        // Pose present. Start running Heuristic
+        var estStdDevs = singleTagStdDevs;
+        int numTags = 0;
+        double avgDist = 0;
+
+        // Precalculation - see how many tags we found, and calculate an
+        // average-distance metric
+        for (var tgt : targets) {
+          var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+          if (tagPose.isEmpty()) {
+            continue;
+          }
+          numTags++;
+          avgDist +=
+              tagPose
+                  .get()
+                  .toPose2d()
+                  .getTranslation()
+                  .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+        }
+
+        if (numTags == 0) {
+          // No tags visible. Default to single-tag std devs
+          curStdDevs = singleTagStdDevs;
+        } else {
+          // One or more tags visible, run the full heuristic.
+          avgDist /= numTags;
+          // Decrease std devs if multiple targets are visible
+          if (numTags > 1) {
+            estStdDevs = multiTagStdDevs;
+          }
+          // Increase std devs based on (average) distance
+          if (numTags == 1 && avgDist > 4) {
+            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+          } else {
+            estStdDevs = estStdDevs.times(1 + ((avgDist * avgDist) / 30));
+          }
+          curStdDevs = estStdDevs;
+        }
+      }
+    }
+  }
 }

@@ -21,21 +21,22 @@ All the fancy quick reference stuff goes here.
 4. Score L2 Red (align center red cage)
 
 ![Score L2 Red](autos/l2-red.png)
+
 ## Controls
 
 ### Teleop
 
 #### Xbox Controller (Driver) [`Port 0`]
 
-| Binding         | Action | Description |
-| --------------- | ------ | ----------- |
-| `Button A`      | Zero gyro | Resets gyro heading |
+| Binding         | Action                 | Description                                                                    |
+| --------------- | ---------------------- | ------------------------------------------------------------------------------ |
+| `Button A`      | Zero gyro              | Resets gyro heading                                                            |
 | `Button X`      | Auto Target left Reef  | automatically target and drive to left reef; will rumble if further than 1.5m  |
 | `Button B`      | Auto Target right Reef | automatically target and drive to right reef; will rumble if further than 1.5m |
-| `Button Y`      | kill auto drive | restores manual control to the drive system |
-| `Left Bumper`   | Lock drive | Locks drivebase |
-| `Right Trigger` | Play music | Climber plays the duck song |
-| `Right Bumper`  | Toggle robot relative  | Switches between field and robot relative driving |
+| `Button Y`      | kill auto drive        | restores manual control to the drive system                                    |
+| `Left Bumper`   | Lock drive             | Locks drivebase                                                                |
+| `Right Trigger` | Play music             | Climber plays the duck song                                                    |
+| `Right Bumper`  | Toggle robot relative  | Switches between field and robot relative driving                              |
 
 #### Left Joystick (Operator) [`Port 1`]
 
@@ -62,28 +63,28 @@ All the fancy quick reference stuff goes here.
 
 #### Xbox Controller (Driver)
 
-| Binding         | Action          | Description                            |
-| --------------- | --------------- | -------------------------------------- |
-| `A Button`      | Zero gyro       | Resets gyro heading                    |
-| `X Button`      | Auto Target     | Auto-targets the left reef             |
-| `B Button`      | Auto Target     | Auto-targets the right reef            |
-| `Y Button`      | cancel align    | Escape auto drive to pose              |
-| `Back Button`   | Center modules  | Centers swerve modules                 |
-| `Left Bumper`   | Play music      | Plays duck song                        |
-| `Right Bumper`  | Run intake      | Runs the intake mechanism              |
+| Binding        | Action         | Description                 |
+| -------------- | -------------- | --------------------------- |
+| `A Button`     | Zero gyro      | Resets gyro heading         |
+| `X Button`     | Auto Target    | Auto-targets the left reef  |
+| `B Button`     | Auto Target    | Auto-targets the right reef |
+| `Y Button`     | cancel align   | Escape auto drive to pose   |
+| `Back Button`  | Center modules | Centers swerve modules      |
+| `Left Bumper`  | Play music     | Plays duck song             |
+| `Right Bumper` | Run intake     | Runs the intake mechanism   |
 
 #### Left Joystick (Operator) - Test Mode
 
-| Binding     | Action             | Description                       |
-| ----------- | ------------------ | --------------------------------- |
-| `Trigger`   | Manual elevator    | Controls elevator speed manually  |
-| `Button 3`  | lvl 4              | Sets elevator to level 4          |
-| `Button 7`  | Demo mode          | Cycles through elevator positions |
-| `Button 8`  | Tilt to position 0 | Resets tilt to zero position      |
-| `Button 9`  | Descend            | Controls climber down             |
+| Binding     | Action             | Description                                  |
+| ----------- | ------------------ | -------------------------------------------- |
+| `Trigger`   | Manual elevator    | Controls elevator speed manually             |
+| `Button 3`  | lvl 4              | Sets elevator to level 4                     |
+| `Button 7`  | Demo mode          | Cycles through elevator positions            |
+| `Button 8`  | Tilt to position 0 | Resets tilt to zero position                 |
+| `Button 9`  | Descend            | Controls climber down                        |
 | `Joystick`  | Tilt               | Nudges tilt up/down (no limits in test mode) |
-| `Button 12` | zero tilt encoder  | zeros tilt encoder                |
-| `Button 2`  | Tilt SysID         | Runs tilt system identification   |
+| `Button 12` | zero tilt encoder  | zeros tilt encoder                           |
+| `Button 2`  | Tilt SysID         | Runs tilt system identification              |
 
 #### Right Joystick (Operator) [`Port 2`]
 

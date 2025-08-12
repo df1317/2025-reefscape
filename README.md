@@ -100,7 +100,6 @@ public class ExampleSubsystem extends SubsystemBase {
 		return new RunCommand(() -> motor.set(speed.getAsDouble()), this);
 	}
 }
-
 ```
 
 ```java
@@ -113,7 +112,6 @@ public class RobotContainer {
 		joystick.trigger().onTrue(elevatorSubsystem.setPos(() -> 0.3));
 	}
 }
-
 ```
 
 ## Why AGPL 3.0 as a license?
