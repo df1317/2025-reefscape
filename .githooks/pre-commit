@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Pre-commit hook to format Java code with Google Java Format
+
+echo "Running Google Java Format on staged Java files..."
+
+# Get list of staged Java files
+STAGED_JAVA_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.java$')
+
+if [ -z "$STAGED_JAVA_FILES" ]; then
+    echo "No Java files to format."
+    exit 0
+fi
+
+# Format the files
+mill formatJava
+
+# Add the formatted files back to staging
+for file in $STAGED_JAVA_FILES; do
+    if [ -f "$file" ]; then
+        git add "$file"
+        echo "Formatted and re-staged: $file"
+    fi
+done
+
+echo "Java formatting complete!"
+exit 0

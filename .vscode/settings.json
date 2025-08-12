@@ -1,6 +1,11 @@
 {
 	"java.configuration.updateBuildConfiguration": "automatic",
 	"java.server.launchMode": "Standard",
+	"java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+	"java.format.settings.profile": "GoogleStyle",
+	"java.format.enabled": true,
+	"java.saveActions.organizeImports": true,
+	"java.compile.nullAnalysis.mode": "automatic",
 	"files.exclude": {
 		"**/.git": true,
 		"**/.svn": true,
@@ -26,8 +31,27 @@
 		}
 	],
 	"java.test.defaultConfig": "WPIlibUnitTests",
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "explicit"
+	},
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+	"files.trimFinalNewlines": true,
 	"[java]": {
+		"editor.defaultFormatter": "redhat.java",
+		"editor.tabSize": 2,
+		"editor.insertSpaces": true,
+		"editor.detectIndentation": false
+	},
+	"[json]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
-	"editor.formatOnSave": true
+	"[yaml]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[markdown]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }

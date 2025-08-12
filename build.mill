@@ -1,0 +1,563 @@
+package build
+
+import mill._
+import mill.javalib._
+import coursier.maven.MavenRepository
+
+object `package` extends RootModule with JavaModule {
+
+  def artifactName = "2025-reefscape"
+
+  def javaVersion = "17"
+
+  def mainClass = Some("frc.robot.Main")
+
+  def javacOptions = super.javacOptions() ++ Seq(
+    "-XDstringConcat=inline",
+    "--release", "17"
+  )
+
+  def repositoriesTask = Task.Anon {
+    super.repositoriesTask() ++ Seq(
+      MavenRepository("file:/home/kierank/wpilib/2025/maven"),
+      MavenRepository(
+        "https://3015rangerrobotics.github.io/pathplannerlib/repo"
+      ),
+      MavenRepository(
+        "https://broncbotz3481.github.io/YAGSL-Lib/yagsl/repos"
+      ),
+      MavenRepository("https://dev.studica.com/maven/release/2025/"),
+      MavenRepository("https://docs.home.thethriftybot.com"),
+      MavenRepository("https://frcmaven.wpi.edu/artifactory/release"),
+      MavenRepository(
+        "https://frcmaven.wpi.edu/artifactory/vendor-mvn-release"
+      ),
+      MavenRepository("https://maven.ctr-electronics.com/release/"),
+      MavenRepository("https://maven.photonvision.org/repository/internal"),
+      MavenRepository("https://maven.photonvision.org/repository/snapshots"),
+      MavenRepository("https://maven.reduxrobotics.com/"),
+      MavenRepository("https://maven.revrobotics.com/"),
+      MavenRepository("https://repo1.maven.org/maven2"),
+      MavenRepository(
+        "https://shenzhen-robotics-alliance.github.io/maple-sim/vendordep/repos/releases"
+      )
+    )
+  }
+
+  def ivyDeps = T {
+    import mill.scalalib._
+    Agg(
+      // WPILib Core Dependencies
+      ivy"edu.wpi.first.wpilibj:wpilibj-java:2025.3.2",
+      ivy"edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java:2025.3.2",
+      ivy"edu.wpi.first.wpimath:wpimath-java:2025.3.2",
+      ivy"edu.wpi.first.wpiutil:wpiutil-java:2025.3.2",
+      ivy"edu.wpi.first.wpinet:wpinet-java:2025.3.2",
+      ivy"edu.wpi.first.wpiunits:wpiunits-java:2025.3.2",
+      ivy"edu.wpi.first.hal:hal-java:2025.3.2",
+      ivy"edu.wpi.first.ntcore:ntcore-java:2025.3.2",
+      ivy"edu.wpi.first.cscore:cscore-java:2025.3.2",
+      ivy"edu.wpi.first.cameraserver:cameraserver-java:2025.3.2",
+      ivy"edu.wpi.first.apriltag:apriltag-java:2025.3.2",
+      ivy"edu.wpi.first.epilogue:epilogue-runtime-java:2025.3.2",
+      ivy"edu.wpi.first.thirdparty.frc2025.opencv:opencv-java:4.10.0-3",
+
+      // Vendor Dependencies
+      ivy"com.ctre.phoenix6:wpiapi-java:25.3.1",
+      ivy"com.ctre.phoenix:api-java:5.35.1",
+      ivy"com.ctre.phoenix:wpiapi-java:5.35.1",
+      ivy"com.revrobotics.frc:REVLib-java:2025.0.3",
+      ivy"com.pathplanner.lib:PathplannerLib-java:2025.2.6",
+      ivy"com.reduxrobotics.frc:ReduxLib-java:2025.0.1",
+      ivy"com.studica.frc:Studica-java:2025.0.1",
+      ivy"com.thethriftybot.frc:ThriftyLib-java:2025.1.0",
+      ivy"org.photonvision:photonlib-java:v2025.2.1",
+      ivy"org.photonvision:photontargeting-java:v2025.2.1",
+      ivy"swervelib:YAGSL-java:2025.7.2",
+      // Note: maple-sim dependency removed due to checksum issues
+
+      // Supporting Libraries
+      ivy"com.fasterxml.jackson.core:jackson-annotations:2.15.2",
+      ivy"com.fasterxml.jackson.core:jackson-core:2.15.2",
+      ivy"com.fasterxml.jackson.core:jackson-databind:2.15.2",
+      ivy"org.dyn4j:dyn4j:5.0.2",
+      ivy"org.ejml:ejml-simple:0.43.1",
+      ivy"us.hebi.quickbuf:quickbuf-runtime:1.3.3"
+    )
+  }
+
+  // Test dependencies
+  object test extends JavaTests with TestModule.Junit5 {
+    def ivyDeps = T {
+      import mill.scalalib._
+      Agg(
+        ivy"org.junit.jupiter:junit-jupiter:5.10.1",
+        ivy"org.junit.platform:junit-platform-launcher:1.10.1"
+      )
+    }
+
+    def testFramework = "com.github.sbt.junit.JupiterFramework"
+
+    def forkArgs = T {
+      Seq(
+        "-Djunit.jupiter.extensions.autodetection.enabled=true"
+      )
+    }
+  }
+
+  // Assembly task for creating fat jar (equivalent to Gradle's jar task)
+  def assembly = T {
+    val cp = runClasspath()
+    val mainClassValue = mainClass().getOrElse(
+      throw new RuntimeException("Main class not specified")
+    )
+    
+    mill.scalalib.Assembly.createAssembly(
+      cp.map(_.path),
+      manifest = mill.util.JarManifest(
+        Map("Main-Class" -> mainClassValue)
+      )
+    )
+  }
+
+  // Team number from wpilib preferences
+  def teamNumber = T {
+    val prefsFile = millSourcePath / ".wpilib" / "wpilib_preferences.json"
+    if (os.exists(prefsFile)) {
+      val content = os.read(prefsFile)
+      val teamNumRegex = """"teamNumber":\s*(\d+)""".r
+      teamNumRegex.findFirstMatchIn(content) match {
+        case Some(m) => m.group(1).toInt
+        case None => throw new RuntimeException("Team number not found in wpilib_preferences.json")
+      }
+    } else {
+      throw new RuntimeException("wpilib_preferences.json not found")
+    }
+  }
+
+  // RoboRIO IP address
+  def roborioAddress = T {
+    val team = teamNumber()
+    s"roborio-${team}-frc.local"
+  }
+
+  // Deploy static files task
+  def deployStaticFiles() = Task.Command {
+    val team = teamNumber()
+    val address = roborioAddress()
+    val deployDir = millSourcePath / "src" / "main" / "deploy"
+    
+    if (os.exists(deployDir)) {
+      println(s"Deploying static files to RoboRIO at $address...")
+      
+      // Use scp to copy files to RoboRIO
+      val scpCmd = Seq(
+        "scp", "-r", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"${deployDir}/*", s"lvuser@$address:/home/lvuser/deploy/"
+      )
+      
+      try {
+        os.proc(scpCmd).call(cwd = millSourcePath)
+        println("Static files deployed successfully")
+      } catch {
+        case e: Exception =>
+          println(s"Failed to deploy static files: ${e.getMessage}")
+          throw e
+      }
+    } else {
+      println("No deploy directory found, skipping static file deployment")
+    }
+  }
+
+  // Deploy robot code task
+  def deployCode() = Task.Command {
+    val team = teamNumber()
+    val address = roborioAddress()
+    val jarFile = assembly()
+    val jarName = "FRCUserProgram.jar"
+    
+    println(s"Deploying robot code to RoboRIO at $address...")
+    
+    try {
+      // Stop robot program
+      println("Stopping robot program...")
+      val stopCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address", ". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null"
+      )
+      os.proc(stopCmd).call(cwd = millSourcePath, check = false)
+      
+      // Copy jar file
+      println("Copying robot program...")
+      val scpCmd = Seq(
+        "scp", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        jarFile.path.toString, s"lvuser@$address:/home/lvuser/$jarName"
+      )
+      os.proc(scpCmd).call(cwd = millSourcePath)
+      
+      // Set executable permissions and create run script
+      println("Setting up robot program...")
+      val setupCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address",
+        s"""chmod +x /home/lvuser/$jarName && """ +
+        s"""echo '#!/bin/bash' > /home/lvuser/robotCommand && """ +
+        s"""echo 'exec /usr/local/frc/JRE/bin/java -Djava.library.path=/usr/local/frc/third-party/lib -jar /home/lvuser/$jarName' >> /home/lvuser/robotCommand && """ +
+        s"""chmod +x /home/lvuser/robotCommand"""
+      )
+      os.proc(setupCmd).call(cwd = millSourcePath)
+      
+      // Start robot program
+      println("Starting robot program...")
+      val startCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address", ". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t -r 2> /dev/null"
+      )
+      os.proc(startCmd).call(cwd = millSourcePath, check = false)
+      
+      println("Robot code deployed successfully!")
+      
+    } catch {
+      case e: Exception =>
+        println(s"Failed to deploy robot code: ${e.getMessage}")
+        throw e
+    }
+  }
+
+  // Main deploy task that deploys both static files and code
+  def deploy() = Task.Command {
+    println(s"Deploying to team ${teamNumber()} RoboRIO...")
+    
+    // First compile and build
+    compile()
+    assembly()
+    
+    // Deploy static files first
+    deployStaticFiles()()
+    
+    // Then deploy code
+    deployCode()()
+    
+    println("Deployment complete!")
+  }
+
+  // Deploy for debugging (same as deploy but with debug info)
+  def deployDebug() = Task.Command {
+    println(s"Deploying debug build to team ${teamNumber()} RoboRIO...")
+    
+    // First compile and build
+    compile()
+    assembly()
+    
+    // Deploy static files first
+    deployStaticFiles()()
+    
+    // Deploy code with debug flags
+    val team = teamNumber()
+    val address = roborioAddress()
+    val jarFile = assembly()
+    val jarName = "FRCUserProgram.jar"
+    
+    println(s"Deploying robot code (debug) to RoboRIO at $address...")
+    
+    try {
+      // Stop robot program
+      println("Stopping robot program...")
+      val stopCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address", ". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null"
+      )
+      os.proc(stopCmd).call(cwd = millSourcePath, check = false)
+      
+      // Copy jar file
+      println("Copying robot program...")
+      val scpCmd = Seq(
+        "scp", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        jarFile.path.toString, s"lvuser@$address:/home/lvuser/$jarName"
+      )
+      os.proc(scpCmd).call(cwd = millSourcePath)
+      
+      // Set executable permissions and create debug run script
+      println("Setting up robot program (debug mode)...")
+      val setupCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address",
+        s"""chmod +x /home/lvuser/$jarName && """ +
+        s"""echo '#!/bin/bash' > /home/lvuser/robotCommand && """ +
+        s"""echo 'exec /usr/local/frc/JRE/bin/java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8348 -Djava.library.path=/usr/local/frc/third-party/lib -jar /home/lvuser/$jarName' >> /home/lvuser/robotCommand && """ +
+        s"""chmod +x /home/lvuser/robotCommand"""
+      )
+      os.proc(setupCmd).call(cwd = millSourcePath)
+      
+      println("Robot code deployed successfully in debug mode!")
+      println("Debug port: 8348")
+      
+    } catch {
+      case e: Exception =>
+        println(s"Failed to deploy robot code: ${e.getMessage}")
+        throw e
+    }
+  }
+
+  // Check RoboRIO connection
+  def checkRoborio() = Task.Command {
+    val address = roborioAddress()
+    println(s"Checking connection to RoboRIO at $address...")
+    
+    try {
+      val pingCmd = Seq("ping", "-c", "1", "-W", "3", address)
+      os.proc(pingCmd).call(cwd = millSourcePath, stdout = os.Pipe)
+      println(s"✓ RoboRIO is reachable at $address")
+    } catch {
+      case e: Exception =>
+        println(s"✗ Cannot reach RoboRIO at $address")
+        println("Make sure the RoboRIO is connected and powered on")
+        throw e
+    }
+  }
+
+  // Kill robot program
+  def killRobot() = Task.Command {
+    val address = roborioAddress()
+    println(s"Stopping robot program on $address...")
+    
+    try {
+      val stopCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address", ". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null"
+      )
+      os.proc(stopCmd).call(cwd = millSourcePath, check = false)
+      println("Robot program stopped")
+    } catch {
+      case e: Exception =>
+        println(s"Failed to stop robot program: ${e.getMessage}")
+        throw e
+    }
+  }
+
+  // Start robot program
+  def startRobot() = Task.Command {
+    val address = roborioAddress()
+    println(s"Starting robot program on $address...")
+    
+    try {
+      val startCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address", ". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t -r 2> /dev/null"
+      )
+      os.proc(startCmd).call(cwd = millSourcePath, check = false)
+      println("Robot program started")
+    } catch {
+      case e: Exception =>
+        println(s"Failed to start robot program: ${e.getMessage}")
+        throw e
+    }
+  }
+
+  // Show RoboRIO logs
+  def robotLogs() = Task.Command {
+    val address = roborioAddress()
+    println(s"Showing robot logs from $address...")
+    println("Press Ctrl+C to exit")
+    
+    try {
+      val logsCmd = Seq(
+        "ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+        s"lvuser@$address", "tail", "-f", "/home/lvuser/FRC_UserProgram.log"
+      )
+      os.proc(logsCmd).call(cwd = millSourcePath, stdin = os.Inherit, stdout = os.Inherit)
+      ()
+    } catch {
+      case e: Exception =>
+        println(s"Failed to show robot logs: ${e.getMessage}")
+        ()
+    }
+  }
+
+  // Run robot simulation
+  def simulate() = Task.Command {
+    val cp = runClasspath()
+    val mainClassValue = mainClass().getOrElse(
+      throw new RuntimeException("Main class not specified")
+    )
+    
+    println("Starting robot simulation...")
+    
+    val javaCmd = Seq(
+      "java",
+      "-cp", cp.map(_.path.toString).mkString(":"),
+      "-Djava.library.path=/usr/local/frc/third-party/lib",
+      "-Dfile.encoding=UTF-8",
+      "-Djava.awt.headless=false",
+      mainClassValue
+    )
+    
+    os.proc(javaCmd).call(cwd = millSourcePath, stdin = os.Inherit, stdout = os.Inherit)
+    ()
+  }
+
+  // Format Java code using Google Java Format
+  def formatJava() = Task.Command {
+    val sourceFiles = os.walk(millSourcePath / "src")
+      .filter(_.ext == "java")
+    
+    if (sourceFiles.nonEmpty) {
+      println(s"Formatting ${sourceFiles.length} Java files...")
+      
+      // Download Google Java Format if not already available
+      val gfJar = mill.util.Util.download(
+        "https://github.com/google/google-java-format/releases/download/v1.22.0/google-java-format-1.22.0-all-deps.jar"
+      )
+      
+      val javaCmd = Seq(
+        "java", "-jar", gfJar.path.toString,
+        "--replace"
+      ) ++ sourceFiles.map(_.toString)
+      
+      os.proc(javaCmd).call(cwd = millSourcePath)
+      println("Java formatting complete!")
+    } else {
+      println("No Java files found to format")
+    }
+  }
+
+  // Check Java formatting
+  def checkJavaFormat() = Task.Command {
+    val sourceFiles = os.walk(millSourcePath / "src")
+      .filter(_.ext == "java")
+    
+    if (sourceFiles.nonEmpty) {
+      println(s"Checking format of ${sourceFiles.length} Java files...")
+      
+      // Download Google Java Format if not already available
+      val gfJar = mill.util.Util.download(
+        "https://github.com/google/google-java-format/releases/download/v1.22.0/google-java-format-1.22.0-all-deps.jar"
+      )
+      
+      val javaCmd = Seq(
+        "java", "-jar", gfJar.path.toString,
+        "--dry-run", "--set-exit-if-changed"
+      ) ++ sourceFiles.map(_.toString)
+      
+      try {
+        os.proc(javaCmd).call(cwd = millSourcePath)
+        println("✓ All Java files are properly formatted")
+      } catch {
+        case e: Exception =>
+          println("✗ Some Java files need formatting. Run 'mill formatJava' to fix.")
+          throw e
+      }
+    } else {
+      println("No Java files found to check")
+    }
+  }
+
+  // Setup git hooks for automatic formatting
+  def setupGitHooks() = Task.Command {
+    val hooksDir = millSourcePath / ".git" / "hooks"
+    val preCommitHook = hooksDir / "pre-commit"
+    
+    if (os.exists(millSourcePath / ".git")) {
+      if (!os.exists(hooksDir)) {
+        os.makeDir.all(hooksDir)
+      }
+      
+      // Detect platform and install appropriate hook
+      val isWindows = System.getProperty("os.name").toLowerCase.contains("windows")
+      
+      if (isWindows) {
+        // Windows: Create a batch file hook
+        val hookContent = """@echo off
+REM Pre-commit hook to format Java code with Google Java Format
+
+echo Running Google Java Format on staged Java files...
+
+REM Check for staged Java files
+git diff --cached --name-only --diff-filter=ACM | findstr "\.java$" >nul
+if errorlevel 1 (
+    echo No Java files to format.
+    exit /b 0
+)
+
+echo Formatting Java files...
+mill formatJava
+if errorlevel 1 (
+    echo Failed to format Java files
+    exit /b 1
+)
+
+REM Re-stage the formatted files
+for /f "delims=" %%i in ('git diff --cached --name-only --diff-filter=ACM ^| findstr "\.java$"') do (
+    git add "%%i"
+    echo Formatted and re-staged: %%i
+)
+
+echo Java formatting complete!
+exit /b 0"""
+        
+        os.write(preCommitHook, hookContent)
+        println("✓ Git pre-commit hook installed")
+      } else {
+        // Unix/Linux/macOS: Use bash script
+        val sourceHook = millSourcePath / ".githooks" / "pre-commit"
+        if (os.exists(sourceHook)) {
+          os.copy.over(sourceHook, preCommitHook)
+          os.perms.set(preCommitHook, "rwxr-xr-x")
+          println("✓ Git pre-commit hook installed")
+        } else {
+          println("✗ Source hook not found at .githooks/pre-commit")
+        }
+      }
+      
+      println("  Java files will be automatically formatted before each commit")
+    } else {
+      println("✗ Not a git repository")
+    }
+  }
+
+  // Format non-Java files using prettier (JSON, YAML, Markdown, etc.)
+  def format() = Task.Command {
+    os.proc("npm", "run", "format").call(cwd = millSourcePath)
+  }
+
+  // Show help with available commands
+  def help() = Task.Command {
+    println("Available Mill commands for FRC Robot:")
+    println()
+    println("Build Commands:")
+    println("  mill compile          - Compile the robot code")
+    println("  mill test.compile     - Compile test code")
+    println("  mill test             - Run tests")
+    println("  mill assembly         - Create deployable JAR file")
+    println()
+    println("Formatting Commands:")
+    println("  mill formatJava       - Format Java code with Google Java Format")
+    println("  mill checkJavaFormat  - Check if Java code is properly formatted")
+    println("  mill format           - Format other files with Prettier (JSON, YAML, etc.)")
+    println("  mill setupGitHooks    - Install git pre-commit hook for auto-formatting")
+    println()
+    println("Deploy Commands:")
+    println("  mill deploy           - Deploy robot code to RoboRIO")
+    println("  mill deployDebug      - Deploy with debug support (port 8348)")
+    println("  mill deployStaticFiles - Deploy only static files")
+    println("  mill deployCode       - Deploy only robot code")
+    println()
+    println("RoboRIO Commands:")
+    println("  mill checkRoborio     - Check RoboRIO connection")
+    println("  mill killRobot        - Stop robot program")
+    println("  mill startRobot       - Start robot program")
+    println("  mill robotLogs        - Show robot logs (Ctrl+C to exit)")
+    println()
+    println("Simulation:")
+    println("  mill simulate         - Run robot simulation")
+    println()
+    println("Info Commands:")
+    println("  mill show teamNumber  - Show team number")
+    println("  mill show roborioAddress - Show RoboRIO address")
+    println("  mill help             - Show this help")
+    println()
+    println(s"Team: ${teamNumber()}")
+    println(s"RoboRIO: ${roborioAddress()}")
+  }
+
+}
