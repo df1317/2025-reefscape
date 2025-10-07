@@ -4,7 +4,12 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -29,6 +34,22 @@ public class Robot extends LoggedRobot {
   private Timer disabledTimer;
 
   public Robot() {
+    // BEGIN AKit CONFIG
+    Logger.recordMetadata("ProjectName", "1317");
+    // Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+
+    if (isReal()) {
+      Logger.addDataReceiver(new WPILOGWriter());
+      Logger.addDataReceiver(new NT4Publisher());
+    } else {
+      setUseTiming(false);
+      String logPath = LogFileUtil.findReplayLog();
+      Logger.setReplaySource(new WPILOGReader(logPath));
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+    }
+
+    Logger.start();
+    // END AKit CONFIG
     instance = this;
   }
 

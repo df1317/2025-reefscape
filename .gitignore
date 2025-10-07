@@ -188,3 +188,6 @@ compile_commands.json
 
 # bun
 node_modules/
+
+# AKit wants this for some reason?
+src/main/java/frc/robot/BuildConstants.java
