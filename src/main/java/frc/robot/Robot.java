@@ -34,7 +34,7 @@ public class Robot extends LoggedRobot {
   private Timer disabledTimer;
 
   public Robot() {
-    Logger.recordMetadata("key", "MyProject");
+    Logger.recordMetadata("key", "1317");
 
     if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter());
