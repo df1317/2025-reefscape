@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -100,6 +102,7 @@ public class ScoringSubsystem extends SubsystemBase {
 		}
 		canTiltController.setReference(setpoint, ControlType.kPosition);
 
+		// SmartDashboard logging
 		SmartDashboard.putNumber("scoring/setpoint", setpoint);
 		SmartDashboard.putNumber("scoring/tilt current", canTiltMax.getOutputCurrent());
 		SmartDashboard.putNumber("scoring/tilt voltage", canTiltMax.getBusVoltage() * canTiltMax.getAppliedOutput());
@@ -112,6 +115,20 @@ public class ScoringSubsystem extends SubsystemBase {
 
 		SmartDashboard.putNumber("scoring/motor1 temp", motor1.getMotorTemperature());
 		SmartDashboard.putNumber("scoring/motor2 temp", motor2.getMotorTemperature());
+
+		// AdvantageScope logging
+		Logger.recordOutput("Scoring/Tilt/Setpoint", setpoint);
+		Logger.recordOutput("Scoring/Tilt/Position", canTiltEncoder.getPosition());
+		Logger.recordOutput("Scoring/Tilt/Current", canTiltMax.getOutputCurrent());
+		Logger.recordOutput("Scoring/Tilt/Voltage", canTiltMax.getBusVoltage() * canTiltMax.getAppliedOutput());
+		Logger.recordOutput("Scoring/CoralDetected", !coralSensor.get());
+		Logger.recordOutput("Scoring/Intake/Motor1/Current", motor1.getOutputCurrent());
+		Logger.recordOutput("Scoring/Intake/Motor1/Voltage", motor1.getBusVoltage() * motor1.getAppliedOutput());
+		Logger.recordOutput("Scoring/Intake/Motor1/Temperature", motor1.getMotorTemperature());
+		Logger.recordOutput("Scoring/Intake/Motor2/Current", motor2.getOutputCurrent());
+		Logger.recordOutput("Scoring/Intake/Motor2/Voltage", motor2.getBusVoltage() * motor2.getAppliedOutput());
+		Logger.recordOutput("Scoring/Intake/Motor2/Temperature", motor2.getMotorTemperature());
+		Logger.recordOutput("Scoring/AtDesiredPosition", atDesiredPosition());
 	}
 
 	public Command runIntakeCommand() {

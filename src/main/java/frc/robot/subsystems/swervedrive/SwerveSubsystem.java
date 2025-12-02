@@ -51,6 +51,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -169,6 +170,15 @@ public class SwerveSubsystem extends SubsystemBase {
 		if (visionDriveTest) {
 			vision.updatePoseEstimation(swerveDrive);
 		}
+
+		// AdvantageScope logging
+		Logger.recordOutput("Swerve/Pose", getPose());
+		Logger.recordOutput("Swerve/Heading", getHeading().getDegrees());
+		Logger.recordOutput("Swerve/Pitch", getPitch().getDegrees());
+		Logger.recordOutput("Swerve/FieldVelocity", getFieldVelocity());
+		Logger.recordOutput("Swerve/RobotVelocity", getRobotVelocity());
+		Logger.recordOutput("Swerve/ModuleStates", swerveDrive.getStates());
+		Logger.recordOutput("Swerve/VisionEnabled", visionDriveTest);
 	}
 
 	@Override

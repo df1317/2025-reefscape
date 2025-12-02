@@ -42,6 +42,7 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.littletonrobotics.junction.Logger;
 import swervelib.SwerveDrive;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
@@ -149,8 +150,11 @@ public class Vision {
 		}
 		for (Cameras camera : Cameras.values()) {
 			if (!camera.camera.isConnected()) {
+				Logger.recordOutput("Vision/" + camera.name() + "/Connected", false);
 				continue;
 			}
+			Logger.recordOutput("Vision/" + camera.name() + "/Connected", true);
+			
 			Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
 			if (poseEst.isPresent()) {
 				var pose = poseEst.get();
@@ -159,6 +163,15 @@ public class Vision {
 					pose.timestampSeconds,
 					camera.curStdDevs
 				);
+				
+				// Log vision data
+				Logger.recordOutput("Vision/" + camera.name() + "/EstimatedPose", pose.estimatedPose.toPose2d());
+				Logger.recordOutput("Vision/" + camera.name() + "/Timestamp", pose.timestampSeconds);
+				Logger.recordOutput("Vision/" + camera.name() + "/TargetCount", pose.targetsUsed.size());
+				Logger.recordOutput("Vision/" + camera.name() + "/StdDevs", camera.curStdDevs);
+			} else {
+				Logger.recordOutput("Vision/" + camera.name() + "/EstimatedPose", new Pose2d());
+				Logger.recordOutput("Vision/" + camera.name() + "/TargetCount", 0);
 			}
 		}
 	}

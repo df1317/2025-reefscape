@@ -15,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitSourceValue;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -67,9 +68,16 @@ public class ClimberSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		// SmartDashboard logging
 		SmartDashboard.putNumber("climber/climber speed", beefyMotor.get());
 		SmartDashboard.putNumber("climber/climber current", beefyMotor.getStatorCurrent().getValueAsDouble());
 		SmartDashboard.putNumber("climber/climber temp", beefyMotor.getDeviceTemp().getValueAsDouble());
+
+		// AdvantageScope logging
+		Logger.recordOutput("Climber/Speed", beefyMotor.get());
+		Logger.recordOutput("Climber/Current", beefyMotor.getStatorCurrent().getValueAsDouble());
+		Logger.recordOutput("Climber/Temperature", beefyMotor.getDeviceTemp().getValueAsDouble());
+		Logger.recordOutput("Climber/Position", beefyMotor.getPosition().getValueAsDouble());
 	}
 
 	public Command climbCommand() {

@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.CanConstants;
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 public class ElevatorSubsystem extends SubsystemBase {
 
 	private final double maxHeight = 1.23;
@@ -96,6 +98,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public void setDesiredPosistion(double height, double time) {
 		ffState.position = height;
 		ffState.velocity = 0.0;
+		Logger.recordOutput("elevator/log", height);
 	}
 
 	private Limits checkLimits() {
@@ -176,6 +179,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 			);
 		}
 
+		// SmartDashboard logging
 		SmartDashboard.putNumber("elevator/current-position", preRenfernce.position);
 		SmartDashboard.putNumber("elevator/current-velocity", preRenfernce.velocity);
 		SmartDashboard.putNumber("elevator/end-position", ffState.position);
@@ -186,6 +190,19 @@ public class ElevatorSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("elevator/motorL voltage", motorL.getBusVoltage());
 		SmartDashboard.putNumber("elevator/motorR current", motorR.getOutputCurrent());
 		SmartDashboard.putNumber("elevator/motorR voltage", motorR.getBusVoltage());
+
+		// AdvantageScope logging
+		Logger.recordOutput("Elevator/CurrentPosition", preRenfernce.position);
+		Logger.recordOutput("Elevator/CurrentVelocity", preRenfernce.velocity);
+		Logger.recordOutput("Elevator/TargetPosition", ffState.position);
+		Logger.recordOutput("Elevator/MaxVelocity", currentMaxVel);
+		Logger.recordOutput("Elevator/EncoderLeft", encoderL.getPosition());
+		Logger.recordOutput("Elevator/EncoderRight", encoderR.getPosition());
+		Logger.recordOutput("Elevator/MotorLeft/Current", motorL.getOutputCurrent());
+		Logger.recordOutput("Elevator/MotorLeft/Voltage", motorL.getBusVoltage());
+		Logger.recordOutput("Elevator/MotorRight/Current", motorR.getOutputCurrent());
+		Logger.recordOutput("Elevator/MotorRight/Voltage", motorR.getBusVoltage());
+		Logger.recordOutput("Elevator/AtDesiredPosition", atDesiredPosition());
 	}
 
 	public Command setPos(DoubleSupplier height) {

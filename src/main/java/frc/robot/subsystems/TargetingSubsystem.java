@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -123,7 +125,10 @@ public class TargetingSubsystem extends SubsystemBase {
 
 	public Command autoTargetCommand(Supplier<Pose2d> currentPose) {
 		return Commands.runOnce(() -> {
-			autoTarget(currentPose);
+			Pose2d targetPose = autoTarget(currentPose);
+			Logger.recordOutput("Targeting/TargetBranch", targetBranch.name());
+			Logger.recordOutput("Targeting/TargetSide", targetSide.name());
+			Logger.recordOutput("Targeting/TargetPose", targetPose);
 			System.out.println("Auto-targetting complete - Selected: " + targetBranch.name());
 		});
 	}
@@ -169,7 +174,10 @@ public class TargetingSubsystem extends SubsystemBase {
 
 	public Command autoTargetPairCommand(Supplier<Pose2d> currentPose, Side preferredSide) {
 		return Commands.runOnce(() -> {
-			autoTargetPair(currentPose, preferredSide);
+			Pose2d targetPose = autoTargetPair(currentPose, preferredSide);
+			Logger.recordOutput("Targeting/TargetBranch", targetBranch.name());
+			Logger.recordOutput("Targeting/TargetSide", targetSide.name());
+			Logger.recordOutput("Targeting/TargetPose", targetPose);
 			System.out.println("Auto-targetting pair complete - Selected: " + targetBranch.name());
 		});
 	}
