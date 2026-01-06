@@ -5,6 +5,7 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.maxHeight;
 import static frc.robot.subsystems.elevator.ElevatorConstants.maxV;
 import static frc.robot.subsystems.elevator.ElevatorConstants.minHeight;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
   private ElevatorIO io;
+  private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   public Elevator(ElevatorIO io) {
     this.io = io;
@@ -82,6 +84,9 @@ public class Elevator extends SubsystemBase {
     if (running) {
       io.setReference(preRenfernce.position * krot, ffValue);
     }
+
+    io.updateInputs(inputs);
+    Logger.processInputs("Elevator", inputs);
   }
 
   public Command setSpeed(DoubleSupplier velo) {
@@ -124,6 +129,10 @@ public class Elevator extends SubsystemBase {
     } else {
       return Limits.NONE;
     }
+  }
+
+  public boolean atDesiredPosition() {
+    return MathUtil.isNear(preRenfernce.position, ffState.position, 0.1);
   }
 
 }

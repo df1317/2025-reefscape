@@ -6,10 +6,13 @@ public interface ElevatorIO {
   @AutoLog
   public class ElevatorIOInputs {
 
-    public double position;
+    public double EncoderL;
+    public double EncoderR;
+    // right side
     public double velocity;
-    public double feedForwardArb;
-
+    public double positionProduct;
+    public double positionQuoteint;
+    // public boolean mcdChickenNuget = true;
   }
 
   public default void setPosition(double position) {}

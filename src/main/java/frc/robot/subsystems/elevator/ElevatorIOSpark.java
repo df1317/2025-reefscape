@@ -5,6 +5,7 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.elevatorCurrentLim
 import static frc.robot.subsystems.elevator.ElevatorConstants.kd;
 import static frc.robot.subsystems.elevator.ElevatorConstants.ki;
 import static frc.robot.subsystems.elevator.ElevatorConstants.kp;
+import static frc.robot.subsystems.elevator.ElevatorConstants.krot;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -69,5 +70,16 @@ public class ElevatorIOSpark implements ElevatorIO {
 
     controllerR.setReference(setpoint, ControlType.kPosition, ClosedLoopSlot.kSlot0,
         feedForwardArb);
+  }
+
+  @Override
+  public void updateInputs(ElevatorIOInputs inputs) {
+    inputs.EncoderL = encoderL.getPosition();
+    inputs.EncoderR = encoderR.getPosition();
+
+    inputs.positionProduct = encoderR.getPosition() * krot;
+    inputs.positionQuoteint = encoderR.getPosition() / krot;
+
+    inputs.velocity = encoderR.getVelocity();
   }
 }
