@@ -12,16 +12,24 @@ public interface ElevatorIO {
 
   }
 
-  public default void setPosition(double position) {
+  public default void setPosition(double position) {}
+
+  public default void setVelocity(double velocity) {}
+
+  public default void setFeedForwardArb(double arb) {}
+
+  public default void updateInputs(ElevatorIOInputs inputs) {}
+
+  public default double getLeftEncoderPosition() {
+    return 0.0;
   }
 
-  public default void setVelocity(double velocity) {
+  public default double getRightEncoderPosition() {
+    return 0.0;
   }
 
-  public default void setFeedForwardArb() {
-  }
+  public default void motorBreak() {}
 
-  public default void updateInputs(ElevatorIOInputs inputs) {
-  }
+  public default void setReference(double setpoint, double feedForwardArb) {}
 
 }
